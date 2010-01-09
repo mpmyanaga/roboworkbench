@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="Reference" link_to="toc.xml#reference">
+	<topic href="doc/reference/architecture.html" label="Architecture">
+    <anchor id="architecture"/>
+	</topic> 
+	<topic label="JavaDoc"  href="doc/reference/javadoc/index.html">
+    <anchor id="javadoc"/> 
+	</topic> 
+</toc>

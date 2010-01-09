@@ -1,0 +1,18 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: Robot Workbench
+Bundle-SymbolicName: uk.co.dancowan.robots.ui;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: uk.co.dancowan.robots.ui.Activator
+Bundle-Vendor: Dan Cowan
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ org.junit,
+ uk.co.dancowan.robots.hal;bundle-version="1.0.0",
+ org.eclipse.help.ui;bundle-version="3.4.1",
+ org.eclipse.help.webapp;bundle-version="3.4.1"
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-ClassPath: .
+Export-Package: uk.co.dancowan.robots.ui,
+ uk.co.dancowan.robots.ui.utils,
+ uk.co.dancowan.robots.ui.views

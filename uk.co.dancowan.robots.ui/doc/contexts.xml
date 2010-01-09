@@ -1,0 +1,22 @@
+<contexts>
+    <context id="keypadView">
+      <description>The Keypad View is a configurable view which displays action sets contributed via the commandButton extension point.
+
+Buttons may be push or toggle buttons and may also belong to radio sets.
+
+Commands fired by the buttons should not expect a response</description>
+   </context>
+   <context id="commandConsole">
+      <description>The Command Console is as much a logging view for commands as it is an input method.
+
+Use the CommandConsole at different levels of details to track services, commands and program exceptions to better debug and understand robot control.
+
+The command console embeds a command line which will translate from decimal input into hex if necessary.</description>
+   </context>
+   <context id="connectionView">
+      <description>The Connection View allows for control over the connection to the robot. An additional log window displays connection activity.
+The view can be used to configure the connection to a robot and to monitor that link.</description>
+      <topic href="doc/concepts/connection-concept.html" label="Connection Concept" />
+   </context>
+
+</contexts>

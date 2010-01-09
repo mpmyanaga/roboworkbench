@@ -1,0 +1,198 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="uk.co.dancowan.robots.ui" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="uk.co.dancowan.robots.ui" id="commandButton" name="CommandButton"/>
+      </appinfo>
+      <documentation>
+         Extension point to add atomic command buttons for use in the KeypadView.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="commandButton" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="commandButton">
+      <annotation>
+         <documentation>
+            Defines a new command button for use in the KeyPadView
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  This command button&apos;s id.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="tooltip" type="string">
+            <annotation>
+               <documentation>
+                  An optional tooltip describing the command
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="type" use="required">
+            <annotation>
+               <documentation>
+                  Identifies PUSH or TOGGLE button. TOGGLE buttons must supply an off-action class.
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="push">
+                  </enumeration>
+                  <enumeration value="toggle">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+         <attribute name="radioID" type="string">
+            <annotation>
+               <documentation>
+                  An optional attribute to assign a radio group id. Allows TOGGLE buttons with the same radioID to share radio button behaviour.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="icon" type="string">
+            <annotation>
+               <documentation>
+                  An image icon ID
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  The command&apos;s name, will be written on the utton if no image icon is set.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="onCmd" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The HEX string for the command to send when selected.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="offCmd" type="string">
+            <annotation>
+               <documentation>
+                  Optional HEX string command to send when deselected (toggle behaviour)
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="index" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The index of the button to associate with in the grid. Should be a non-negative integer and unique amongst commandButton extensions.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="return" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The length of the expected return string, or -1 to expect an line ending char.
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="encode">
+            <annotation>
+               <documentation>
+                  does the command string need encoding in hexadecimal
+               </documentation>
+            </annotation>
+            <simpleType>
+               <restriction base="string">
+                  <enumeration value="true">
+                  </enumeration>
+                  <enumeration value="false">
+                  </enumeration>
+               </restriction>
+            </simpleType>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         Version 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         On and off actions should implement &lt;code&gt;uk.co.dancowan.srv1q.hal.Command&lt;/cmd&gt;. These commands should be simple and require a no-args constructor for the extension point factory.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         [Enter information about supplied implementation of this extension point.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         (c) 2009 Dan Cowan
+      </documentation>
+   </annotation>
+
+</schema>
