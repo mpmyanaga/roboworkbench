@@ -1,0 +1,20 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: HAL
+Bundle-SymbolicName: uk.co.dancowan.robots.hal;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: uk.co.dancowan.robots.hal.HALActivator
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Require-Bundle: 
+ org.eclipse.core.runtime,
+ org.junit
+Export-Package: 
+ uk.co.dancowan.robots.hal;uses:="org.eclipse.core.runtime,org.osgi.framework",
+ uk.co.dancowan.robots.hal.core,
+ uk.co.dancowan.robots.hal.core.commands,
+ uk.co.dancowan.robots.hal.logger
+Bundle-ClassPath: 
+ lib/,
+ lib/RXTXcomm.jar,
+ .
