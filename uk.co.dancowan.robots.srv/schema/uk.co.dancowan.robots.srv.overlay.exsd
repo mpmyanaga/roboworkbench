@@ -1,0 +1,117 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="uk.co.dancowan.robots.srv" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="uk.co.dancowan.robots.srv" id="overlay" name="Overlay"/>
+      </appinfo>
+      <documentation>
+         Extension point for adding overlay contributions. Overlay&apos;s are classes which will render additional information on top of the SRV1 camera&apos;s image stream. The extnesion point requires a single attribute: the class name of a Java class implementing the OverlayContributor interface. Overlays will be added to the OverlayManager class which will in turn add them to the CameraCanvas class for rendering. The OverlayManager class lets callers obtain a reference to the overlay instance so it can be manipulated programatically as required.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="overlay" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="overlay">
+      <annotation>
+         <documentation>
+            Adds an OverlayContributor to the Camera View
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class supplied here must implement the OverlayContributor interface.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         [Enter extension point usage example here.]
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         This extension point requires a class which implements uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor. See the Javadoc for this class for further information.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="implementation"/>
+      </appinfo>
+      <documentation>
+         The BlobOverlay class is an example of an internal use of this extension point. The BlobOverlay class renders the FeatureDetectors bloblist for the currently focussed colour bin. Blobs are indicated by a coloured rectangle.
+
+Rendering the blobs can be turned on and off from an action button situated in the Camera view. This button toggle&apos;s the overlay&apos;s &lt;i&gt;shouldRun&lt;/i&gt; flag. Blobs are updated by the FeatureDetector, the overlay should just be responsible for painting some additional content but not for sourcing and maintaining that content. It is advisable to make the overlay&apos;s paint method as fast as possible.
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         (c) 2009, 2010 D. J. Cowan
+      </documentation>
+   </annotation>
+
+</schema>

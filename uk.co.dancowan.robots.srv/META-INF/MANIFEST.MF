@@ -1,0 +1,15 @@
+Manifest-Version: 1.0
+Bundle-ManifestVersion: 2
+Bundle-Name: SRV
+Bundle-SymbolicName: uk.co.dancowan.robots.srv;singleton:=true
+Bundle-Version: 1.0.0
+Bundle-Activator: uk.co.dancowan.robots.srv.SRVActivator
+Require-Bundle: org.eclipse.ui,
+ org.eclipse.core.runtime,
+ uk.co.dancowan.robots.ui,
+ org.junit,
+ uk.co.dancowan.robots.hal;bundle-version="1.0.0",
+ org.eclipse.help
+Bundle-ActivationPolicy: lazy
+Bundle-RequiredExecutionEnvironment: JavaSE-1.6
+Bundle-Vendor: Dan Cowan

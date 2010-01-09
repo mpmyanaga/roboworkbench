@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.6"/>
+	<classpathentry kind="con" path="org.eclipse.pde.core.requiredPlugins"/>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="test"/>
+	<classpathentry combineaccessrules="false" kind="src" path="/uk.co.dancowan.robots.hal">
+		<accessrules>
+			<accessrule kind="accessible" pattern="*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry combineaccessrules="false" kind="src" path="/uk.co.dancowan.robots.ui">
+		<accessrules>
+			<accessrule kind="accessible" pattern="*"/>
+		</accessrules>
+	</classpathentry>
+	<classpathentry kind="lib" path="lib/wstreamd_embed.jar"/>
+	<classpathentry kind="lib" path="C:/Program Files/eclipse-rcp/plugins/org.junit_3.8.2.v20090203-1005/junit.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
