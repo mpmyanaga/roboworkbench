@@ -116,16 +116,16 @@ public class HALRegistry
 			c.componentAdded(component);
 		}
 
-		INFO_LOGGER.fine(component.getID() + " registered.");
+		INFO_LOGGER.fine(component.getID() + " registered");
 	}
 
 	/**
-	 * Return the <code>Component</code> for the given ID.
+	 * Return the <code>Component</code> for the given class.
 	 * 
 	 * <p>Calling classes should not hold on to references to Components
 	 * because they may be removed from the registry or replaced.</p>
 	 * 
-	 * @param id the Component ID
+	 * @param cls the Component's Class
 	 * @return the Component
 	 */
 	public Component get(Class<? extends Component> cls)

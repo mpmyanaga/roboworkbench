@@ -14,7 +14,7 @@
 package uk.co.dancowan.robots.hal.core;
 
 /**
- * Interface for SRV1 connection events.
+ * Interface for connection listeners.
  * 
  * @author Dan Cowan
  * @since version 1.0.0

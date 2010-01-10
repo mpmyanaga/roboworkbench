@@ -24,7 +24,7 @@ import java.util.logging.Logger;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 
 /**
- * Configuration class handles persistent non UI configuration properties. 
+ * Configuration class handles essential and persistent non UI configuration properties. 
  */
 public class Config
 {
@@ -40,6 +40,7 @@ public class Config
 
 	/**
 	 * Read the standard properties file <code>.config</code>
+	 * 
 	 * <p>Properties are expected in the form:
 	 * <pre>    name=value</pre>
 	 * in a simple text file. Property names and values should
@@ -79,44 +80,4 @@ public class Config
 		}
 		sIsReady = true;
 	}
-
-	/**
-	 * Write the properties to file.
-	 * 
-	 * <p>Properties are stored in the form:
-	 * <pre>    name=value</pre>
-	 * in a simple text file. Property names and values should avoid onerous
-	 * characters.</p>
-	 * 
-	 * @throws IOException
-	 */
-	/*public static void saveConfig()
-	{
-		BufferedWriter writer;
-		try
-		{
-			File file = new File(Config.class.getClassLoader().getResource(CONFIG_FILE).toURI());
-			writer = new BufferedWriter (new FileWriter(file));
-
-			INFO_LOGGER.fine("Config writing to file:");
-
-			for(String property : sProperties.keySet())
-			{
-				String value = sProperties.get(property);
-				INFO_LOGGER.finer("    " + property + SEP + value);
-				writer.write(property + SEP + value);
-				writer.newLine();
-			}
-	
-			writer.close();
-		}
-		catch (IOException e)
-		{
-			ERROR_LOGGER.finest("Config.saveConfig() : " + e.getMessage());
-		}
-		catch (URISyntaxException e)
-		{
-			ERROR_LOGGER.finest("Config.saveConfig() : " + e.getMessage());
-		}
-	}*/
 }

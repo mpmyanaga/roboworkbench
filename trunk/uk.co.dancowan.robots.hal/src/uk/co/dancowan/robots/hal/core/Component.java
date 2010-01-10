@@ -14,14 +14,13 @@
 package uk.co.dancowan.robots.hal.core;
 
 /**
- * Interface to mark a physical components of the SRV1 system.
+ * Interface for physical/logical hardware components of a robotic platform.
  * 
- * <p>Interface determines methods used with the <code>ComponentRegistry
- * </code> to allow for managing various components and their dependencies.
- * </p>
+ * <p>Interface determines methods used with the <code>ComponentRegistry</code> to allow for
+ * managing various components and their dependencies.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public interface Component
 {
@@ -34,9 +33,9 @@ public interface Component
 
 	/**
 	 * Return true if this <code>Component</code> is an extension of a Java
-	 * <code>Thread</code> which needs starting.
+	 * <code>Thread</code> which needs starting on registration.
 	 * 
-	 * <p><code>Component</code> must implement <code>Thread</code></p>
+	 * <p><code>Component</code> must extend <code>Thread</code></p>
 	 * 
 	 * @return boolean
 	 */
