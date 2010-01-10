@@ -28,7 +28,7 @@ package uk.co.dancowan.robots.hal.logger;
  * <p>ROOT_LOGGER is the root logger for both the information and exception loggers.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class LoggingService
 {
