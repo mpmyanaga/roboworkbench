@@ -458,9 +458,9 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	private void connect(final boolean connect)
 	{
 		if (connect)
-			mConnection.openSRVConnection();
+			mConnection.openConnection();
 		else
-			mConnection.closeSRVConnection();
+			mConnection.closeConnection();
 
 		if (mConnection.isConnected())
 			mConnectButton.setText("Disconnect");
