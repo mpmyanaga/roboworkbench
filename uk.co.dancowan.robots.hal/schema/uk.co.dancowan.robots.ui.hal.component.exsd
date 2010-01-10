@@ -1,0 +1,125 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<!-- Schema file written by PDE -->
+<schema targetNamespace="uk.co.dancowan.srv1q" xmlns="http://www.w3.org/2001/XMLSchema">
+<annotation>
+      <appinfo>
+         <meta.schema plugin="uk.co.dancowan.srv1q" id="component" name="Component"/>
+      </appinfo>
+      <documentation>
+         Extension point to add Components to the hardware abstraction layer.
+      </documentation>
+   </annotation>
+
+   <element name="extension">
+      <annotation>
+         <appinfo>
+            <meta.element />
+         </appinfo>
+      </annotation>
+      <complexType>
+         <sequence>
+            <element ref="component" minOccurs="1" maxOccurs="unbounded"/>
+         </sequence>
+         <attribute name="point" type="string" use="required">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+            </annotation>
+         </attribute>
+         <attribute name="name" type="string">
+            <annotation>
+               <documentation>
+                  
+               </documentation>
+               <appinfo>
+                  <meta.attribute translatable="true"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <element name="component">
+      <annotation>
+         <documentation>
+            A hardware component of the system.
+         </documentation>
+      </annotation>
+      <complexType>
+         <attribute name="class" type="string" use="required">
+            <annotation>
+               <documentation>
+                  The class for this component. Class must have a no-args constructor and must implement &lt;code&gt;uk.co.dancowan.srv1q.hal.Component&lt;/code&gt;.
+               </documentation>
+               <appinfo>
+                  <meta.attribute kind="java" basedOn=":uk.co.dancowan.srv1q.hal.Component"/>
+               </appinfo>
+            </annotation>
+         </attribute>
+         <attribute name="id" type="string" use="required">
+            <annotation>
+               <documentation>
+                  Should match the components internal ID returned by &lt;code&gt;String getID()&lt;/code&gt;.
+               </documentation>
+            </annotation>
+         </attribute>
+      </complexType>
+   </element>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="since"/>
+      </appinfo>
+      <documentation>
+         version 1.0.0
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="examples"/>
+      </appinfo>
+      <documentation>
+         &lt;extension
+      point=&quot;SRV1q.component&quot;&gt;
+      &lt;component
+          class=&quot;uk.co.dancowan.srv1q.hal.SRV1&quot;&gt;
+      &lt;/component&gt;
+      &lt;component
+          class=&quot;uk.co.dancowan.srv1q.hal.camera.Camera&quot;&gt;
+      &lt;/component&gt;
+      &lt;component
+          class=&quot;uk.co.dancowan.srv1q.hal.Motors&quot;&gt;
+      &lt;/component&gt;
+&lt;/extension&gt;
+      </documentation>
+   </annotation>
+
+   <annotation>
+      <appinfo>
+         <meta.section type="apiinfo"/>
+      </appinfo>
+      <documentation>
+         Class contribution must implement &lt;code&gt;uk.co.dancowan.srv1q.hal.Component&lt;/code&gt; and must offer a no-args construtor for the extesion point factory to use.
+      </documentation>
+   </annotation>
+
+
+   <annotation>
+      <appinfo>
+         <meta.section type="copyright"/>
+      </appinfo>
+      <documentation>
+         (c) 2009 Dan Cowan
+      </documentation>
+   </annotation>
+
+</schema>
