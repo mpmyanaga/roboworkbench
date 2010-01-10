@@ -1,0 +1,27 @@
+Create command parser for services
+
+Create memento in lifecycle
+
+Create an Image handling service
+
+Create GPIO hardware abstraction
+
+Create Lasers hardware abstraction
+
+Create I2C hardware abstraction
+
+Create Neural Network views attached to Camera
+
+Create pico-c editor
+
+Create ways to update robot firmware
+
+Create a terminal to connect to the MatchPoint wireless
+
+Complete initial SRV1 command set
+
+Review all Javadoc and build docs for each plugin
+
+Write Help, create schema docs, architecture, basic intro to robot and how-to's from the blog (link to the blog
+
+Get docs from the SRV1 site for redistribution 

@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?eclipse version="3.4"?>
+<plugin>
+   <extension-point id="uk.co.dancowan.robots.ui.commandButton" name="CommandButton" schema="schema/uk.co.dancowan.robots.ui.commandButton.exsd"/>
+
+   <extension
+         id="application"
+         point="org.eclipse.core.runtime.applications">
+      <application>
+         <run
+               class="uk.co.dancowan.robots.ui.Application">
+         </run>
+      </application>
+   </extension>
+   
+   <extension
+         point="org.eclipse.core.runtime.products">
+      <product
+            application="uk.co.dancowan.robots.ui.Application"
+            description="Workbench for developing and interacting with small mobile robots."
+            name="RoboWorkbench">
+         <property
+               name="aboutText"
+               value="RoboWorkbench v1.0.0\n\n(c) 2009 Dan Cowan\n\ndan@dancowan.co.uk">
+         </property>
+         <!-- <property
+               name="windowImages"
+               value="icons/window_icon.gif">
+         </property>
+         <property
+               name="aboutImage"
+               value="icons/about_image.gif">
+         </property> -->
+      </product>
+   </extension>
+
+  
+   <extension
+         point="org.eclipse.ui.perspectives">
+      <perspective
+            class="uk.co.dancowan.robots.ui.Perspective"
+            fixed="false"
+            id="uk.co.dancowan.robots.ui.basicPerspective"
+            name="Basic Perspective">
+      </perspective>
+   </extension>
+   
+   <extension
+         point="org.eclipse.ui.views">
+      <view
+            class="uk.co.dancowan.robots.ui.views.connection.ConnectionView"
+            icon="icons/view_connection.gif"
+            id="uk.co.dancowan.robots.ui.connectionView"
+            name="Connection">
+      </view>
+      <view
+            class="uk.co.dancowan.robots.ui.views.commandConsole.CommandConsole"
+            icon="icons/view_command.gif"
+            id="uk.co.dancowan.robots.ui.commandConsole"
+            name="Command Console">
+      </view>
+      <view
+            class="uk.co.dancowan.robots.ui.views.keypad.KeypadView"
+            icon="icons/view_keypad.gif"
+            id="uk.co.dancowan.robots.ui.keypadView"
+            name="Keypad">
+      </view>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="uk.co.dancowan.robots.ui.preferences.CommandConsolePreferencePage"
+            id="uk.co.dancowan.robots.ui.preferences.LoggerPreferencePage"
+            name="Command Console">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="uk.co.dancowan.robots.ui.preferences.ConnectionPreferencePage"
+            id="uk.co.dancowan.robots.ui.preferences.ConnectionPreferencePage"
+            name="Connection">
+      </page>
+   </extension>
+   <extension
+         point="org.eclipse.core.runtime.preferences">
+      <initializer
+            class="uk.co.dancowan.robots.ui.preferences.PreferenceInitializer">
+      </initializer>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="doc/toc.xml"
+            primary="true">
+      </toc>
+      <toc
+            file="doc/tocconcepts.xml">
+      </toc>
+      <toc
+            file="doc/tocgettingstarted.xml">
+      </toc>
+      <toc
+            file="doc/tocreference.xml">
+      </toc>
+   </extension>
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="doc/contexts.xml">
+      </contexts>
+   </extension>
+</plugin>

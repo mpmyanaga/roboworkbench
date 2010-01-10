@@ -1,0 +1,11 @@
+uk.co.dancowan.robots.hal
+uk.co.dancowan.robots.hal.core
+uk.co.dancowan.robots.hal.core.commands
+uk.co.dancowan.robots.hal.logger
+uk.co.dancowan.robots.ui
+uk.co.dancowan.robots.ui.preferences
+uk.co.dancowan.robots.ui.utils
+uk.co.dancowan.robots.ui.views
+uk.co.dancowan.robots.ui.views.actions
+uk.co.dancowan.robots.ui.views.commandConsole
+uk.co.dancowan.robots.ui.views.connection
