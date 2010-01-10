@@ -13,24 +13,27 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.hal.core;
 
-
 /**
- * Abstract base class for <code>Component</code>s.
+ * Abstract base class for Components.
  * 
- * <p>Implements the interface with no-operation methods.</p>
+ * <p>Implements the <code>Component</code> interface, mostly with no-operation methods.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public abstract class AbstractComponent implements Component
 {
 	/**
+	 * Extending classes must return a unique component identifier in String form.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#getID()
 	 */
 	@Override
 	public abstract String getID();
 
 	/**
+	 * Base implementation does nothing.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#componentAdded(uk.co.dancowan.robots.hal.core.Component)
 	 */
 	@Override
@@ -40,6 +43,8 @@ public abstract class AbstractComponent implements Component
 	}
 
 	/**
+	 * Base implementation does nothing.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#componentRemoved(uk.co.dancowan.robots.hal.core.Component)
 	 */
 	@Override
@@ -49,6 +54,8 @@ public abstract class AbstractComponent implements Component
 	}
 
 	/**
+	 * Base implementation returns false.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#requiresThreadStartup()
 	 */
 	@Override

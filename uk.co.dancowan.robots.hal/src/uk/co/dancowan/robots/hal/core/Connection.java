@@ -34,13 +34,12 @@ import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 
 /**
- * Handles establishing a connection to the SRV.
+ * Handles establishing a connection to a robotic platform.
  * 
- * <p>Creates low level methods to connect to, read to and
- * write from the connection's I/O streams.</p>
+ * <p>Creates low level methods to connect to, read to and write from the connection's
+ * I/O streams.</p>
  * 
- * <p><code>ConnectionListener</code>s may be added to track
- * low level communications.</p>
+ * <p><code>ConnectionListener</code>s may be added to track low level communications.</p>
  *
  * @author Dan Cowan
  * @since version 1.0.0
@@ -91,6 +90,8 @@ public class Connection implements Component
 	}
 
 	/**
+	 * Return's the connections identifier: 'Connection'.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#getID()
 	 */
 	@Override
@@ -100,6 +101,8 @@ public class Connection implements Component
 	}
 
 	/**
+	 * Connection does not require thread startup.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#requiresThreadStartup()
 	 */
 	@Override
@@ -109,7 +112,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Adds a <code>ConnectionListener</code> to the collection of listeners
+	 * Adds the passed <code>ConnectionListener</code> to the collection of listeners
 	 * notified of connection events.
 	 * 
 	 * @param listener the listener to be added
@@ -131,20 +134,18 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Open a connection to the SRV.
+	 * Open a connection to the robot hardware.
 	 * 
-	 * <p>If configuration indicates this is a networked SRV then a network
-	 * connection is opened, otherwise a serial connection on a com port is opened.
-	 * The WCSPush service is started in its own thread to push images to the WebCamSat
-	 * service.</p>
+	 * <p>If configuration indicates this is a networked robot then a network
+	 * connection is opened, otherwise a serial connection on a Com port is opened.</p>
 	 */
-	public void openSRVConnection()
+	public void openConnection()
 	{
 		if (isNetworkPort())
 		{
-			if (openNetworkSRV())
+			if (openNetworkConnection())
 			{
-				INFO_LOGGER.fine("SRV1Connection network opened");
+				INFO_LOGGER.fine("Connection network opened");
 				fireConnectionEvent(CONNECTED);
 			}
 		}
@@ -152,8 +153,8 @@ public class Connection implements Component
 		{
 			if (openSerialPort())
 			{
-				INFO_LOGGER.fine("SRV1Connection com port opened");
-				fireConnectionEvent(DISCONNECTED);
+				INFO_LOGGER.fine("Connection Com port opened");
+				fireConnectionEvent(CONNECTED);
 			}
 		}
 	}
@@ -161,13 +162,15 @@ public class Connection implements Component
 	/**
 	 * Closes the connection and tidies up the resources.
 	 */
-	public void closeSRVConnection()
+	public void closeConnection()
 	{
 		if (! isConnected())
 			return;
 
 		if ( ! isNetworkPort())
 			closeSerialPort();
+
+		fireConnectionEvent(DISCONNECTED);
 
 		try
 		{
@@ -199,7 +202,7 @@ public class Connection implements Component
 		}
 		mSocket = null;
 		
-		INFO_LOGGER.log(Level.FINE, "SRV1Connection closed");
+		INFO_LOGGER.log(Level.FINE, "Connection closed");
 		for (ConnectionListener listener : mConnectionListeners)
 		{
 			listener.disconnected();
@@ -209,7 +212,8 @@ public class Connection implements Component
 	/**
 	 * Sets the connection mode.
 	 * 
-	 * <p>Mode could be networked wireless or serial over com.</p>
+	 * <p>Mode could be networked wireless or serial over Com.</p>
+	 * 
 	 * @param isNetwork
 	 */
 	public void setNetwork(boolean isNetwork)
@@ -219,6 +223,7 @@ public class Connection implements Component
 
 	/**
 	 * Sets the port number in wireless mode.
+	 * 
 	 * @param port the port number >= 0
 	 */
 	public void setNetworkPort(int port)
@@ -227,7 +232,8 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Sets the host name or IP-address of the SRV.
+	 * Sets the host name or IP-address of the robot in network mode.
+	 * 
 	 * @param host
 	 */
 	public void setHost(String host)
@@ -237,7 +243,8 @@ public class Connection implements Component
 
 	/**
 	 * Returns the configured network port.
-	 * @return int
+	 * 
+	 * @return int the network port number
 	 */
 	public int getNetworkPort()
 	{
@@ -246,7 +253,8 @@ public class Connection implements Component
 
 	/**
 	 * Returns the configured host name or ip-address.
-	 * @return
+	 * 
+	 * @return String host name or address
 	 */
 	public String getHost()
 	{
@@ -254,7 +262,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Sets the com port to use for the connection.
+	 * Sets the Com port to use for the connection.
 	 * 
 	 * @param port the port ID to connect to.
 	 */
@@ -264,7 +272,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Returns the com port configured for this connection.
+	 * Returns the Com port configured for this connection.
 	 * 
 	 * @return String
 	 */
@@ -274,7 +282,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Returns a list of available com serial ports.
+	 * Returns a list of available Com ports.
 	 * 
 	 * @return List<String>
 	 */
@@ -319,7 +327,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Reads from the InputStream into the passed <code>byte[]</code> frame.
+	 * Reads from the InputStream into the passed <code>byte[]</code> chunk.
 	 * 
 	 * <p>Wraps a call to <code>int java.io.InputStream.read(byte[], int, int)</code>.</p>
 	 * 
@@ -327,10 +335,10 @@ public class Connection implements Component
 	 * @return int, the status of the call
 	 * @throws IOException
 	 */	
-	public int read(byte[] frame, int pos, int len) throws IOException
+	public int read(byte[] chunk, int pos, int len) throws IOException
 	{
-		int read = mInputStream.read(frame, pos, len);
-		fireRXEvent(new String(frame));
+		int read = mInputStream.read(chunk, pos, len);
+		fireRXEvent(new String(chunk));
 		return read;
 	}
 
@@ -464,10 +472,11 @@ public class Connection implements Component
 	/**
 	 * Flushes the InputStream.
 	 * 
-	 * <p>Wraps a call to <code>int java.io.InputStream.flush()</code>.</p>
+	 * <p>Reads remaining bytes from the straem into the return string until the stream is empty.</p>
 	 * 
 	 * @see int java.io.InputStream
 	 * @throws IOException
+	 * @return String the remaining bytes that were 'flushed' from the stream
 	 */
 	public String flushIntput() throws IOException
 	{
@@ -496,7 +505,7 @@ public class Connection implements Component
 	/**
 	 * Returns true if this connection uses a network port.
 	 * 
-	 * <p>A network port is distinguished from a standard Comm port.</p>
+	 * <p>A network port is distinguished from a standard Com port.</p>
 	 * 
 	 * @return true if this connection uses a network port
 	 */
@@ -553,7 +562,7 @@ public class Connection implements Component
 					}
 					catch (PortInUseException e)
 					{
-						ERROR_LOGGER.finest("SRV1Connection.openSerialPort(): " + e.getMessage());
+						ERROR_LOGGER.finest("Connection.openSerialPort(): " + e.getMessage());
 						fireErrorEvent(e.getMessage());
 						return false;
 					}
@@ -567,7 +576,7 @@ public class Connection implements Component
 					}
 					catch (IOException e)
 					{
-						ERROR_LOGGER.finest("SRV1Connection.openSerialPort(): " + e.getMessage());
+						ERROR_LOGGER.finest("Connection.openSerialPort(): " + e.getMessage());
 						fireErrorEvent(e.getMessage());
 						return false;
 					}
@@ -660,9 +669,9 @@ public class Connection implements Component
 	}
 
 	/*
-	 * Open connection to networked SRV
+	 * Open connection to networked robot
 	 */
-	private boolean openNetworkSRV()
+	private boolean openNetworkConnection()
 	{	
 		if (mHost != null && mPort > 0)
 		{
@@ -679,7 +688,7 @@ public class Connection implements Component
 				{
 					listener.error(e.getMessage());
 				}
-				ERROR_LOGGER.finest("SRV1Connection.openNetworkSRV(): " + e.getMessage());
+				ERROR_LOGGER.finest("Connection.openNetworkConnection(): " + e.getMessage());
 				return false;
 			}
 		}
@@ -690,7 +699,7 @@ public class Connection implements Component
 			{
 				listener.error(msg);
 			}
-			INFO_LOGGER.finest("SRV1Connection.openNetworkSRV():" + msg);
+			INFO_LOGGER.finest("Connection.openNetworkConnection():" + msg);
 			return false;
 		}
 	}
@@ -709,7 +718,7 @@ public class Connection implements Component
 		}
 		catch (UnsupportedCommOperationException e)
 		{
-			INFO_LOGGER.finest("SRV1Connection.setBPS(): " + e.getMessage());
+			INFO_LOGGER.finest("Connection.setBPS(): " + e.getMessage());
 			fireErrorEvent(e.getMessage());
 		}
 

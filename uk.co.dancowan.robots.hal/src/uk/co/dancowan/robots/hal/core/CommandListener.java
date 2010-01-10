@@ -13,9 +13,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.hal.core;
 
-
 /**
- * Interface for objects wishing to monitor a <code>Command</code>.
+ * Interface for objects needing to monitor a <code>Command</code>.
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -24,20 +23,22 @@ public interface CommandListener
 {
 	/**
 	 * Called when a <code>Command</code> begins execution.
+	 * 
+	 * @param event CommandEvent
 	 */
-	public void commandExecuted(CommandEvent e);
+	public void commandExecuted(CommandEvent event);
 	
 	/**
 	 * Called when a <code>Command</code> completes execution.
 	 * 
-	 * @param result CommandEvent
+	 * @param event CommandEvent
 	 */
-	public void commandCompleted(CommandEvent e);
+	public void commandCompleted(CommandEvent event);
 
 	/**
 	 * Called when a <code>Command</code> fails to execute.
 	 * 
-	 * @param result CommandEvent
+	 * @param event CommandEvent
 	 */
-	public void commandFailed(CommandEvent e);
+	public void commandFailed(CommandEvent event);
 }

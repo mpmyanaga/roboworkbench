@@ -13,10 +13,9 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.hal.core;
 
-
 /**
- * Event class thrown by <code>Command</code> instances to indicate
- * events in the life cycle of the <code>Command</code>.
+ * Event class thrown by <code>Command</code> instances to indicate events in the life
+ * cycle of the <code>Command</code>.
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -32,8 +31,8 @@ public class CommandEvent
 	/**
 	 * C'tor.
 	 * 
-	 * @param id the Command's ID field
-	 * @param message the event's message
+	 * @param source the Command which fired the event
+	 * @param message String, the event's message
 	 */
 	public CommandEvent(Command source, String message)
 	{

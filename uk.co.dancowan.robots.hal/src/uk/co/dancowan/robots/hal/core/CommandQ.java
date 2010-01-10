@@ -23,16 +23,19 @@ import uk.co.dancowan.robots.hal.logger.LoggingService;
 
 
 /**
- * Manages the command communication between the console and the hardware SRV.
+ * Manages the command communication between the console and the robot hardware.
  * 
  * <p>Class uses a <code>BlockingQue</code> to pipe <code>Command</code> objects
- * from client code into a dispatch loop. Class creates an <code>SRV1Connection</code>
+ * from client code into a dispatch loop. Class creates a <code>Connection</code>
  * instance enabling two way communication between the dispatched <code>Command</code>
- * and the SRV hardware.</p>
+ * and the robot hardware.</p>
  * 
  * <p>Where possible long running <code>Command</code> instances should be cancellable
  * by higher priority <code>Command</code>s at the top of the queue. All <Code>Command
  * </code> instances are ordered by priority in the queue.</p>
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
  */
 public class CommandQ extends Thread implements Component
 {
@@ -40,7 +43,7 @@ public class CommandQ extends Thread implements Component
 
 	private static final Logger LOGGER = Logger.getLogger(LoggingService.INFO_LOGGER);
 
-	private final Object sMutex = new Object();
+	private final Object mMutex = new Object();
 	private final Connection mConnection;
 	private final BlockingQueue<Command> mCommandQ;
 
@@ -48,10 +51,10 @@ public class CommandQ extends Thread implements Component
 	private boolean mShouldRun;
 
 	/**
-	 * Creates a new SRV1 instance.
+	 * Creates a new CommandQ instance.
 	 * 
-	 * <p>Object will create a <code>Connection<code> instance
-	 * for communication with the target device.</p>
+	 * <p>Object will create a <code>Connection<code> instance for communication with
+	 * the target device.</p>
 	 */
 	public CommandQ()
 	{
@@ -64,6 +67,8 @@ public class CommandQ extends Thread implements Component
 	}
 
 	/**
+	 * Returns the Components identifier: 'CommandQ'.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#getID()
 	 */
 	public String getID()
@@ -72,6 +77,8 @@ public class CommandQ extends Thread implements Component
 	}
 
 	/**
+	 * CommandQ does require thread startup by the HAL on registry.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#requiresThreadStartup()
 	 */
 	public boolean requiresThreadStartup()
@@ -80,9 +87,9 @@ public class CommandQ extends Thread implements Component
 	}
 
 	/**
-	 * Returns the queue's <code>SRV1Connection</code> instance.
+	 * Returns the queue's <code>Connection</code> instance.
 	 * 
-	 * @return SRV1Connection
+	 * @return Connection
 	 */
 	public Connection getConnection()
 	{
@@ -94,7 +101,7 @@ public class CommandQ extends Thread implements Component
 	 * 
 	 * <p>Waits on commands to execute. If the run flag is set to <code>false
 	 * <code> the thread will sleep briefly before checking the flag again and
-	 * not execute the next command.</p>
+	 * not execute the next command until the flag is set true.</p>
 	 * 
 	 * @see java.lang.Thread
 	 */
@@ -141,14 +148,28 @@ public class CommandQ extends Thread implements Component
 	/**
 	 * Stops the thread running additional commands.
 	 * 
-	 * <p>Uses a flag in the command dispatch loop to halt the loop, the
-	 * <code>Thread</code> is not stopped or paused using normal Thread methods.</p>
+	 * <p>Uses a flag in the command dispatch loop to halt the loop, the <code>Thread</code> is
+	 * not stopped or paused using normal (depricated) Thread methods.</p>
 	 */
 	public void pause()
 	{
-		synchronized(sMutex)
+		synchronized(mMutex)
 		{
 			mShouldRun = false;
+		}
+	}
+
+	/**
+	 * Allows the thread to resume running commands.
+	 * 
+	 * <p>Uses a flag in the command dispatch loop to restart the loop, the <code>Thread</code> is
+	 * not stopped or paused using normal (depricated) Thread methods.</p>
+	 */
+	public void restart()
+	{
+		synchronized(mMutex)
+		{
+			mShouldRun = true;
 		}
 	}
 
@@ -159,7 +180,7 @@ public class CommandQ extends Thread implements Component
 	 */
 	public boolean shouldRun()
 	{
-		synchronized(sMutex)
+		synchronized(mMutex)
 		{
 			return mShouldRun;
 		}
@@ -168,8 +189,8 @@ public class CommandQ extends Thread implements Component
 	/**
 	 * Adds the Command to the command queue.
 	 * 
-	 * <p>Uses <code>BlockingQueue.offer(e)</code> method to insert
-	 * the command only if there is room in the queue.</p>
+	 * <p>Uses <code>BlockingQueue.offer(e)</code> method to insert the command only if
+	 * there is room in the queue.</p>
 	 * 
 	 * @param cmd the Command to add
 	 */
@@ -180,27 +201,34 @@ public class CommandQ extends Thread implements Component
 			if (mConnection.isConnected())
 			{
 				if (mCommandQ.contains(cmd))
+				{
 					LOGGER.finest(cmd.getName() + " already in the command queue, command not added.");
+				}
 				else
-					mCommandQ.offer(cmd);
+				{
+					if (!mCommandQ.offer(cmd))
+						LOGGER.finest("CommandQ overloaded, " + cmd.getName() + " not added.");
+				}
 				checkInteruptions();
 			}
 		}
 	}
 
 	/**
-	 * <code>SRV1</code> will add a <code>Connection</code> instance to the <code>ComponentRegistry</code>.
+	 * Implementation does nothing.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#componentAdded(uk.co.dancowan.robots.hal.core.Component)
 	 */
 	@Override
 	public void componentAdded(Component component)
 	{
-		//if (component.getID().equals(ID))
-			//HALRegistry.getInsatnce().register(mConnection);
+		// No Components effect this component, it holds an internal reference
+		// to its Connection class.
 	}
 
 	/**
+	 * Implementation does nothing.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Component#componentRemoved(uk.co.dancowan.robots.hal.core.Component)
 	 */
 	@Override

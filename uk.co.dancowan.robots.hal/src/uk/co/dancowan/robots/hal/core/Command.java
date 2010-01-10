@@ -13,18 +13,17 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.hal.core;
 
-
 /**
- * Interface for an SRV1 command.
+ * Interface for a robot command.
 
  * @author Dan Cowan
- * @Since version 1.0.0
+ * @since version 1.0.0
  */
 public interface Command
 {
 	/**
-	 * Adds this listener to the collection of listeners notified
-	 * about <code>CommandEvent</code> instances.
+	 * Adds the passed listener to the collection of listeners notified
+	 * about <code>CommandEvent</code>s.
 	 * 
 	 * @see CommandEvent
 	 * @param listener CommandListener
@@ -32,7 +31,7 @@ public interface Command
 	public void addListener(CommandListener listener);
 
 	/**
-	 * Removes this listener from the collection of listeners notified
+	 * Removes the passed listener from the collection of listeners notified
 	 * about <code>CommandEvent</code> instances.
 	 * 
 	 * @see CommandEvent
@@ -42,8 +41,10 @@ public interface Command
 	
 	/**
 	 * Called to request that this command stop execution at the first
-	 * possible opportunity and return control to the <code>SRV1</code>
-	 * instance.
+	 * possible opportunity.
+	 * 
+	 * <p>Command instances should make every endeavour to stop quickly but remain responsible
+	 * for releasing resources and memory if necessary.</p>
 	 * 
 	 * @return true iff this command can be (and was) interrupted
 	 */
@@ -52,25 +53,25 @@ public interface Command
 	/**
 	 * Requests this command resume polling.
 	 * 
-	 * <p>Commands exit their read write thread when interrupted so this method
-	 * will do nothing for volatile commands and serves only to enable commands
-	 * run in a polling queue which have been interrupted.</p>
+	 * <p>Commands should exit their read-write code when interrupted so this method
+	 * will do nothing for single operation commands and serves only to enable/disable
+	 * commands run repeatedly in a polling thread which have been interrupted.</p>
 	 */
 	public void resume();
 
 	/**
-	 * Called by the <code>SRV</code> instance to request this
-	 * command to perform its action.
+	 * Called by the <code>CommandQ</code> instance to request this command to
+	 * begin performing it's action.
 	 * 
-	 * @param SRV the SRV instance
+	 * @param CommandQ the command queue executing this command
 	 */
 	public void execute(CommandQ que);
 
 	/**
-	 * Call-back to notify of external failure.
+	 * Call-back to notify a <code>Command<code> of some external failure.
 	 * 
-	 * <p><code>Command</code> instances should stop executing
-	 * as soon as possible and tidy any resources.</p>
+	 * <p><code>Command</code> instances should stop executing as soon as possible on
+	 * receiving the failed notification and tidy any resources as necessary.</p>
 	 * 
 	 * @param reason String, the reason for the failure
 	 */
@@ -79,25 +80,26 @@ public interface Command
 	/**
 	 * Returns the priority of this command.
 	 * 
-	 * <p>Priority should be a positive integer, larger values
-	 * indicate a lower priority. Long running processes should
-	 * normally be a low priority and enable cancellation.</p>
+	 * <p>Priority should be a positive integer, larger values indicate a lower priority.
+	 * Long running processes should normally be a low priority and enable cancellation.</p>
 	 * 
-	 * <p>Default priority is 100, long running commands such as
-	 * image polling should be 1000.</p>
+	 * <p>Default priority is 100, long running commands such as image polling should be 1000.</p>
 	 *  
-	 * @return int, the priority
+	 * @return int, the priority of this Command
 	 */
 	public int getPriority();
-	
+
 	/**
-	 * Return this commands name.
+	 * Return this commands display name.
 	 * 
 	 * <p>Commands are often named to look like methods:
 	 * <pre>    getImage()
 	 *    motors()</pre>
-	 * Key parameters are often appended:
-	 * <pre>    motors() 100 100 200</pre></p>
+	 * Key parameters may be rendered:
+	 * <pre>    motors(100 100 200)</pre></p>
+	 * 
+	 * <p>Essentially users are free to return whatever string they'd like to see appear
+	 * in the Command Console on execution.</p>
 	 * 
 	 * @return String, the command's name
 	 */
