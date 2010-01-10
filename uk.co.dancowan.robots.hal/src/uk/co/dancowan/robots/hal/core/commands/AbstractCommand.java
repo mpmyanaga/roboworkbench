@@ -82,6 +82,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * 
 	 * <p>Default command is not interruptable. Equivalent to:</p>
 	 * <pre><code>    new AbstractCommand(-1, false)</code></pre>
+	 * <p>Command expects to terminate reading a new line character.</p>
 	 */
 	public AbstractCommand()
 	{
@@ -93,6 +94,9 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * 
 	 * <p>Default command is not interruptable. Equivalent to:</p>
 	 * <pre><code>    new AbstractCommand(len, false)</code></pre>
+	 * <p>Command expects to terminate reading configured number of characters.</p>
+	 * 
+	 * @param expectedLineLength the number of characters to read as a response
 	 */
 	public AbstractCommand(int expectedLength)
 	{
@@ -100,10 +104,10 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	}
 
 	/**
-	 * Adds the listener to the collection of listeners to be notified
-	 * of command events.
+	 * Adds the passed listener to the collection of listeners to be notified of command events.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Command
+	 * @param listener CommandListener instance
 	 */
 	@Override
 	public void addListener(CommandListener listener)
@@ -112,14 +116,14 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	}
 
 	/**
-	 * Removes the listener from the collection of listeners to be notified
-	 * of command events.
+	 * Removes the passed listener from the collection of listeners to be notified of command events.
 	 * 
 	 * <p>Listener is added to a list for removal outside of listener iteration
 	 * to avoid a <code>ConcurrentModificationException</code> being thrown
 	 * if the listener needs to remove itself during an event.</p>
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Command
+	 * @param listener CommandListener instance
 	 */
 	@Override
 	public void removeListener(CommandListener listener)
@@ -128,25 +132,23 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	}
 
 	/**
-	 * Called by the <code>SRV</code> instance to request this
-	 * command to perform its action.
+	 * Called by the <code>CommandQ</code> instance to request this command to perform its action.
 	 * 
-	 * <p>Implement <code>read()</code> and <code>write()</code> methods
-	 * to read and write the command essentials to the SRV. Fires execute
-	 * and completion events to all listeners.</p>
+	 * <p>Implement <code>read()</code> and <code>write()</code> methods to read and write the
+	 * command essentials to the robot. Fires execute and completion events to all listeners.</p>
 	 *  
-	 * @param SRV the SRV instance
+	 * @param CommandQ the CommandQ instance
 	 */
 	@Override
-	public void execute(CommandQ srv) // throws execution exception
+	public void execute(CommandQ cmdQ) // throws execution exception
 	{
 		try
 		{
 			if (shouldRun())
 			{
 				fireExecuteEvent();
-				Connection connection = srv.getConnection();
-				write(srv);
+				Connection connection = cmdQ.getConnection();
+				write(cmdQ);
 				int timeout = 0;
 
 				// wait for some data to process
@@ -164,7 +166,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 					continue;
 				}
 				if (connection.available() > 0)
-					fireCompletionEvent(read(srv));
+					fireCompletionEvent(read(cmdQ));
 				else
 					failed("Timed out waiting for initial response.");
 			}
@@ -183,8 +185,6 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * Callback for implementations to provide the command string
 	 * to execute.
 	 * 
-	 * <p>****</p>
-	 * 
 	 * @return String the command to execute.
 	 */
 	protected abstract String getCommandString();
@@ -193,11 +193,11 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * Writes the byte translation of the result of a call to <code>
 	 * getCommandString()</code> to the output stream.
 	 * 
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected void write(CommandQ srv) throws IOException
+	protected void write(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		if (connection.isConnected())
 		{
 			String cmd = getCommandString();
@@ -210,11 +210,11 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * Read the data from the connection
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.Command#read()
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected String read(CommandQ srv) throws IOException
+	protected String read(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		StringBuilder sb = new StringBuilder();
 		sb.append(consumeHeader(connection));
 		
@@ -349,19 +349,6 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 		{
 			return mShouldRun;
 		}
-	}
-
-	/**
-	 * Returns this class's Logger.
-	 * 
-	 * <p>Convenience method for extending classes to reach the same
-	 * <code>Logger</code> instance as used by the base class.</p>
-	 * 
-	 * @return Logger the Logger instance for this class
-	 */
-	public Logger getLogger()
-	{
-		return INFO_LOGGER;
 	}
 
 	/**
