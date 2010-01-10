@@ -139,7 +139,7 @@ public class BlobOverlay implements OverlayContributor, IPropertyChangeListener
 	private void initFromPrefs()
 	{
 		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
-		RGB rgb = PreferenceConverter.getColor(store, PreferenceConstants.CAMERA_BACKGROUND_COLOUR);
+		RGB rgb = PreferenceConverter.getColor(store, PreferenceConstants.BLOB_OVERLAY_COLOUR);
 		mColour = new Color(rgb.red, rgb.green, rgb.blue);
 	}
 }
