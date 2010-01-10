@@ -14,7 +14,7 @@
 package uk.co.dancowan.robots.hal.core.commands;
 
 /**
- * Sends the configured string to the SRV1q.
+ * Sends the configured string to the robot.
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -41,6 +41,15 @@ public class SendString extends AbstractCommand
 		this(command, false);
 	}
 
+	/**
+	 * C'tor.
+	 * 
+	 * <p>The command should be a single string without whitespace. By default
+	 * the string will not be encoded in hexadecimal prior to transmition, this
+	 * enables sending of decimal or hexadecimal strings directly.</p>
+	 *
+	 *@param command the String command to send
+	 */
 	public SendString(String command, int charCount)
 	{
 		// don't encode, expect length
@@ -89,7 +98,9 @@ public class SendString extends AbstractCommand
 	}
 
 	/**
-	 * Translate the command to hexadecimal if required.
+	 * Returns thiis Command's internal command to send.
+	 * 
+	 * <p>Command is translated to hexadecimal if required.</p>
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
 	 */
