@@ -25,7 +25,7 @@ public class HALActivator extends Plugin
 {
 	public static final String PLUGIN_ID = "uk.co.dancowan.robots.hal";
 
-	private static HALActivator plugin;
+	private static HALActivator sPlugin;
 
 	/**
 	 * C'tor.
@@ -43,7 +43,7 @@ public class HALActivator extends Plugin
 	public void start(BundleContext context) throws Exception
 	{
 		super.start(context);
-		plugin = this;
+		sPlugin = this;
 	}
 
 	/**
@@ -51,7 +51,7 @@ public class HALActivator extends Plugin
 	 */
 	public void stop(BundleContext context) throws Exception
 	{
-		plugin = null;
+		sPlugin = null;
 		super.stop(context);
 	}
 
@@ -62,6 +62,6 @@ public class HALActivator extends Plugin
 	 */
 	public static HALActivator getDefault()
 	{
-		return plugin;
+		return sPlugin;
 	}
 }
