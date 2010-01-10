@@ -26,25 +26,25 @@ import uk.co.dancowan.robots.hal.core.CommandListener;
 public class DebugCommandListener implements CommandListener
 {
 	/**
-	 * Command completed message sent to <code>system.err</code>.
+	 * Command completed message sent to <code>system.out</code>.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandCompleted(uk.co.dancowan.robots.hal.core.CommandEvent)
 	 */
 	@Override
 	public void commandCompleted(CommandEvent e)
 	{
-		System.err.println(e.getMessage());
+		System.out.println(e.getMessage());
 	}
 
 	/**
-	 * Command execution started message sent to <code>system.err</code>.
+	 * Command execution started message sent to <code>system.out</code>.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandExecuted(uk.co.dancowan.robots.hal.core.CommandEvent)
 	 */
 	@Override
 	public void commandExecuted(CommandEvent e)
 	{
-		System.err.println(e.getMessage());
+		System.out.println(e.getMessage());
 	}
 
 	/**
@@ -56,6 +56,6 @@ public class DebugCommandListener implements CommandListener
 	public void commandFailed(CommandEvent e)
 	{
 
-		System.err.println("Failure " + e.getMessage());
+		System.err.println("Failure: " + e.getMessage());
 	}
 }
