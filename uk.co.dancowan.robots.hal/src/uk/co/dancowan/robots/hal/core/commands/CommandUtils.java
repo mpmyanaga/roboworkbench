@@ -23,6 +23,8 @@ import uk.co.dancowan.robots.hal.core.Command;
  */
 public class CommandUtils
 {
+	private static final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D','E', 'F' };
+
 	/**
 	 * Platform specific new line character.
 	 */
@@ -30,6 +32,8 @@ public class CommandUtils
 
 	/**
 	 * Returns an integer value as a 0 padded string.
+	 * 
+	 * <p>formatInt(3, 3) -> 300</p>
 	 * 
 	 * @param int the value to format
 	 */
@@ -47,6 +51,8 @@ public class CommandUtils
 
 	/**
 	 * Detect new line character to terminate reading output stream.
+	 * 
+	 * <p>Detects a single char of codepoint 13 or codepoint 10 (/r or /n).</p>
 	 * 
 	 * @param char the character to inspect
 	 */
@@ -71,7 +77,6 @@ public class CommandUtils
 		byte highNibble, lowNibble;
 		if (input != null)
 		{
-			final char[] HEX_DIGITS = { '0', '1', '2', '3', '4', '5', '6', '7', '8', '9', 'A', 'B', 'C', 'D','E', 'F' };
 			for (int i = 0; i < input.length; i++)
 			{
 				highNibble = (byte) ((input[i] >>> 4) & 0x0F);
@@ -87,8 +92,7 @@ public class CommandUtils
 	/**
 	 * Constructs a <code>SendString</code> command around the passed decimal string.
 	 * 
-	 * <p>The command string will not be translated into hexadecimal
-	 * before execution.</p>
+	 * <p>The command string will not be translated into hexadecimal before execution.</p>
 	 * 
 	 * @param command
 	 * @return Command
@@ -101,8 +105,7 @@ public class CommandUtils
 	/**
 	 * Constructs a <code>SendString</code> command around the passed decimal string.
 	 * 
-	 * <p>The decimal command string will be translated into hexadecimal
-	 * before execution.</p>
+	 * <p>The decimal command string will be translated into hexadecimal before execution.</p>
 	 * 
 	 * @param decCommand
 	 * @return Command
