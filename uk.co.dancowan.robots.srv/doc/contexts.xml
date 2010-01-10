@@ -1,0 +1,19 @@
+<contexts>
+   <context id="cameraView">
+      <description>The Camera View renders images streamed from the SRV1 robot&apos;s onboard camera and provides a certain ammount of control over the polling and image features.
+
+Additionally the Camera View display&apos;s the colour bins from the SRV1 Feature Detector component. These bins can be set and their associated blob lists rendered via an overlay contribution.
+
+Additional configurable overlays may be contributed via the defined extension point.</description>
+   </context>
+   <context id="motorsView">
+      <description>The Motors view allows for control over the SRV1 robots drive system.
+
+Two drive systems are avaialable: joystick-like and graphical command. The graphical command interface allows you to set left and right motor speeds and directions along with a duration before sending. The joystick-like interface allows you to click to send a command derived from the mouse location within a graphic.</description>
+   </context>
+   <context id="WebCamSat" title="WebCamSat">
+      <description>The WCS View contains a browser pointed at the embedded WCS server.
+
+This view is another way to viw images streamed from the SRV1 robot.</description>
+   </context>
+</contexts>
