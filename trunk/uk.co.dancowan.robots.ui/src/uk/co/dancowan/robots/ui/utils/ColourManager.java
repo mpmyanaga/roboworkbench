@@ -139,9 +139,10 @@ public class ColourManager
 	{
 		for (RGB key : mRGBColourMap.keySet())
 		{
-			Color colour = mRGBColourMap.remove(key);
+			Color colour = mRGBColourMap.get(key);
 			colour.dispose();
 		}
+		mRGBColourMap.clear();
 		INFO_LOGGER.fine("ColourManager disposed of cached colours.");
 	}
 }
