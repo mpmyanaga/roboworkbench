@@ -7,8 +7,10 @@
    </topic>
    <topic href="doc/concepts/toc.html" label="Concepts">
       <anchor id="concepts"/>
+      <link toc="doc/tocconcepts.xml"/>
    </topic>
-   <topic href="doc/reference/toc.html" label="Reference">
-      <anchor id="reference"/>
+   <topic href="doc/reference/toc.html" label="SRV1 Reference">
+      <anchor id="srv1-reference"/>
+      <link toc="doc/tocreference.xml"/>
    </topic>
 </toc>
