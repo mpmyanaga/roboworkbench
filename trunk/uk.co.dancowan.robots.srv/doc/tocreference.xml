@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<?NLS TYPE="org.eclipse.help.toc"?>
+
+<toc label="SRV1 Reference" link_to="toc.xml#srv1-reference" topic="doc/reference/toc.html">
+	<topic label="JavaDoc"  href="doc/reference/javadoc/index.html">
+	</topic>
+ <topic href="doc/reference/javadoc/index.html" label="Topic">
+ </topic> 
+</toc>
