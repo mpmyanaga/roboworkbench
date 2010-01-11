@@ -1,0 +1,16 @@
+uk.co.dancowan.robots.srv
+uk.co.dancowan.robots.srv.hal
+uk.co.dancowan.robots.srv.hal.camera
+uk.co.dancowan.robots.srv.hal.commands.camera
+uk.co.dancowan.robots.srv.hal.commands.motors
+uk.co.dancowan.robots.srv.hal.featuredetector
+uk.co.dancowan.robots.srv.hal.featuredetector.commands
+uk.co.dancowan.robots.srv.hal.neuralnet
+uk.co.dancowan.robots.srv.services
+uk.co.dancowan.robots.srv.ui.preferences
+uk.co.dancowan.robots.srv.ui.views.camera
+uk.co.dancowan.robots.srv.ui.views.camera.actions
+uk.co.dancowan.robots.srv.ui.views.camera.overlays
+uk.co.dancowan.robots.srv.ui.views.motors
+uk.co.dancowan.robots.srv.ui.views.neuralnet.actions
+uk.co.dancowan.robots.srv.ui.views.wcs
