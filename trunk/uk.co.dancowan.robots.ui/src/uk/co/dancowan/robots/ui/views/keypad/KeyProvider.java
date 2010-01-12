@@ -44,7 +44,7 @@ import uk.co.dancowan.robots.ui.preferences.PreferenceConstants;
  * create and maintain.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class KeyProvider
 {
@@ -156,9 +156,6 @@ public class KeyProvider
 
 		button.addSelectionListener(new SelectionAdapter()
 		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
