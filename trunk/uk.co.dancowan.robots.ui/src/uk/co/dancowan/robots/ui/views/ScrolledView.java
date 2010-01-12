@@ -44,6 +44,9 @@ public abstract class ScrolledView extends ViewPart
 	 * Implements <code>ViewPart.createPartControl(Composite)</code> and makes a call back
 	 * to <code>getPartControl(Composite)</code> for the part's widgetry.
 	 * 
+	 * <p>The view's base composite will be registered with the Help Context subsystem against
+	 * the view's ID and the focus passed to that composite to enable the context.</p>
+	 * 
 	 * @param parent the parent Composite for the widgets
 	 */
 	public final void createPartControl(Composite parent)
