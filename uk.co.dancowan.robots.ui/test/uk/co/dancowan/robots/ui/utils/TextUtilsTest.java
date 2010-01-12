@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.srv1q.utils;
+package uk.co.dancowan.robots.ui.utils;
 
 import junit.framework.TestCase;
 import uk.co.dancowan.robots.ui.utils.TextUtils;
