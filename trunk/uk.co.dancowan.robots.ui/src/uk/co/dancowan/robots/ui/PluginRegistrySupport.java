@@ -24,17 +24,19 @@ import uk.co.dancowan.robots.ui.views.keypad.CommandButtonDescriptor;
 
 
 /**
- * Support for reading classes from SRV1 extension points.
+ * Support for reading classes from roboworkbench extension points.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class PluginRegistrySupport
 {
 	private static final String CMD_BTN_EXT = "uk.co.dancowan.robots.ui.commandButton";
 
 	/**
-	 * Read CommandButtonDescriptors from extension point.
+	 * Read CommandButtonDescriptors from extension their point.
+	 * 
+	 * <p>The returned list will be sorted by commandButton index.</p>
 	 * 
 	 * @return List<CommandButtonDescriptor>
 	 */
