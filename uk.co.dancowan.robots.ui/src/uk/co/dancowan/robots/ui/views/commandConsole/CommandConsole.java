@@ -59,7 +59,11 @@ import uk.co.dancowan.robots.ui.views.actions.ScrollLockAction;
 
 /**
  * Eclipse <code>View</code> class attaches to root <code>Logger</code> instance
- * exposing methods to change log level and standard edit utilities.
+ * exposing methods to change log level along with standard edit utilities.
+ * 
+ * <p>Also embeds a command line accessed by hitting the enter key. Command style
+ * can be set in the preferences and allows control over return expectations
+ * and hexidecimal/decimal encodings</p>
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -92,7 +96,6 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 
 	/**
 	 * C'tor.
-	 *
 	 */
 	public CommandConsole()
 	{
@@ -115,15 +118,6 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 
 		mPin = false;
 		mInitialized = false;
-	}
-
-	private Point getDisplayRelativeLocation(Control control)
-	{
-		if (control.getParent() == null) //assuming this is the shell ?
-			return control.getLocation();
-		Point pTree = getDisplayRelativeLocation(control.getParent());
-		Point pThis = control.getLocation();
-		return new Point(pTree.x + pThis.x, pTree.y + pThis.y);
 	}
 
 	/**
@@ -174,6 +168,11 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		return part;
 	}
 
+	/**
+	 * Returns this view's unique identifier.
+	 * 
+	 * @return String
+	 */
 	public String getID()
 	{
 		return ID;
@@ -198,12 +197,20 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		return MIN_SIZE;
 	}
 
+	/**
+	 * Sets the passed <code>StyleRange</code> on the classes' <code>org.eclipse.jface.StyledText</code>
+	 * instance.
+	 * 
+	 * @param range
+	 */
 	public void setStyleRange(StyleRange range)
 	{
 		mText.setStyleRange(range);
 	}
 
 	/**
+	 * Implementation clears the class's text widget.
+	 * 
 	 * @see uk.co.dancowan.robots.ui.views.actions.Clearable#clear()
 	 */
 	@Override
@@ -269,8 +276,21 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 				mText.setWordWrap(mWrap);
 		}
 
-		mCommandLine.configureFromPreferences();
+		mCommandLine.initFromPreferences();
 		mInputRenderer.configureFromPreferences();
+	}
+
+	/*
+	 * Recursive call calculates the position of the passed control relative
+	 * to the display.
+	 */
+	private Point getDisplayRelativeLocation(Control control)
+	{
+		if (control.getParent() == null) //assuming this is a shell
+			return control.getLocation();
+		Point pTree = getDisplayRelativeLocation(control.getParent());
+		Point pThis = control.getLocation();
+		return new Point(pTree.x + pThis.x, pTree.y + pThis.y);
 	}
 
 	/*
@@ -325,7 +345,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 	}
 
 	/*
-	 * Initialize widgets from preferences.
+	 * Initialise widgets from preferences.
 	 */
 	private void initializeFromPreferences()
 	{
@@ -349,7 +369,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		if (mInputRenderer != null)
 			mInputRenderer.configureFromPreferences();
 		if (mCommandLine != null)
-			mCommandLine.configureFromPreferences();
+			mCommandLine.initFromPreferences();
 	}
 
 	/*
@@ -538,6 +558,10 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		mText.addExtendedModifyListener(mInputRenderer);
 	}
 
+	/*
+	 * Adjusts the styles to match the widget's content when the content is trimmed to
+	 * a maximum length.
+	 */
 	/*package*/ List<StyleRange> replaceRanges(int start, int length, StyleRange[] ranges)
 	{
 		// inbound ranges are initially expected to cover 0 to > length

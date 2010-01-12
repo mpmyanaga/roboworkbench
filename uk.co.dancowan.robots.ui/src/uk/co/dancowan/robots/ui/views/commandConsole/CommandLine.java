@@ -44,7 +44,6 @@ public class CommandLine
 
 	/**
 	 * C'tor.
-	 *
 	 */
 	public CommandLine()
 	{
@@ -81,6 +80,7 @@ public class CommandLine
 
 	/**
 	 * Set the command to execute.
+	 * 
 	 * @param text
 	 */
 	public void setText(String text)
@@ -89,7 +89,7 @@ public class CommandLine
 	}
 
 	/**
-	 * Execute the current command.
+	 * Executes the current command.
 	 */
 	public void execute()
 	{
@@ -117,7 +117,7 @@ public class CommandLine
 	/**
 	 * Configure this class's parameters from the plugin local preference store.
 	 */
-	public void configureFromPreferences()
+	public void initFromPreferences()
 	{
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
 
@@ -126,7 +126,7 @@ public class CommandLine
 	}
 
 	/*
-	 * Default implementation does nothing 
+	 * Default implementation does nothing, here for later purposes 
 	 */
 	private String parseSpecialCommands()
 	{

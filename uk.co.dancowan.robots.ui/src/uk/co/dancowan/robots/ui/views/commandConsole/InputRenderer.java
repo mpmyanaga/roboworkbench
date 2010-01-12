@@ -26,9 +26,10 @@ import uk.co.dancowan.robots.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 
 /**
- *
+ * ModifyListener to paint user input in the colour determined by the preferences.
+ * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class InputRenderer implements ExtendedModifyListener
 {
@@ -59,6 +60,9 @@ public class InputRenderer implements ExtendedModifyListener
 		mConsole.trimBuffer();
 	}
 
+	/**
+	 * Set the colour to paint with from stored preferences.
+	 */
 	public void configureFromPreferences()
 	{
 		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
