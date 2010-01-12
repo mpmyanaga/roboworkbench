@@ -29,12 +29,27 @@ import org.eclipse.swt.widgets.Text;
 import uk.co.dancowan.robots.ui.utils.TextUtils;
 
 /**
- *
+ * Widget class creates a <code>Shell</code> without trim and places it over the
+ * last line of the <code>StyledText</code> instance.
+ * 
+ * <p>Pressing enter in the Command Console view opens this shell and passes the focus.
+ * Hitting enter or loss of focus passes the command to the CommandLine instance, hitting
+ * escape just closes the shell.</p>
+ * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class CommandLineShell
 {
+	/**
+	 * C'tor.
+	 * 
+	 * <p>Creates and opens a shell to receive commands in text, then processes the command.</p>
+	 * 
+	 * @param commandLine CommandLine object which will execute the command
+	 * @param targetControl StyledText widget which will display the command
+	 * @param absLocation Point the locations to open the shell
+	 */
 	public CommandLineShell(final CommandLine commandLine, final StyledText targetControl, final Point absLocation)
 	{
 		final Rectangle bounds = targetControl.getBounds();
