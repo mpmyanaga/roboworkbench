@@ -28,7 +28,7 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
  * and disposal.</p>
  *
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ApplicationWorkbenchWindowAdvisor extends WorkbenchWindowAdvisor
 {

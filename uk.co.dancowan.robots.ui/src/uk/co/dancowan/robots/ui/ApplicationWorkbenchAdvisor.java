@@ -21,7 +21,7 @@ import org.eclipse.ui.application.WorkbenchWindowAdvisor;
  * Eclipse foundation class configures the workbench.
  *
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ApplicationWorkbenchAdvisor extends WorkbenchAdvisor
 {

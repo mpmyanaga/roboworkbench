@@ -25,7 +25,7 @@ import uk.co.dancowan.robots.ui.views.keypad.KeypadView;
  * Eclipse foundation class to generate the default perspective.
  *
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class Perspective implements IPerspectiveFactory
 {

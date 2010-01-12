@@ -37,7 +37,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 	private IWorkbenchAction mExitAction;
 	private IContributionItem mShowAction;
 	private IWorkbenchAction mPreferencesAction;
-	private IWorkbenchAction mAboutAction;
+	//private IWorkbenchAction mAboutAction;
 	private IWorkbenchAction mHelpAction;
 	private IWorkbenchAction mHelpSearchAction;
 	private IWorkbenchAction mHelpDynamicAction;
@@ -45,7 +45,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 	/**
 	 * C'tor.
 	 *
-	 * @param configurer
+	 * @param configurer the IActionBarConfigurer
 	 */
 	public ApplicationActionBarAdvisor(IActionBarConfigurer configurer)
 	{
@@ -53,7 +53,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 	}
 
 	/**
-	 * Create the actions here.
+	 * Creates the actions.
 	 */
 	protected void makeActions(final IWorkbenchWindow window)
 	{
@@ -65,13 +65,13 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 		mExitAction = ActionFactory.QUIT.create(window);
 		register(mExitAction);
 
-		mAboutAction = ActionFactory.ABOUT.create(window);
-		register(mAboutAction);
+		//mAboutAction = ActionFactory.ABOUT.create(window);
+		//register(mAboutAction);
 
 		mShowAction = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
 
 		mPreferencesAction = ActionFactory.PREFERENCES.create(window);
-		register(mAboutAction);
+		register(mPreferencesAction);
 
 		mHelpAction = ActionFactory.HELP_CONTENTS.create(window);
 		register(mHelpAction);
@@ -101,7 +101,7 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 		windowMenu.add(new Separator());
 		windowMenu.add(mPreferencesAction);
 		
-		helpMenu.add(mAboutAction);
+		//helpMenu.add(mAboutAction);
 		helpMenu.add(new Separator());
 		helpMenu.add(mHelpAction);
 		helpMenu.add(mHelpSearchAction);
