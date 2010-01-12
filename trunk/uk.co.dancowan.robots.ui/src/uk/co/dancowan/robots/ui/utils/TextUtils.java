@@ -26,11 +26,25 @@ public class TextUtils
 	 */
 	public static final String CR = System.getProperty ("line.separator");
 
+	/**
+	 * Clips the passed int at the passed max value.
+	 * 
+	 * @param value
+	 * @param max
+	 * @return int
+	 */
 	public static int cap(int value, int max)
 	{
 		return value < max ? value : max;
 	}
 
+	/**
+	 * Clips the passed int at the passed min value.
+	 * 
+	 * @param value
+	 * @param min
+	 * @return
+	 */
 	public static int collar(int value, int min)
 	{
 		return value > min ? value : min;

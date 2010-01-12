@@ -27,12 +27,10 @@ import uk.co.dancowan.robots.hal.logger.LoggingService;
 /**
  * Manages creation and disposal of colours.
  * 
- * <p>Class also provides static methods for mapping between RGB
- * and YUV colour spaces.</p>
+ * <p>Class also provides static methods for mapping between RGB and YUV colour spaces.</p>
  * 
  * @author Dan Cowan
  * @since version 1.0.0
-
  */
 public class ColourManager
 {
