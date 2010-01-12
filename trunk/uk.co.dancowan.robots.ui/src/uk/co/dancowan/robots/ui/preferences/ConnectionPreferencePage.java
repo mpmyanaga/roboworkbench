@@ -35,13 +35,18 @@ import uk.co.dancowan.robots.ui.Activator;
  * <p>This page is used to modify preferences only. They are stored in the
  * preference store that belongs to the main plug-in class. That way,
  * preferences can be accessed directly via the preference store.</p>
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
  */
 public class ConnectionPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	private IntegerFieldEditor mBufferEditor;
 
 	/**
-	 * C'tor.
+	 * C'tor
+	 * 
+	 * <p>Sets the preference store for this page. Uses a grid layout.</p>
 	 */
 	public ConnectionPreferencePage()
 	{
@@ -86,6 +91,11 @@ public class ConnectionPreferencePage extends FieldEditorPreferencePage implemen
 		setFromPreferences();
 	}
 
+	/**
+	 * Implementation changes widget enablement depending on preference changes within the page.
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
@@ -99,6 +109,8 @@ public class ConnectionPreferencePage extends FieldEditorPreferencePage implemen
 	}
 
 	/**
+	 * Default implementation does nothing.
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench)

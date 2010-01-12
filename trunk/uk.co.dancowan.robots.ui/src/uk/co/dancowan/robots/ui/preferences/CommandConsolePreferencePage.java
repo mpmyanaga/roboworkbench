@@ -16,17 +16,25 @@ import org.eclipse.ui.IWorkbenchPreferencePage;
 import uk.co.dancowan.robots.ui.Activator;
 
 /**
- * Logger Preference page controls settings for the LogView class.
+ * Command Console preference page controls settings for the CommandConsole class.
  * 
  * <p>This page is used to modify preferences only. They are stored in the
  * preference store that belongs to the main plug-in class. That way,
  * preferences can be accessed directly via the preference store.</p>
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
  */
 public class CommandConsolePreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
 	private IntegerFieldEditor mBufferEditor;
 	private BooleanFieldEditor mTranslateEditor;
 
+	/**
+	 * C'tor
+	 * 
+	 * <p>Sets the preference store for this page. Uses a grid layout.</p>
+	 */
 	public CommandConsolePreferencePage()
 	{
 		super(GRID);
@@ -71,6 +79,11 @@ public class CommandConsolePreferencePage extends FieldEditorPreferencePage impl
 		setFromPreferences();
 	}
 
+	/**
+	 * Implementation changes widget enablement depending on preference changes within the page.
+	 * 
+	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
+	 */
 	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
@@ -89,6 +102,8 @@ public class CommandConsolePreferencePage extends FieldEditorPreferencePage impl
 	}
 
 	/**
+	 * Default implementation does nothing.
+	 * 
 	 * @see org.eclipse.ui.IWorkbenchPreferencePage#init(org.eclipse.ui.IWorkbench)
 	 */
 	public void init(IWorkbench workbench)

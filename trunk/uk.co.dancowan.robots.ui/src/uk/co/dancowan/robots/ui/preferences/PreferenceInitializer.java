@@ -10,6 +10,9 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
 
 /**
  * Class used to initialize default preference values.
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
