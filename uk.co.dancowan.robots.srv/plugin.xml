@@ -16,12 +16,36 @@
             id="uk.co.dancowan.robots.srv.motorsView"
             name="Motors View">
       </view>
-      <view
+      <!--<view
             name="WebCamSat View"
             class="uk.co.dancowan.robots.srv.ui.views.wcs.WCSView"
             id="uk.co.dancowan.robots.srv.WCSView">
-      </view>
+      </view>-->
    </extension>
+
+   <extension
+         point="org.eclipse.help.contexts">
+      <contexts
+            file="doc/contexts.xml">
+      </contexts>
+   </extension>
+   <extension
+         point="org.eclipse.help.toc">
+      <toc
+            file="doc/toc.xml"
+            primary="true">
+      </toc>
+      <toc
+            file="doc/tocconcepts.xml">
+      </toc>
+      <toc
+            file="doc/tocgettingstarted.xml">
+      </toc>
+      <toc
+            file="doc/tocreference.xml">
+      </toc>
+   </extension>
+
    <extension
          point="uk.co.dancowan.robots.hal.component">
          <component
@@ -37,7 +61,7 @@
              class="uk.co.dancowan.robots.srv.hal.Motors">
          </component>
    </extension>
-  
+
    <extension
          point="org.eclipse.ui.preferencePages">
       <page
@@ -251,19 +275,6 @@
                tooltip="Request laser ranging call"
                type="push">
          </commandButton>
-   </extension>
-   <extension
-         point="org.eclipse.help.contexts">
-      <contexts
-            file="doc/contexts.xml">
-      </contexts>
-   </extension>
-   <extension
-         point="org.eclipse.help.toc">
-      <toc
-            file="doc/toc.xml"
-            primary="true">
-      </toc>
    </extension>
    <extension
          point="uk.co.dancowan.robots.srv.overlay">
