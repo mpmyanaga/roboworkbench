@@ -233,7 +233,6 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 		boolean connect = prefs.getBoolean(PreferenceConstants.CONNECTION_ON_START);
 		connect(connect);
 
-		//PlatformUI.getWorkbench().getHelpSystem().setHelp(part, ID);
 		part.pack();
 		return part;
 	}
@@ -252,6 +251,11 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 		return MIN_SIZE;
 	}
 
+	/**
+	 * Sets widget state according to connection events.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#connected()
+	 */
 	@Override
 	public void connected()
 	{
@@ -272,6 +276,8 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/**
+	 * Sets widget state according to connection events.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#disconnected()
 	 */
 	@Override
@@ -283,6 +289,8 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/**
+	 * Sets widget state according to connection events.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
 	 */
 	@Override
@@ -293,6 +301,8 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/**
+	 * Sets widget state according to connection events.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#rx(java.lang.String)
 	 */
 	public void rx(final String message)
@@ -302,6 +312,8 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/**
+	 * Sets widget state according to connection events.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#tx(java.lang.String)
 	 */
 	public void tx(String message)
@@ -397,7 +409,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/*
-	 * Initialize widgets from preferences.
+	 * Initialise widgets from preferences.
 	 */
 	private void initializeFromPreferences()
 	{
@@ -769,6 +781,10 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 			mText.showSelection();
 	}
 
+	/*
+	 * Adjusts the styles to match the widget's content when the content is trimmed to
+	 * a maximum length.
+	 */
 	private List<StyleRange> replaceRanges(int start, int length, StyleRange[] ranges)
 	{
 		// inbound ranges are initially expected to cover 0 to > length
