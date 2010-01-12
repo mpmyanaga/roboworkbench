@@ -14,9 +14,13 @@
 package uk.co.dancowan.robots.ui.views.actions;
 
 /**
- *
+ * Interface for the target of a <code>ClearAction</code>
+ * 
+ * <p>A <code>Clearable</code> object is usually a text widget or other container which may need
+ * to be reset by an action but tis is not a restriction on use.</p>
+ * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public interface Clearable
 {

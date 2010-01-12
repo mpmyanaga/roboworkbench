@@ -18,9 +18,11 @@ import org.eclipse.jface.action.Action;
 import uk.co.dancowan.robots.ui.Activator;
 
 /**
- *
+ * Action is associated with an instance of a <code>Clearable</code> object.
+ * 
+ * @see uk.co.dancowan.robots.views.actions.Clearable
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ClearAction extends Action
 {
