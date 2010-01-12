@@ -18,9 +18,11 @@ import org.eclipse.jface.action.Action;
 import uk.co.dancowan.robots.ui.Activator;
 
 /**
- *
+ * Action pins and releases an instance of a <code>Lockable</code> object
+ * 
+ * @see uk.co.dancowan.robots.ui.views.actions.Lockable
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ScrollLockAction extends Action
 {
@@ -28,9 +30,9 @@ public class ScrollLockAction extends Action
 	private boolean mState;
 
 	/**
-	 * C'tor.
+	 * C'tor
 	 *
-	 * @param target the Lockable view
+	 * @param target the <code>Lockable</code> view
 	 */
 	public ScrollLockAction(Lockable target)
 	{

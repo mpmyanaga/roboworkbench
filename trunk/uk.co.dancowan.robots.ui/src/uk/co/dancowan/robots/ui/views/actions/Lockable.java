@@ -22,12 +22,12 @@ package uk.co.dancowan.robots.ui.views.actions;
  * text widget's content.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public interface Lockable
 {
 	/**
-	 * Stops this lockable following the content.
+	 * Stops this Lockable following the content.
 	 */
 	public void pin();
 	/**
