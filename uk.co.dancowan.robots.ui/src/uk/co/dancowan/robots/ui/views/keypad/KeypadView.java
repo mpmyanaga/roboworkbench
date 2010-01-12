@@ -39,6 +39,11 @@ public class KeypadView extends ScrolledView
 
 	private KeyProvider mProvider;
 
+	/**
+	 * C'tor
+	 * 
+	 * <p>Must remain no-args for Eclipse extension point.</p>
+	 */
 	public KeypadView()
 	{
 		mProvider = new KeyProvider();
@@ -74,6 +79,11 @@ public class KeypadView extends ScrolledView
 		return buttonComposite;
 	}
 
+	/**
+	 * Return the view's unique identifier.
+	 * 
+	 * @return String
+	 */
 	public String getID()
 	{
 		return ID;

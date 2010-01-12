@@ -25,7 +25,7 @@ import org.osgi.framework.Bundle;
  * Describes a Button for a Command.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class CommandButtonDescriptor implements Comparable<CommandButtonDescriptor>
 {
