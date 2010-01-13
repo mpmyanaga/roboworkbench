@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.robots.srv.ui.views.camera.actions;
+package uk.co.dancowan.robots.srv.ui.views.featuredetector.actions;
 
 import org.eclipse.jface.action.Action;
 import org.eclipse.swt.widgets.Composite;
