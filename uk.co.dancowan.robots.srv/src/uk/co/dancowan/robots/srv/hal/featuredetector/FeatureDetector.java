@@ -22,10 +22,8 @@ import uk.co.dancowan.robots.hal.core.CommandEvent;
 import uk.co.dancowan.robots.hal.core.CommandListener;
 import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.camera.Blob;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
-import uk.co.dancowan.robots.srv.hal.commands.camera.GrabBlobCmd;
 import uk.co.dancowan.robots.srv.hal.commands.camera.PixelGrabber;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.GrabBlobCmd;
 
 /**
  * Virtual hardware object collecting feature detection routines and structures

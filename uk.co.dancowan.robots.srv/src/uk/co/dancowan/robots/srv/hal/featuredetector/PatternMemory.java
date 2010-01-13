@@ -17,7 +17,7 @@ import uk.co.dancowan.robots.hal.core.CommandEvent;
 import uk.co.dancowan.robots.hal.core.CommandListener;
 import uk.co.dancowan.robots.hal.core.CommandQ;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.featuredetector.commands.GrabPatternCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.GrabPatternCmd;
 
 /**
  * This class acts as a container for stored Patterns.
