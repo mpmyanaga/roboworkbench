@@ -11,7 +11,7 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.robots.srv.hal.camera;
+package uk.co.dancowan.robots.srv.hal.featuredetector;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -22,8 +22,9 @@ import uk.co.dancowan.robots.hal.core.CommandListener;
 import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.commands.camera.GrabBinCmd;
-import uk.co.dancowan.robots.srv.hal.commands.camera.SetBinCmd;
+import uk.co.dancowan.robots.srv.hal.camera.YUV;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.GrabBinCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SetBinCmd;
 
 /**
  * Represents and SRV internal colour bin.

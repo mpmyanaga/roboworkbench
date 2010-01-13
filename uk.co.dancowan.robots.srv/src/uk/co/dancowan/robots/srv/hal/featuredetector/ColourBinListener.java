@@ -11,7 +11,9 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.robots.srv.hal.camera;
+package uk.co.dancowan.robots.srv.hal.featuredetector;
+
+import uk.co.dancowan.robots.srv.hal.camera.YUV;
 
 /**
  * Implementations will be notified of changes to the <code>ColourBin</code>'s
