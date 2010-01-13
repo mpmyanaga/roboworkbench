@@ -18,9 +18,13 @@ import uk.co.dancowan.robots.hal.core.Command;
 import uk.co.dancowan.robots.srv.hal.commands.motors.MotorCommandGenerator;
 
 /**
- *
+ * Class handles motor parameters and settings.
+ * 
+ * <p>Fine grain control over the motor's parameter set is exposed and commands to change
+ * motor settings can be generated and executed.</p>
+ * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class Motors extends AbstractComponent
 {
