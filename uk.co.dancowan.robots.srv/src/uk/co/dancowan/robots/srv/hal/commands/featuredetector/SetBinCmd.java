@@ -11,37 +11,39 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.robots.srv.hal.commands.camera;
+package uk.co.dancowan.robots.srv.hal.commands.featuredetector;
 
 import java.io.IOException;
 
 import uk.co.dancowan.robots.hal.core.CommandQ;
 import uk.co.dancowan.robots.hal.core.Connection;
 import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 
 /**
- * Grab the contents of the configured colour bin.
+ * Extension of AbstractCommand which sets the parameters of a colour bin
+ * on the SRV1q.
  * 
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class GrabBinCmd extends AbstractCommand
+public class SetBinCmd extends AbstractCommand
 {
-	public static final String ID = "grabBin";
+	public static final String ID = "setBin";
+	private static final String COMMAND = "vc";
 
-	private static final byte[] HEADER = new byte[] {'#', '#', 'v', 'r'};
-	private static final String COMMAND = "vr";
-
-	private int mBin;
+	private final ColourBin mBin;
 
 	/**
-	 * Sets the <code>PalletteItem</code> upon which this command operates
+	 * C'tor.
 	 * 
-	 * @param item the receiving PalletteItem
+	 * @param yuv the YUV instance to send
+	 * @param threshold the -/= threshold of the bin
 	 */
-	public GrabBinCmd(int bin)
+	public SetBinCmd(ColourBin bin)
 	{
-		super();
+		// expect newline char
+		super(-1, false);
 
 		mBin = bin;
 	}
@@ -52,16 +54,20 @@ public class GrabBinCmd extends AbstractCommand
 	@Override
 	public String getName()
 	{
-		return ID + "(" + mBin + ")";
+		return ID + "(" + mBin.getParameterString() + ")";
 	}
 
 	/**
+	 * Creates a hexadecimal command.
+	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getCommandString()
 	 */
 	@Override
-	protected String getCommandString()
+	public String getCommandString()
 	{
-		return COMMAND + mBin;
+		StringBuilder sb = new StringBuilder(COMMAND);
+		sb.append(mBin.getParameterString());
+		return sb.toString();
 	}
 
 	/**
@@ -70,6 +76,7 @@ public class GrabBinCmd extends AbstractCommand
 	 * 
 	 * @param srv the SRV1 instance
 	 */
+	@Override
 	protected void write(CommandQ srv) throws IOException
 	{
 		Connection connection = srv.getConnection();
@@ -78,16 +85,5 @@ public class GrabBinCmd extends AbstractCommand
 			connection.write(getCommandString().getBytes());
 			connection.writeComplete();
 		}
-	}
-
-	/**
-	 * Overrides method in AbstractCommand to supply larger header.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getHeader()
-	 */
-	@Override
-	public byte[] getHeader()
-	{
-		return HEADER;
 	}
 }
