@@ -74,11 +74,11 @@ import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
 import uk.co.dancowan.robots.srv.hal.camera.YUV;
 import uk.co.dancowan.robots.srv.hal.commands.camera.SetResolutionCmd;
-import uk.co.dancowan.robots.srv.hal.featuredetector.FeatureDetector;
+import uk.co.dancowan.robots.srv.ui.panels.ColourBinPanel;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
-import uk.co.dancowan.robots.srv.ui.views.camera.actions.RefreshBinsAction;
-import uk.co.dancowan.robots.srv.ui.views.camera.actions.RefreshBlobsAction;
-import uk.co.dancowan.robots.srv.ui.views.neuralnet.actions.RefreshPatternsAction;
+import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBinsAction;
+import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBlobsAction;
+import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshPatternsAction;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
@@ -98,7 +98,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 
 	private static final Point MIN_SIZE = new Point(600, 500);
 
-	private final BinWidgetRadioManager mBinSet;
+	private final ColourBinPanel mColourBinPanel;
 	private final CameraCanvas mCameraCanvas;
 
 	private Composite mColourBinComposite;
@@ -123,10 +123,10 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	public CameraView()
 	{
 		mCameraCanvas = new CameraCanvas(this);
+		mColourBinPanel = new ColourBinPanel(mCameraCanvas);
 
 		mReady = false;
 		mGrabberLock = false;
-		mBinSet = new BinWidgetRadioManager();
 
 		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
 		store.addPropertyChangeListener(this);
@@ -178,7 +178,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		final Composite pollComposite = getPollComposite(part);
 		final Composite locationComposite = getLocationComposite(part);
 		final Composite actionComposite = getActionComposite(part);
-		mColourBinComposite = getColourBinComposite(part);
+		mColourBinComposite = mColourBinPanel.getPanel(part);
 
 		// Image Canvas/Frame layout
 		FormData data = new FormData();
@@ -249,7 +249,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	@Override
 	public void dispose()
 	{
-		mBinSet.dispose();
+		mColourBinPanel.dispose();
 		super.dispose();
 		mReady = false;
 	}
@@ -593,30 +593,6 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	{
 		CommandButtonMediator mediator = new CommandButtonMediator(source);
 		SrvHal.getCamera().setResolution(size, mediator);
-	}
-
-	/*
-	 * Create the composite and listeners for colour bin setting
-	 */
-	private Composite getColourBinComposite(Composite parent)
-	{
-		Composite palletteComposite = new Group(parent, SWT.NONE);
-		palletteComposite.setLayout(new GridLayout(FeatureDetector.BIN_COUNT, true));
-
-		final ColourBinEditor editor = new ColourBinEditor(mCameraCanvas);
-		for (int i = 0; i < FeatureDetector.BIN_COUNT; i ++)
-		{
-			ColourBinWidget c = new ColourBinWidget(i, palletteComposite, editor);
-			c.setLayoutData(new GridData(GridData.FILL_BOTH));
-			if ( i == 0)
-				c.setSelection(true);
-			mBinSet.addWidget(c);
-		}
-		
-		editor.addWidgets(palletteComposite);
-		palletteComposite.pack();
-		editor.selectionChanged();
-		return palletteComposite;
 	}
 
 	/*
