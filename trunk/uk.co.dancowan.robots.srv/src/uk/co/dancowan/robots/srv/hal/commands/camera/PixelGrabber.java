@@ -19,8 +19,8 @@ import uk.co.dancowan.robots.hal.core.CommandEvent;
 import uk.co.dancowan.robots.hal.core.CommandListener;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
 import uk.co.dancowan.robots.srv.hal.camera.YUV;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 
 /**
  * Class to grab a pixel from the camera and set it to a colour bin
