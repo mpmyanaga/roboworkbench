@@ -17,7 +17,7 @@ import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import uk.co.dancowan.robots.hal.logger.LoggingService;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
 
 /**

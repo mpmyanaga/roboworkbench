@@ -26,7 +26,7 @@ import org.eclipse.swt.graphics.RGB;
 
 import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.camera.Blob;
+import uk.co.dancowan.robots.srv.hal.featuredetector.Blob;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
 
