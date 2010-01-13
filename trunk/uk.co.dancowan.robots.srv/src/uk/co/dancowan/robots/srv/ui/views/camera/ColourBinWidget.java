@@ -27,9 +27,9 @@ import org.eclipse.swt.widgets.Event;
 
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.camera.Camera;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBinListener;
 import uk.co.dancowan.robots.srv.hal.camera.YUV;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBinListener;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 
 /**
@@ -39,7 +39,7 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
  * and get the colour component ranges from the hardware. Implements <code>ColourBinListener
  * </code> to react to colour changes in the bin.</p>
  * 
- * @see uk.co.dancowan.robots.srv.hal.camera.ColourBinListener
+ * @see uk.co.dancowan.robots.srv.hal.featuredetector.ColourBinListener
  * @author Dan Cowan
  * @since version 1.0.0
  */
@@ -54,7 +54,7 @@ public class ColourBinWidget extends Composite implements ColourBinListener, Pai
 	/**
 	 * C'tor.
 	 * 
-	 * @see uk.co.dancowan.robots.srv.hal.camera.ColourBin
+	 * @see uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin
 	 * @see org.eclipse.swt.widgets.Composite
 	 * @param bin the colour bin on the SRV1q
 	 * @param parent the parent Composite
