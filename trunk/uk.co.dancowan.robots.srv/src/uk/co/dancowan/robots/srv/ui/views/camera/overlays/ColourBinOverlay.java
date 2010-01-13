@@ -19,7 +19,7 @@ import java.util.logging.Logger;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.camera.Camera;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 
 /**
  * OverlayContributor implementation to highlight pixels within a given colour bin.
