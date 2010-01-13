@@ -29,8 +29,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Text;
 
 import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.camera.ColourBin;
-import uk.co.dancowan.robots.srv.hal.commands.camera.SetBinCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SetBinCmd;
+import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 import uk.co.dancowan.robots.srv.ui.views.camera.overlays.BlobOverlay;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 
@@ -92,22 +92,30 @@ public class ColourBinEditor extends SelectionAdapter
 		getLabel(parent, MAX_V);
 		mVmax = getText(parent, MAX_V);
 
-		final Button overlay = new Button(parent, SWT.TOGGLE);
-		overlay.setText("Overlay");
-		overlay.setToolTipText("Overlay blobs detected for this colour bin's contents");
-		overlay.addSelectionListener(new SelectionAdapter()
+		if (mCanvas != null)
 		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
+			final Button overlay = new Button(parent, SWT.TOGGLE);
+			overlay.setText("Overlay");
+			overlay.setToolTipText("Overlay blobs detected for this colour bin's contents");
+			overlay.addSelectionListener(new SelectionAdapter()
 			{
-				OverlayContributor oc = mCanvas.getOverlayManager().getOverlay(BlobOverlay.ID);
-				if (oc != null)
-					oc.setShouldRun(overlay.getSelection());
-			}
-		});
-		gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 2;
-		overlay.setLayoutData(gd);
+				@Override
+				public void widgetSelected(SelectionEvent e)
+				{
+					OverlayContributor oc = mCanvas.getOverlayManager().getOverlay(BlobOverlay.ID);
+					if (oc != null)
+						oc.setShouldRun(overlay.getSelection());
+				}
+			});
+			gd = new GridData(GridData.FILL_BOTH);
+			gd.horizontalSpan = 2;
+			overlay.setLayoutData(gd);
+		}
+		else
+		{
+			getLabel(parent, "");
+			getLabel(parent, "");
+		}
 
 		getLabel(parent, MIN_Y);
 		mYmin = getText(parent, MIN_Y);
