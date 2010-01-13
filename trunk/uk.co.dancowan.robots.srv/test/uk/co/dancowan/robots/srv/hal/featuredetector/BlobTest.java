@@ -16,7 +16,6 @@ package uk.co.dancowan.robots.srv.hal.featuredetector;
 import java.util.List;
 
 import junit.framework.TestCase;
-import uk.co.dancowan.robots.srv.hal.camera.Blob;
 
 /**
  * Tests for parsing blobs from expected result string.
