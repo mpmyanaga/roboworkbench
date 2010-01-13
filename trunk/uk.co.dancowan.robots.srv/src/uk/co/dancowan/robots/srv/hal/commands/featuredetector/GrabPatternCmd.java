@@ -11,42 +11,51 @@
  *  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  *  GNU General Public License for more details (www.gnu.org/licenses)
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
-package uk.co.dancowan.robots.srv.hal.commands.camera;
+package uk.co.dancowan.robots.srv.hal.featuredetector.commands;
 
 import java.io.IOException;
-import java.util.logging.Logger;
 
 import uk.co.dancowan.robots.hal.core.CommandQ;
 import uk.co.dancowan.robots.hal.core.Connection;
 import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
 import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
-import uk.co.dancowan.robots.hal.logger.LoggingService;
 
 /**
- * Request blob information for the configured colour bin.
+ * Command to grab a neural network pattern stored in the SRV1's memory.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
-public class GrabBlobCmd extends AbstractCommand
+public class GrabPatternCmd extends AbstractCommand
 {
-	private static final Logger ERROR_LOGGER = Logger.getLogger(LoggingService.ERROR_LOGGER);
-
-	private static final String HEADER = "##vb";
-	private static final String COMMAND = "vb";
+	private static final String HEADER = "##nd";
+	private static final String COMMAND = "nd";
+	private static final int EXPECTED_LINES = 9;
 	private static final int PRIORITY = 1000;
 	private static final int TIMEOUT = 300;
-
-	private int mBin;
+	
+	private final int mIndex;
 
 	/**
 	 * C'tor.
 	 *
-	 * @param bin the initial reference ColourBin
+	 * <p>Sets the index of the <code>Pattern</code> to grab from the SRV1.
+	 * 
+	 * @param index the index of the Pattern 0 <= index < 16
 	 */
-	public GrabBlobCmd(int bin)
+	public GrabPatternCmd(int index)
 	{
-		mBin = bin;
+		mIndex = index;
+	}
+
+	/**
+	 * Returns the index of the grabbed <code>Pattern</code>.
+	 * 
+	 * @return int index
+	 */
+	public int getPatternIndex()
+	{
+		return mIndex;
 	}
 
 	/**
@@ -70,12 +79,12 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.srv1.commands.Command#getCommandString()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
 	 */
 	@Override
 	protected String getCommandString()
 	{
-		return COMMAND + mBin;
+		return COMMAND + Integer.toHexString(mIndex);
 	}
 
 	/**
@@ -84,9 +93,9 @@ public class GrabBlobCmd extends AbstractCommand
 	 * 
 	 * @param srv the SRV1 instance
 	 */
-	protected void write(CommandQ srv) throws IOException
+	protected void write(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		if (connection.isConnected())
 		{
 			connection.write(getCommandString().getBytes());
@@ -95,20 +104,19 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * Read the data from the connection into an Image.
+	 * Read the data from the connection into a String.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.Command#read()
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected String read(CommandQ srv) throws IOException
+	protected String read(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		StringBuilder sb = new StringBuilder();
 		sb.append(consumeHeader(connection));
 		
 		int timeout = 0;
 		int lineCount = 0;
-		int expectedLines = 1;
 		while (timeout < TIMEOUT && shouldRun())
 		{
 			// wait for some data to process
@@ -132,11 +140,6 @@ public class GrabBlobCmd extends AbstractCommand
 				char c1 = (char) connection.read();
 				if (CommandUtils.isEnd(c1) && CommandUtils.isEnd(c2)) // looking for /r/n sequence
 				{
-					if (lineCount == 0)
-					{
-						// first CR so trace back to parse expected line count
-						expectedLines = countLines(sb.toString());
-					}
 					lineCount ++;
 				}
 				else
@@ -144,7 +147,7 @@ public class GrabBlobCmd extends AbstractCommand
 					sb.append(c2);
 					c2 = c1; // shuffle down the lookahead sequence
 				}
-				if (lineCount == expectedLines)
+				if (lineCount == EXPECTED_LINES)
 				{
 					connection.readComplete();
 					return sb.toString();
@@ -154,24 +157,6 @@ public class GrabBlobCmd extends AbstractCommand
 		failed(shouldRun() ? "Timed out reading response." : "Interrupted");
 		connection.readComplete();
 		return sb.toString();
-	}
-
-	private int countLines(String response)
-	{
-		int lines = 1; // include the header line
-		if (response.contains(HEADER))
-		{
-			String part = response.substring(response.lastIndexOf(' ')).trim();
-			try
-			{
-				lines += Integer.parseInt(part);
-			}
-			catch (NumberFormatException e)
-			{
-				ERROR_LOGGER.finest("Failed parsing line count from " + part);
-			}
-		}
-		return lines;
 	}
 
 	/**
