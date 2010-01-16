@@ -46,6 +46,7 @@ public class CameraPreferencePage extends FieldEditorPreferencePage implements I
 	/**
 	 * Creates the field editors.
 	 */
+	@Override
 	public void createFieldEditors()
 	{
 		new Label(getFieldEditorParent(), SWT.NONE);

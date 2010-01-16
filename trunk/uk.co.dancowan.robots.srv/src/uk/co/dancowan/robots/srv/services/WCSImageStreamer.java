@@ -105,6 +105,7 @@ public class WCSImageStreamer extends Thread
 	 * frame is sent and set <code>null</code>. Thread can be controlled by calling
 	 * <code>disconnect()</code> or <code>connect()</code> accordingly.</p>
 	 */
+	@Override
 	public void run()
 	{
 		INFO_LOGGER.fine("WebCamSat push service started.");

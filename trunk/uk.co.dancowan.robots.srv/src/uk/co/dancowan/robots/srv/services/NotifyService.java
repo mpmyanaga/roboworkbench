@@ -78,7 +78,7 @@ public class NotifyService extends Thread
 	 * <p>Token map should contains:
 	 * <pre>    token=url</pre></p>
 	 * 
-	 * @param notifyProps Map&lt;String, String&gt;
+	 * @param tokens Map&lt;String, String&gt;
 	 */
 	public void addProperties(Map<String, String> tokens)
 	{
@@ -90,6 +90,7 @@ public class NotifyService extends Thread
 	 * 
 	 * <p>Thread will scan the buffer for tokens and visit indicated urls.</p>
 	 */
+	@Override
 	public void run() 
 	{
 		INFO_LOGGER.fine("Notify service started.");
