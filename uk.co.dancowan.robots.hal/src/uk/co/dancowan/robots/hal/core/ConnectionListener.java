@@ -38,13 +38,13 @@ public interface ConnectionListener
 	/**
 	 * Notification of a connection error.
 	 * 
-	 * @param error the error message
+	 * @param writeChars the characters written to the stream
 	 */
 	public void tx(String writeChars);
 	/**
 	 * Notification of a connection error.
 	 * 
-	 * @param error the error message
+	 * @param readChars the characters read from the stream
 	 */
 	public void rx(String readChars);
 }

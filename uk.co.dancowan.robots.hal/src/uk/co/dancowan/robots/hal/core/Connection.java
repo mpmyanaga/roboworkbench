@@ -347,7 +347,7 @@ public class Connection implements Component
 	 * 
 	 * <p>Wraps a call to <code>java.io.InputStream.read()</code>.</p>
 	 * 
-	 * @see java.io.InputStream#read()#read()
+	 * @see java.io.InputStream#read()
 	 * @return int, the byte read from the stream
 	 * @throws IOException
 	 */	
@@ -407,8 +407,8 @@ public class Connection implements Component
 	 * 
 	 * <p>Wraps a call to <code>java.io.OutputStream.write(byte)</code>.</p>
 	 * 
-	 * @see java.io.OutputStream#write(byte)
-	 * @param byte the byte to write
+	 * @see java.io.OutputStream#write(int)
+	 * @param single the byte to write
 	 * @throws IOException
 	 */	
 	public void write(byte single) throws IOException
@@ -461,7 +461,7 @@ public class Connection implements Component
 	 * 
 	 * <p>Wraps a call to <code>int java.io.OutputStream.flush()</code>.</p>
 	 * 
-	 * @see int java.io.OutputStream
+	 * @see java.io.OutputStream
 	 * @throws IOException
 	 */
 	public void flushOutput() throws IOException
@@ -472,9 +472,9 @@ public class Connection implements Component
 	/**
 	 * Flushes the InputStream.
 	 * 
-	 * <p>Reads remaining bytes from the straem into the return string until the stream is empty.</p>
+	 * <p>Reads remaining bytes from the stream into the return string until the stream is empty.</p>
 	 * 
-	 * @see int java.io.InputStream
+	 * @see java.io.InputStream
 	 * @throws IOException
 	 * @return String the remaining bytes that were 'flushed' from the stream
 	 */

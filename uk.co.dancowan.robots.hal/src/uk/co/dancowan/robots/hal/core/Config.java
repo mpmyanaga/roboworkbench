@@ -47,7 +47,6 @@ public class Config
 	 * avoid onerous characters.</p>
 	 * 
 	 * <p>May throw an <code>IOException</code> while reading from file.</p>
-	 * @throws IOException
 	 */
 	public static void loadConfig()
 	{

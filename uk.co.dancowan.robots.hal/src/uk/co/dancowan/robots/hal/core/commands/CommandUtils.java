@@ -35,7 +35,8 @@ public class CommandUtils
 	 * 
 	 * <p>formatInt(3, 3) -> 300</p>
 	 * 
-	 * @param int the value to format
+	 * @param i the value to format
+	 * @param size the length of the return string
 	 */
 	public static String formatInt(int i, int size)
 	{
@@ -54,7 +55,7 @@ public class CommandUtils
 	 * 
 	 * <p>Detects a single char of codepoint 13 or codepoint 10 (/r or /n).</p>
 	 * 
-	 * @param char the character to inspect
+	 * @param end the character to inspect
 	 */
 	public static boolean isEnd(Character end)
 	{

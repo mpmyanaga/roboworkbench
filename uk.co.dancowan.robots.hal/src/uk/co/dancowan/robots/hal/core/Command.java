@@ -63,7 +63,7 @@ public interface Command
 	 * Called by the <code>CommandQ</code> instance to request this command to
 	 * begin performing it's action.
 	 * 
-	 * @param CommandQ the command queue executing this command
+	 * @param que the CommandQ executing this command
 	 */
 	public void execute(CommandQ que);
 

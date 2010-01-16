@@ -96,7 +96,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * <pre><code>    new AbstractCommand(len, false)</code></pre>
 	 * <p>Command expects to terminate reading configured number of characters.</p>
 	 * 
-	 * @param expectedLineLength the number of characters to read as a response
+	 * @param expectedLength the number of characters to read as a response
 	 */
 	public AbstractCommand(int expectedLength)
 	{
@@ -137,7 +137,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * <p>Implement <code>read()</code> and <code>write()</code> methods to read and write the
 	 * command essentials to the robot. Fires execute and completion events to all listeners.</p>
 	 *  
-	 * @param CommandQ the CommandQ instance
+	 * @param cmdQ the CommandQ instance
 	 */
 	@Override
 	public void execute(CommandQ cmdQ) // throws execution exception
@@ -209,7 +209,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	/**
 	 * Read the data from the connection
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.Command#read()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 * @param cmdQ the CommandQ instance
 	 */
 	protected String read(CommandQ cmdQ) throws IOException
