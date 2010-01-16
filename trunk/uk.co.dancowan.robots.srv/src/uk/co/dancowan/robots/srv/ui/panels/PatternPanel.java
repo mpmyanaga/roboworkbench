@@ -13,9 +13,18 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.ui.panels;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.layout.GridData;
+import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
+
+import uk.co.dancowan.robots.srv.hal.SrvHal;
+import uk.co.dancowan.robots.srv.hal.featuredetector.Pattern;
+import uk.co.dancowan.robots.srv.hal.featuredetector.PatternMemory;
 
 /**
  * Class manages a view sub-panel for the pattern recognition algorithms of the SRV1.
@@ -26,6 +35,13 @@ import org.eclipse.swt.widgets.Group;
 public class PatternPanel implements Panel
 {
 	public static final String ID = "uk.co.dancowan.robots.ui.PatternPanel";
+
+	private final List<PatternWidget> mPatterns;
+
+	public PatternPanel()
+	{
+		mPatterns = new ArrayList<PatternWidget>();
+	}
 
 	/**
 	 * @see uk.co.dancowan.robots.srv.ui.panels.Panel#getID()
@@ -43,7 +59,17 @@ public class PatternPanel implements Panel
 	public Composite getPanel(Composite parent)
 	{
 		Group panel = new Group(parent, SWT.NONE);
+		panel.setText("Patterns");
+		panel.setLayout(new GridLayout(8, true));
 
+		PatternMemory memory = SrvHal.getCamera().getDetector().getPatternMemory();
+		for (int i = 0; i < 16; i ++)
+		{
+			Pattern pattern = memory.getPattern(i);
+			PatternWidget pw = new PatternWidget(panel, pattern);
+			pw.setLayoutData(new GridData(GridData.FILL_BOTH));
+			mPatterns.add(pw);
+		}
 		return panel;
 	}
 
