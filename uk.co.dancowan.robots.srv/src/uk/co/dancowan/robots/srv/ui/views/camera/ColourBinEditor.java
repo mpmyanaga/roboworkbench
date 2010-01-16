@@ -80,10 +80,35 @@ public class ColourBinEditor extends SelectionAdapter
 	 */
 	public void addWidgets(Composite parent)
 	{
-		final Label blank = new Label(parent, SWT.NONE);
-		GridData gd = new GridData(GridData.FILL_BOTH);
-		gd.horizontalSpan = 2;
-		blank.setLayoutData(gd);
+		final Button narrow = new Button(parent, SWT.PUSH);
+		narrow.setText("<");
+		narrow.setToolTipText("Narrow the colour range");
+		narrow.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ColourBin bin = SrvHal.getCamera().getDetector().getFocusBin();
+				bin.narrow(10);
+				updateBin(0, ""); // params skip condition and just send command
+			}
+		});
+		narrow.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		final Button widen = new Button(parent, SWT.PUSH);
+		widen.setText(">");
+		widen.setToolTipText("Widen the colour range");
+		widen.addSelectionListener(new SelectionAdapter()
+		{
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				ColourBin bin = SrvHal.getCamera().getDetector().getFocusBin();
+				bin.widen(10);
+				updateBin(0, ""); // params skip condition and just send command
+			}
+		});
+		widen.setLayoutData(new GridData(GridData.FILL_BOTH));
 
 		getLabel(parent, MAX_Y);
 		mYmax = getText(parent, MAX_Y);
@@ -107,7 +132,7 @@ public class ColourBinEditor extends SelectionAdapter
 						oc.setShouldRun(overlay.getSelection());
 				}
 			});
-			gd = new GridData(GridData.FILL_BOTH);
+			GridData gd = new GridData(GridData.FILL_BOTH);
 			gd.horizontalSpan = 2;
 			overlay.setLayoutData(gd);
 		}
