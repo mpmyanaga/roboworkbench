@@ -16,11 +16,11 @@
             id="uk.co.dancowan.robots.srv.motorsView"
             name="Motors View">
       </view>
-      <!--<view
+      <view
             name="WebCamSat View"
             class="uk.co.dancowan.robots.srv.ui.views.wcs.WCSView"
             id="uk.co.dancowan.robots.srv.WCSView">
-      </view>-->
+      </view>
    </extension>
 
    <extension
@@ -74,6 +74,12 @@
             class="uk.co.dancowan.robots.srv.ui.preferences.BlobOverlayPreferencePage"
             id="uk.co.dancowan.robots.srv.blobOverlay"
             name="Blob Overlay">
+      </page>
+      <page
+            category="uk.co.dancowan.robots.srv.ui.preferences.CameraPreferencePage"
+            class="uk.co.dancowan.robots.srv.ui.preferences.PatternPreferencePage"
+            id="uk.co.dancowan.robots.srv.patternPreferencePage"
+            name="Pattern Detection">
       </page>
    </extension>
    <extension
