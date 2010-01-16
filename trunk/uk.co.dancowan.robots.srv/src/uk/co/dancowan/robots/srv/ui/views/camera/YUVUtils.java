@@ -23,7 +23,7 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
  * Static methods for mapping between RGB and YUV colour spaces.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class YUVUtils
 {
@@ -70,9 +70,9 @@ public class YUVUtils
 		int g = rgb.green;
 		int b = rgb.blue;
 
-		double y = (0.299*(double)r) + (0.587*(double)g) + (0.114*(double)b);
-		double u = (-0.168736*(double)r) - (0.331264*(double)g) + (0.5*(double)b) + 128;
-		double v = (0.5*(double)r) - (0.418688*(double)g) - (0.081312*(double)b) + 128;
+		double y = (0.299*r) + (0.587*g) + (0.114*b);
+		double u = (-0.168736*r) - (0.331264*g) + (0.5*b) + 128;
+		double v = (0.5*r) - (0.418688*g) - (0.081312*b) + 128;
 
 		return new YUV((int) y, (int) u, (int) v);
 	}
@@ -82,7 +82,7 @@ public class YUVUtils
 	 * independent of the colour range. Colours could be 0-1 or 0-255.
 	 *
 	 * @param yuv The YUV components to convert
-	 * @param rgb equivalent RGB
+	 * @return rgb equivalent RGB
 	 */
 	public static RGB convertYUVtoRGB(YUV yuv)
 	{
@@ -90,9 +90,9 @@ public class YUVUtils
 		int u = yuv.getU() - 128;
 		int v = yuv.getV() - 128;
 
-		double r = (double)y + (double)(1.4075 * ((double)v));
-		double g = (double)y - (double)(0.3455 * ((double)u)) - (double)(0.7169*((double)v));
-		double b = (double)y + (double)(1.7790 * ((double)u));
+		double r = y + (1.4075 * v);
+		double g = y - (0.3455 * u) - (0.7169*v);
+		double b = y + (1.7790 * u);
 
 		return new RGB(clipAndBound(r), clipAndBound(g), clipAndBound(b));
 	}
