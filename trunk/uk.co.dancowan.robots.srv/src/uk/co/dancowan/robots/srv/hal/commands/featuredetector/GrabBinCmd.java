@@ -37,7 +37,7 @@ public class GrabBinCmd extends AbstractCommand
 	/**
 	 * Sets the <code>PalletteItem</code> upon which this command operates
 	 * 
-	 * @param item the receiving PalletteItem
+	 * @param bin
 	 */
 	public GrabBinCmd(int bin)
 	{
@@ -47,7 +47,7 @@ public class GrabBinCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
 	 */
 	@Override
 	public String getName()
@@ -56,7 +56,7 @@ public class GrabBinCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getCommandString()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
 	 */
 	@Override
 	protected String getCommandString()
@@ -68,11 +68,12 @@ public class GrabBinCmd extends AbstractCommand
 	 * Writes the byte translation of the result of a call to <code>
 	 * getCommandString()</code> to the output stream.
 	 * 
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected void write(CommandQ srv) throws IOException
+	@Override
+	protected void write(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		if (connection.isConnected())
 		{
 			connection.write(getCommandString().getBytes());
@@ -83,7 +84,7 @@ public class GrabBinCmd extends AbstractCommand
 	/**
 	 * Overrides method in AbstractCommand to supply larger header.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getHeader()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
 	 */
 	@Override
 	public byte[] getHeader()

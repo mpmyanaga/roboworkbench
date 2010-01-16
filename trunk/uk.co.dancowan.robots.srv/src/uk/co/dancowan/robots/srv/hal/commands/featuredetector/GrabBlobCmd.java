@@ -26,7 +26,7 @@ import uk.co.dancowan.robots.hal.logger.LoggingService;
  * Request blob information for the configured colour bin.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class GrabBlobCmd extends AbstractCommand
 {
@@ -50,7 +50,7 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getHeader()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
 	 */
 	@Override
 	public byte[] getHeader()
@@ -70,7 +70,7 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.srv1.commands.Command#getCommandString()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
 	 */
 	@Override
 	protected String getCommandString()
@@ -82,11 +82,12 @@ public class GrabBlobCmd extends AbstractCommand
 	 * Writes the byte translation of the result of a call to <code>
 	 * getCommandString()</code> to the output stream.
 	 * 
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected void write(CommandQ srv) throws IOException
+	@Override
+	protected void write(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		if (connection.isConnected())
 		{
 			connection.write(getCommandString().getBytes());
@@ -97,12 +98,13 @@ public class GrabBlobCmd extends AbstractCommand
 	/**
 	 * Read the data from the connection into an Image.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.Command#read()
-	 * @param srv the SRV1 instance
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
+	 * @param cmdQ the CommandQ instance
 	 */
-	protected String read(CommandQ srv) throws IOException
+	@Override
+	protected String read(CommandQ cmdQ) throws IOException
 	{
-		Connection connection = srv.getConnection();
+		Connection connection = cmdQ.getConnection();
 		StringBuilder sb = new StringBuilder();
 		sb.append(consumeHeader(connection));
 		
@@ -175,7 +177,7 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.srv1.commands.PollCommand#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
 	 */
 	@Override
 	public String getName()
