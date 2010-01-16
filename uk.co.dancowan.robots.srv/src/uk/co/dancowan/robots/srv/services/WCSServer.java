@@ -24,7 +24,7 @@ import com.surveyor.wstreamd.StreamServer;
  * <p>Derived from code written by the Surveyor Corporation (c) 2005 2009.</p>
  *
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class WCSServer extends Thread
 {
@@ -105,6 +105,7 @@ public class WCSServer extends Thread
 	 * 
 	 * <p>Should be a short running thread.</p>
 	 */
+	@Override
 	public void run()
 	{
 		// wait to ensure properties have loaded

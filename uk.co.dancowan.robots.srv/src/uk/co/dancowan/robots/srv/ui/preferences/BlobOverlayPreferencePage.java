@@ -42,6 +42,7 @@ public class BlobOverlayPreferencePage extends FieldEditorPreferencePage impleme
 	/**
 	 * Creates the field editors.
 	 */
+	@Override
 	public void createFieldEditors()
 	{
 		new Label(getFieldEditorParent(), SWT.NONE);
