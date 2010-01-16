@@ -13,19 +13,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.featuredetector;
 
-import uk.co.dancowan.robots.hal.core.CommandEvent;
-import uk.co.dancowan.robots.hal.core.CommandListener;
-import uk.co.dancowan.robots.hal.core.CommandQ;
-import uk.co.dancowan.robots.srv.hal.SrvHal;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.GrabPatternCmd;
-
 /**
  * This class acts as a container for stored Patterns.
  * 
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class PatternMemory implements CommandListener
+public class PatternMemory
 {
 	private static final int MAX_PATTERNS = 16;
 
@@ -34,13 +28,14 @@ public class PatternMemory implements CommandListener
 	public PatternMemory()
 	{
 		mPatternArray = new Pattern[MAX_PATTERNS];
+		createPatterns();
 	}
 
 	/**
 	 * Returns the <code>Pattern</code> at the passed index.
 	 * 
-	 * @throws IndexOutOfBoundsException
 	 * @param index the pattern to return
+	 * @throws IndexOutOfBoundsException
 	 * @return Pattern the pattern
 	 */
 	public Pattern getPattern(int index)
@@ -54,9 +49,9 @@ public class PatternMemory implements CommandListener
 	/**
 	 * Sets the <code>Pattern</code> in the passed index.
 	 * 
-	 * @throws IndexOutOfBoundsException
 	 * @param pattern the Pattern to set
 	 * @param index
+	 * @throws IndexOutOfBoundsException
 	 */
 	public void setPattern(Pattern pattern, int index)
 	{
@@ -71,75 +66,17 @@ public class PatternMemory implements CommandListener
 	 */
 	public void refreshPatterns()
 	{
-		CommandQ cmdQ = SrvHal.getCommandQ();
+		for (Pattern pattern : mPatternArray)
+		{
+			pattern.refreshPattern();
+		}
+	}
+
+	private void createPatterns()
+	{
 		for (int i = 0; i < MAX_PATTERNS; i ++)
 		{
-			GrabPatternCmd cmd = new GrabPatternCmd(i);
-			cmd.addListener(this);
-			cmdQ.addCommand(cmd);
+		setPattern(new Pattern(i), i);	
 		}
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandExecuted(uk.co.dancowan.robots.hal.core.CommandEvent)
-	 */
-	@Override
-	public void commandExecuted(CommandEvent e)
-	{
-		// NOP
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandFailed(uk.co.dancowan.robots.hal.core.CommandEvent)
-	 */
-	@Override
-	public void commandFailed(CommandEvent e)
-	{
-		// NOP
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandCompleted(uk.co.dancowan.robots.hal.core.CommandEvent)
-	 */
-	@Override
-	public void commandCompleted(CommandEvent e)
-	{
-		String result = e.getMessage();
-		int index = ((GrabPatternCmd) e.getSource()).getPatternIndex();
-		decodePatternInfo(result, index);
-	}
-
-	/*
-	 * Parse a Pattern object from the command result.
-	 */
-	private void decodePatternInfo(String info, int index)
-	{
-		Pattern pattern = new Pattern();
-		String[] lines = info.split("\r");
-		for (int i = 1; i < lines.length; i ++)
-		{
-			String line = lines[i];
-			pattern.setFromString(parseLine(line), i - 1);
-		}
-		setPattern(pattern, index);
-	}
-
-	/*
-	 * Parse a line from SRV format into Command format
-	 * ' **    **    **    **   ' = '10101010'
-	 */
-	private String parseLine(String line)
-	{
-		assert line.length() == 24 : "Bad line length: " + line.length() + "/24";
-
-		StringBuilder sb = new StringBuilder();
-		for (int i = 2; i < 24; i += 3)
-		{
-			if (line.charAt(i) == '*')
-				sb.append("1");
-			else
-				sb.append("0");
-		}
-		return sb.toString();
 	}
 }
