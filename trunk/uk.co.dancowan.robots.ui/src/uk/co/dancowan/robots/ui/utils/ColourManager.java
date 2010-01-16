@@ -69,7 +69,7 @@ public class ColourManager
 	 * Get a system colour using SWT constants.
 	 * 
 	 * @param swt int constant
-	 * @return
+	 * @return Color
 	 */
 	public static Color getColour(int swt)
 	{

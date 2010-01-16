@@ -20,7 +20,7 @@ import uk.co.dancowan.robots.ui.Activator;
 /**
  * Action is associated with an instance of a <code>Clearable</code> object.
  * 
- * @see uk.co.dancowan.robots.views.actions.Clearable
+ * @see uk.co.dancowan.robots.ui.views.actions.Clearable
  * @author Dan Cowan
  * @since version 1.0.0
  */
