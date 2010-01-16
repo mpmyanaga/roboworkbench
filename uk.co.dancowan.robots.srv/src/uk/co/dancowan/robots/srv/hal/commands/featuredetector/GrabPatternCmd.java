@@ -49,17 +49,7 @@ public class GrabPatternCmd extends AbstractCommand
 	}
 
 	/**
-	 * Returns the index of the grabbed <code>Pattern</code>.
-	 * 
-	 * @return int index
-	 */
-	public int getPatternIndex()
-	{
-		return mIndex;
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getHeader()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
 	 */
 	@Override
 	public byte[] getHeader()
@@ -91,8 +81,9 @@ public class GrabPatternCmd extends AbstractCommand
 	 * Writes the byte translation of the result of a call to <code>
 	 * getCommandString()</code> to the output stream.
 	 * 
-	 * @param srv the SRV1 instance
+	 * @param cmdQ the CommandQ instance
 	 */
+	@Override
 	protected void write(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
@@ -106,9 +97,10 @@ public class GrabPatternCmd extends AbstractCommand
 	/**
 	 * Read the data from the connection into a String.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.Command#read()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 * @param cmdQ the CommandQ instance
 	 */
+	@Override
 	protected String read(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
@@ -160,7 +152,7 @@ public class GrabPatternCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.srv1.commands.PollCommand#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
 	 */
 	@Override
 	public String getName()
