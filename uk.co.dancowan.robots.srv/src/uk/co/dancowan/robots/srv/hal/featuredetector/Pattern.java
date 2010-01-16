@@ -13,7 +13,14 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.featuredetector;
 
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import uk.co.dancowan.robots.hal.core.CommandEvent;
+import uk.co.dancowan.robots.hal.core.CommandListener;
+import uk.co.dancowan.robots.srv.hal.SrvHal;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.GrabPatternCmd;
 
 /**
  * Class represents a potential pattern.
@@ -21,39 +28,68 @@ import java.util.Iterator;
  * <p>The SRV stores and recognises patterns encoded as a series of 8 8 bit
  * characters, much like the original ASCII characters of yore. A pattern is
  * stored thus:</p>
- * <pre> **    **    195
- * **    **    195
- * **    **    195
- * ********    255
- * ********    255
- * **    **    195
- * **    **    195
- * **    **    195</pre>
+ * <pre> **    **    11000011
+ * **    **    11000011
+ * **    **    11000011
+ * ********    11111111
+ * ********    11111111
+ * **    **    11000011
+ * **    **    11000011
+ * **    **    11000011</pre>
  * <p>Patterns are stored internally to this class as an array of bytes.</p>
+ * 
  * @author Dan Cowan
  * @since version 1.0.0
  */
 public class Pattern
 {
-	private byte[] mPattern;
+	private final List<PatternListener> mListeners;
+	private final int mIndex;
+	private String[] mPattern;
 
 	/**
 	 * C'tor.
+	 * 
+	 * @param index int
 	 */
-	public Pattern()
+	public Pattern(int index)
 	{
-		mPattern = new byte[8];
+		mListeners = new ArrayList<PatternListener>();
+		mIndex = index;
+		mPattern = new String[8];
 	}
 
 	/**
-	 * Returns the byte at the passed index.
+	 * Add this listener to the collection of listeners notified
+	 * of changes to this pattern.
+	 * 
+	 * @param listener
+	 */
+	public void addListener(PatternListener listener)
+	{
+		mListeners.add(listener);
+	}
+
+	/**
+	 * Remove this listener from the collection of listeners notified
+	 * of changes to this pattern.
+	 * 
+	 * @param listener
+	 */
+	public void removeListener(PatternListener listener)
+	{
+		mListeners.remove(listener);
+	}
+
+	/**
+	 * Returns the String encoding at the passed index.
 	 * 
 	 * <p>Index value should be between 0 and 7 inclusive.</p>
 	 * 
-	 * @throws IndexOutOfBoundsException
 	 * @param index the index to set the value at
+	 * @throws IndexOutOfBoundsException
 	 */
-	public byte get(int index)
+	public String get(int index)
 	{
 		if (index < 0 || index > 7)
 			throw new IndexOutOfBoundsException("Index out of bounds, should be between 0 and 7 inclusive but found " + index);
@@ -62,60 +98,52 @@ public class Pattern
 	}
 
 	/**
-	 * Sets the byte at the passed index.
+	 * Sets the String at the passed index.
 	 * 
 	 * <p>Index value should be between 0 and 7 inclusive.</p>
 	 * 
-	 * @throws IndexOutOfBoundsException
-	 * @param value the byte value to set
+	 * @param value the String value to set
 	 * @param index the index to set the value at
+	 * @throws IndexOutOfBoundsException
 	 */
-	public void set(byte value, int index)
+	public void set(String value, int index)
 	{
 		if (index < 0 || index > 7)
 			throw new IndexOutOfBoundsException("Index out of bounds, should be between 0 and 7 inclusive but found " + index);
 
 		mPattern[index] = value;
+		notifyListeners();
 	}
 
 	/**
-	 * Sets the byte at the passed index from the passed String.
-	 * 
-	 * <p>The String should be a binary representation of the pattern's
-	 * line information.</p>
-	 * 
-	 * <p>Index value should be between 0 and 7 inclusive.</p>
-	 * 
-	 * @throws IndexOutOfBoundsException
-	 * @param value the String value to encode and set
-	 * @param index the index to set the value at
+	 * Send a grabBinCmd for this colour bin and set the colour accordingly.
 	 */
-	public void setFromString(String value, int index)
+	public void refreshPattern()
 	{
-		if (index < 0 || index > 7)
-			throw new IndexOutOfBoundsException("Index out of bounds, should be between 0 and 7 inclusive but found " + index);
-
-		mPattern[index] = (byte) encode(value);
-	}
-
-	/**
-	 * Returns the byte at the passed index as a decoded String.
-	 * 
-	 * <p>String will be in the form 1001010 derived from parsing
-	 * the byte as binary.
-	 * 
-	 * <p>Index value should be between 0 and 7 inclusive.</p>
-	 * 
-	 * @throws IndexOutOfBoundsException
-	 * @param value the byte value to set
-	 * @param index the index to set the value at
-	 */
-	public String getAsString(int index)
-	{
-		if (index < 0 || index > 7)
-			throw new IndexOutOfBoundsException("Index out of bounds, should be between 0 and 7 inclusive but found " + index);
-
-		return decode(mPattern[index]);
+		GrabPatternCmd cmd = new GrabPatternCmd(mIndex);
+		cmd.addListener(new CommandListener()
+		{
+			@Override
+			public void commandFailed(CommandEvent e)
+			{
+				// NOP		
+			}
+			@Override
+			public void commandExecuted(CommandEvent e)
+			{
+				// NOP
+			}
+			/**
+			 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandCompleted(uk.co.dancowan.robots.hal.core.CommandEvent)
+			 */
+			@Override
+			public void commandCompleted(CommandEvent e)
+			{
+				decodePatternInfo(e.getMessage());
+				notifyListeners();
+			}
+		});
+		SrvHal.getCommandQ().addCommand(cmd);
 	}
 	
 	/**
@@ -123,70 +151,66 @@ public class Pattern
 	 * 
 	 * @return Iterator
 	 */
-	public Iterator<Byte> iterator()
+	public Iterator<String> iterator()
 	{
 		return new PatternIterator(mPattern);
 	}
 
 	/*
-	 * Takes an  8 char String of the form 10010101 and returns
-	 * a byte decoded via binary.
+	 * Notify listeners of a change
 	 */
-	private int encode(String value)
+	private void notifyListeners()
 	{
-		assert value.length() == 8 : "Incorrect String passed: " + value;
-
-		int val = 0;
-		for (int i = 0; i < 8; i ++)
+		for (PatternListener listener : mListeners)
 		{
-			if (value.charAt(7 - i) != '0')
-				val += Math.pow(2, i);
+			listener.patternUpdated();
 		}
-		return val;
 	}
 
 	/*
-	 * Return a String of the form 1001010 for a passed byte.
+	 * Parse a Pattern object from the command result.
 	 */
-	private String decode(byte b)
+	private void decodePatternInfo(String info)
 	{
-		StringBuilder sb = new StringBuilder();
-
-		int unsigned = unsignedByteToInt(b);
-		for (int i = 7; i >= 0; i --)
+		String[] lines = info.split("\r");
+		for (int i = 1; i < lines.length; i ++)
 		{
-			if ((unsigned & (int)Math.pow(2, i)) == (int)Math.pow(2, i))
-			{
+			String line = lines[i];
+			set(parseLine(line), i - 1);
+		}
+	}
+
+	/*
+	 * Parse a line from SRV format into Command format
+	 * ' **    **    **    **   ' = '10101010'
+	 */
+	private String parseLine(String line)
+	{
+		assert line.length() == 24 : "Bad line length: " + line.length() + "/24";
+
+		StringBuilder sb = new StringBuilder();
+		for (int i = 2; i < 24; i += 3)
+		{
+			if (line.charAt(i) == '*')
 				sb.append("1");
-			}
 			else
-			{
 				sb.append("0");
-			}
 		}
 		return sb.toString();
 	}
 
 	/*
-	 * Unsign the byte (must then be an int)
+	 * Simple Iterator to read String lines out of the pattern.
 	 */
-	private int unsignedByteToInt(byte b)
+	private class PatternIterator implements Iterator<String>
 	{
-		return (int) b & 0xFF;
-	}
-
-	/*
-	 * Simple Iterator to read bytes out of the pattern.
-	 */
-	private class PatternIterator implements Iterator<Byte>
-	{
-		private final byte[] mPattern;
+		private final String[] mPattern;
 		private int mIndex;
 
 		/*
 		 * Private constructor checks pattern correctness
 		 */
-		private PatternIterator(byte[] pattern)
+		private PatternIterator(String[] pattern)
 		{
 			assert pattern.length == 8 : "Miscoded pattern detected. " + pattern;
 
@@ -207,7 +231,7 @@ public class Pattern
 		 * @see java.util.Iterator#next()
 		 */
 		@Override
-		public Byte next()
+		public String next()
 		{
 			// Note that mIndex is post incremented
 			return mPattern[mIndex ++];
@@ -222,7 +246,7 @@ public class Pattern
 		@Override
 		public void remove()
 		{
-			throw new UnsupportedOperationException("Cannot remove a byte from a Pattern.");	
+			throw new UnsupportedOperationException("Cannot remove a line from a Pattern.");	
 		}	
 	}
 }
