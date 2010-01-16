@@ -46,7 +46,6 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
 public class ColourBinWidget extends Composite implements ColourBinListener, PaintListener
 {
 	private final ColourBin mBin;
-	private final Camera mCamera;
 
 	private boolean mSelected;
 	private ColourBinEditor mEditor;
@@ -63,8 +62,8 @@ public class ColourBinWidget extends Composite implements ColourBinListener, Pai
 	{
 		super(parent, SWT.NONE);
 
-		mCamera = SrvHal.getCamera();
-		mBin = mCamera.getDetector().getBin(bin);
+		Camera camera = SrvHal.getCamera();
+		mBin = camera.getDetector().getBin(bin);
 		mBin.addListener(this);
 		mEditor = editor;
 
@@ -89,7 +88,7 @@ public class ColourBinWidget extends Composite implements ColourBinListener, Pai
 				if ( ! mSelected)
 				{
 					mSelected = true;
-					mCamera.getDetector().setFocusBin(getBin().getBin());
+					SrvHal.getCamera().getDetector().setFocusBin(getBin().getBin());
 					redraw();
 					notifyListeners(SWT.Selection, new Event()); // event is not read so OK just as a token
 					mEditor.selectionChanged();
@@ -134,7 +133,7 @@ public class ColourBinWidget extends Composite implements ColourBinListener, Pai
 	/**
 	 * Set the selection state of this widget.
 	 * 
-	 * @param selected boolean
+	 * @return boolean
 	 */
 	public boolean getSelection()
 	{
@@ -156,7 +155,7 @@ public class ColourBinWidget extends Composite implements ColourBinListener, Pai
 	/**
 	 * Update this composite with the latest from the bin
 	 * 
-	 * @see 
+	 * @see uk.co.dancowan.robots.srv.hal.featuredetector.ColourBinListener#colourChanged(YUV)
 	 */
 	public void colourChanged(final YUV yuv)
 	{
