@@ -64,13 +64,20 @@ public class GrabImageCmd extends AbstractCommand
 	/**
 	 * Low priority command.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getPriority()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getPriority()
 	 */
+	@Override
 	public int getPriority()
 	{
 		return PRIORITY;
 	}
 
+	/**
+	 * Returns the command string to execute
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
+	 */
+	@Override
 	protected String getCommandString()
 	{
 		return CommandUtils.byteArrayToHex(COMMAND.getBytes());
@@ -79,7 +86,7 @@ public class GrabImageCmd extends AbstractCommand
 	/**
 	 * Read the data from the connection into an Image
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#read()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 */
 	@Override
 	protected String read(CommandQ srv) throws IOException
@@ -154,7 +161,7 @@ public class GrabImageCmd extends AbstractCommand
 	/**
 	 * Returns the result header: ##IMJ
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getHeader()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
 	 */
 	@Override
 	protected byte[] getHeader()

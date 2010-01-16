@@ -27,7 +27,7 @@ import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
  * via the configured receiver class.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class PixelGrabber
 {
@@ -38,7 +38,6 @@ public class PixelGrabber
 	/**
 	 * C'tor.
 	 *
-	 * @param srv the srv1q instance
 	 * @param receiver the widget wrapping a colour bin.
 	 */
 	public PixelGrabber(ColourBin receiver)
