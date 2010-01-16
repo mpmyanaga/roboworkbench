@@ -35,7 +35,7 @@ import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
  * and paints the blobs to the screen.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class BlobOverlay implements OverlayContributor, IPropertyChangeListener
 {
@@ -76,7 +76,7 @@ public class BlobOverlay implements OverlayContributor, IPropertyChangeListener
 	/**
 	 * Outlines most recent blob information..
 	 * 
-	 * @see uk.co.dancowan.srv1q.views.camera.AbstractBinOverlay#paintOverlay()
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(BufferedImage)
 	 */
 	@Override
 	public void paintOverlay(BufferedImage image)

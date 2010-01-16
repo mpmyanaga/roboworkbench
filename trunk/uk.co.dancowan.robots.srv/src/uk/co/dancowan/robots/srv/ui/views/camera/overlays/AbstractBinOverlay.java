@@ -33,7 +33,7 @@ import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
  * 
  * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.ColourBinOverlay
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public abstract class AbstractBinOverlay implements OverlayContributor
 {
@@ -48,7 +48,7 @@ public abstract class AbstractBinOverlay implements OverlayContributor
 	 * <p>Configures the overlay with a <code>ColourBin</code> as a source
 	 * of the overlay's colour bin information.</p>
 	 * 
-	 * @param item the source PalletteItem
+	 * @param bin ColourBin
 	 */
 	public AbstractBinOverlay(ColourBin bin)
 	{
@@ -84,7 +84,7 @@ public abstract class AbstractBinOverlay implements OverlayContributor
 	/**
 	 * Extending classes must implement to paint overlay.
 	 * 
-	 * @see uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor#paintOverlay()
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor#paintOverlay(BufferedImage)
 	 */
 	@Override
 	public abstract void paintOverlay(BufferedImage image);
