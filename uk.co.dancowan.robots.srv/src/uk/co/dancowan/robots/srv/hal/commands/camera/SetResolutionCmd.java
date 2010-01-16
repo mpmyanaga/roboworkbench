@@ -53,7 +53,7 @@ public class SetResolutionCmd extends SendString
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.SendString#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.SendString#getName() 
 	 */
 	@Override
 	public String getName()
