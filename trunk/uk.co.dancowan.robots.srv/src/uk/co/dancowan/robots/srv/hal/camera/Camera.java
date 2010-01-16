@@ -34,7 +34,7 @@ import uk.co.dancowan.robots.srv.hal.featuredetector.FeatureDetector;
  * the Camera instance as a facade to enable state and correct response decoding.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class Camera implements ConnectionListener, Component
 {
@@ -55,14 +55,10 @@ public class Camera implements ConnectionListener, Component
 	}
 
 	/**
-	 * Configures the <Code>Camera</code> with a <code>FrameDecoder</code>
+	 * Configures the <Code>Camera</code> with a <code>CameraImageConsumer</code>
 	 * instance.
 	 * 
-	 * <p>The <code>FrameDecoder</code> is used to turn the byte data gathered
-	 * from the <code>Connection</code> class's input stream by the <code>
-	 * GrabImageCmd</code> into images for rendering.</p>
-	 * 
-	 * @param decoder the FrameDecoder to use
+	 * @param consumer the typed CamerImageConsumer to use
 	 */
 	public void setConsumer(CameraImageConsumer<java.awt.Component> consumer)
 	{

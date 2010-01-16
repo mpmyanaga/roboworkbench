@@ -186,7 +186,6 @@ public class FrameDecoder extends Thread
 
 	/**
 	 * Enable or block this operation.
-	 * @param shouldRun
 	 */
 	public void terminate()
 	{
@@ -232,7 +231,7 @@ public class FrameDecoder extends Thread
 		{
 			for (int j = 0; j < 8; j++)
 			{
-				if (((int)mImageBytes[i] & (0x00000080 >> j)) > 0)
+				if ((mImageBytes[i] & (0x00000080 >> j)) > 0)
 				{
 					mPixels[i*8 + j] = 0xFFFFFFFF;
 				}

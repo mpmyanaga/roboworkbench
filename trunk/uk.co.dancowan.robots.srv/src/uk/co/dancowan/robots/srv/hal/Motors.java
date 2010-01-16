@@ -74,7 +74,7 @@ public class Motors extends AbstractComponent
 	 */
 	public int getMotorValue(int selection, int max)
 	{
-		int value = (int)(256 * (double)selection/(double)max);
+		int value = (int)(256 * (double)selection/max);
 		if (value < 128)
 			value = 127 - value;
 		else
@@ -85,6 +85,7 @@ public class Motors extends AbstractComponent
 	/**
 	 * @see uk.co.dancowan.robots.hal.core.AbstractComponent#getID()
 	 */
+	@Override
 	public String getID()
 	{
 		return ID;

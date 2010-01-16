@@ -16,7 +16,7 @@ package uk.co.dancowan.robots.srv.hal.camera;
 /**
  *
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public interface CameraListener
 {

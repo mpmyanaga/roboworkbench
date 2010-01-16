@@ -51,7 +51,7 @@ public class CameraPollThread extends Thread
 		mShouldTerminate = false;
 		
 		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
-		mPollDelay = (Integer) store.getInt(PreferenceConstants.CAMERA_POLL_DELAY);
+		mPollDelay = store.getInt(PreferenceConstants.CAMERA_POLL_DELAY);
 		
 		setName("Camera Poll Thread");
 	}
@@ -62,6 +62,7 @@ public class CameraPollThread extends Thread
 	 * 
 	 * @see java.lang.Thread
 	 */
+	@Override
 	public void run()
 	{
 		long lastPoll = System.currentTimeMillis();
