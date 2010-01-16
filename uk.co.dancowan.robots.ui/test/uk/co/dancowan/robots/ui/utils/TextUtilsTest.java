@@ -26,8 +26,6 @@ public class TextUtilsTest extends TestCase
 {
 	/**
 	 * C'tor.
-	 * 
-	 * @see junit.framework.TextCase(java.lang.String)
 	 */
 	public TextUtilsTest(String name)
 	{
