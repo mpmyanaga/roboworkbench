@@ -3,6 +3,8 @@
 	<name>uk.co.dancowan.robots.srv</name>
 	<comment></comment>
 	<projects>
+		<project>uk.co.dancowan.robots.hal</project>
+		<project>uk.co.dancowan.robots.ui</project>
 	</projects>
 	<buildSpec>
 		<buildCommand>
