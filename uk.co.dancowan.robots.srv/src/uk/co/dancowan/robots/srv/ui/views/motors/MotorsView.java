@@ -144,6 +144,7 @@ public class MotorsView extends ScrolledView
 		return part;
 	}
 
+	@Override
 	public String getID()
 	{
 		return ID;
@@ -215,6 +216,7 @@ public class MotorsView extends ScrolledView
 		lMotor.setToolTipText("Left motor power: " + getDisplayMotorValue(lMotor.getSelection(), 200));
 		lMotor.addSelectionListener(new SelectionAdapter()
 		{
+			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				if (e.getSource() instanceof Slider)
@@ -248,6 +250,7 @@ public class MotorsView extends ScrolledView
 		bothMotors.setToolTipText("Both motors");
 		bothMotors.addSelectionListener(new SelectionAdapter()
 		{
+			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				if (e.getSource() instanceof Slider)
@@ -269,6 +272,7 @@ public class MotorsView extends ScrolledView
 		trim.setToolTipText("Motor trim.");
 		trim.addSelectionListener(new SelectionAdapter()
 		{
+			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
 				if (e.getSource() instanceof Spinner)
@@ -421,11 +425,11 @@ public class MotorsView extends ScrolledView
 	}
 
 	/*
-	 * Translates slider value into display motor value (-100 m-> 100) for tooltips
+	 * Translates slider value into display motor value (-100 m-> 100) for tool-tips
 	 */
 	private int getDisplayMotorValue(int selection, int max)
 	{
-		int value = (int)(200 * (double)selection/(double)max);
+		int value = (int)(200 * (double)selection/max);
 		if (value < 100)
 			value = 100 - value;
 		else
