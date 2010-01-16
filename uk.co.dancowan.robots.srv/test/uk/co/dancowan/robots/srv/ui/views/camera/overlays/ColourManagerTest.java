@@ -24,7 +24,7 @@ import uk.co.dancowan.robots.srv.ui.views.camera.YUVUtils;
  * Colour mapping methods test suite.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ColourManagerTest extends TestCase
 {

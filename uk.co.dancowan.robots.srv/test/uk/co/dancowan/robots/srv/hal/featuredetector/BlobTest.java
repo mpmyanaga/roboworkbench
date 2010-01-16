@@ -26,7 +26,7 @@ import junit.framework.TestCase;
 public class BlobTest extends TestCase
 {
 	/**
-	 * Test method for {@link uk.co.dancowan.robots.srv.ui.views.camera.overlays.BlobOverlay#processBlobData(java.lang.String)}.
+	 * Test method for {@link uk.co.dancowan.robots.srv.hal.featuredetector.FeatureDetector#processBlobData(java.lang.String)}.
 	 */
 	public void testProcessMessage()
 	{
