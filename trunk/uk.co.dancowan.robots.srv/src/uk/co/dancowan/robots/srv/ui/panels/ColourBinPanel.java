@@ -67,23 +67,24 @@ public class ColourBinPanel implements Panel
 	@Override
 	public Composite getPanel(Composite parent)
 	{
-		Composite palletteComposite = new Group(parent, SWT.NONE);
-		palletteComposite.setLayout(new GridLayout(FeatureDetector.BIN_COUNT, true));
+		Group panel = new Group(parent, SWT.NONE);
+		panel.setText("Colour Bins");
+		panel.setLayout(new GridLayout(FeatureDetector.BIN_COUNT, true));
 
 		final ColourBinEditor editor = new ColourBinEditor(mCameraCanvas);
 		for (int i = 0; i < FeatureDetector.BIN_COUNT; i ++)
 		{
-			ColourBinWidget c = new ColourBinWidget(i, palletteComposite, editor);
+			ColourBinWidget c = new ColourBinWidget(i, panel, editor);
 			c.setLayoutData(new GridData(GridData.FILL_BOTH));
-			if ( i == 0)
+			if (i == 0)
 				c.setSelection(true);
 			mBinSet.addWidget(c);
 		}
 		
-		editor.addWidgets(palletteComposite);
-		palletteComposite.pack();
+		editor.addWidgets(panel);
+		panel.pack();
 		editor.selectionChanged();
-		return palletteComposite;
+		return panel;
 	}
 
 	/**
