@@ -30,7 +30,7 @@ import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
  * 
  * <p>Use <code>BlobOverlay</code> for an alternative approximation.</p>
  * 
- * @see uk.co.dancowan.srv1q.views.camera.BlobOverlay
+ * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.BlobOverlay
  * @author Dan Cowan
  * @since version 1.0.0
  */
@@ -43,7 +43,7 @@ public class ColourBinOverlay extends AbstractBinOverlay
 	/**
 	 * C'tor.
 	 *
-	 * @param item
+	 * @param bin ColourBin
 	 */
 	public ColourBinOverlay(ColourBin bin)
 	{
@@ -78,7 +78,7 @@ public class ColourBinOverlay extends AbstractBinOverlay
 	 * Paints those pixels falling within the configured colour bin's bounds in a
 	 * fixed colour.
 	 * 
-	 * @see uk.co.dancowan.srv1q.views.camera.AbstractBinOverlay#paintOverlay()
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(BufferedImage)
 	 */
 	@Override
 	public void paintOverlay(BufferedImage image)
