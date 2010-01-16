@@ -107,7 +107,6 @@ public class FeatureDetector extends AbstractComponent
 	 * list.</p>
 	 * 
 	 * @throws IndexOutOfBoundsException
-	 * @param index int
 	 */
 	public ColourBin getBin(int index)
 	{
@@ -121,7 +120,6 @@ public class FeatureDetector extends AbstractComponent
 	 * is out of bounds. 0 <= index <= 15.</p>
 	 * 
 	 * @throws IndexOutOfBoundsException
-	 * @param index int
 	 */
 	public void setFocusBin(int index)
 	{

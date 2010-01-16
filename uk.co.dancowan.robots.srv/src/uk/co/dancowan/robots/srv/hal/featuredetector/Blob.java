@@ -18,7 +18,7 @@ package uk.co.dancowan.robots.srv.hal.featuredetector;
  * content.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class Blob
 {

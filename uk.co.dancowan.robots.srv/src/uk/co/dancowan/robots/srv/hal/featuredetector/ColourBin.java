@@ -30,7 +30,7 @@ import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SetBinCmd;
  * Represents and SRV internal colour bin.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class ColourBin
 {
@@ -121,7 +121,7 @@ public class ColourBin
 	 * Sets this bin's contents according to the passed YUV and the default
 	 * threshold value.
 	 * 
-	 * @param YUV
+	 * @param yuv
 	 */
 	public void setYUV(YUV yuv)
 	{
@@ -228,7 +228,7 @@ public class ColourBin
 	/**
 	 * Return true if the passed <RGB>YUV</code> lies within this bin.
 	 * 
-	 * @param YUV
+	 * @param yuv
 	 */
 	public boolean withinBin(YUV yuv)
 	{
@@ -371,6 +371,45 @@ public class ColourBin
 	public int getBin()
 	{
 		return mBin;
+	}
+
+	/**
+	 * Widen the colour threshold by the passed amount
+	 * 
+	 * <p>Amount must be between 0 and 255 and the actual YUV bounds will be clipped
+	 * appropriately. Clipping means the mean YUV value may change when a boundary is met.</p>
+	 */
+	public void widen(int points)
+	{
+		int widen = points/2;
+		if (widen < 1)
+			widen = 1;
+
+		setYmax(bound(getYmax() + widen));
+		setYmin(bound(getYmin() - widen));
+		setUmax(bound(getUmax() + widen));
+		setUmin(bound(getUmin() - widen));
+		setVmax(bound(getVmax() + widen));
+		setVmin(bound(getVmin() - widen));
+	}
+
+	/**
+	 * Narrow the colour threshold by the passed amount
+	 * 
+	 * <p>Amount must be between 0 and 255.</p>
+	 */
+	public void narrow(int points)
+	{
+		int widen = points/2;
+		if (widen < 1)
+			widen = 1;
+
+		setYmax(bound(getYmax() - widen));
+		setYmin(bound(getYmin() + widen));
+		setUmax(bound(getUmax() - widen));
+		setUmin(bound(getUmin() + widen));
+		setVmax(bound(getVmax() - widen));
+		setVmin(bound(getVmin() + widen));
 	}
 
 	/**
