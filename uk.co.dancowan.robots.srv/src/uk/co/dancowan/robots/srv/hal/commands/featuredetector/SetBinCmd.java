@@ -37,8 +37,7 @@ public class SetBinCmd extends AbstractCommand
 	/**
 	 * C'tor.
 	 * 
-	 * @param yuv the YUV instance to send
-	 * @param threshold the -/= threshold of the bin
+	 * @param bin ColourBin
 	 */
 	public SetBinCmd(ColourBin bin)
 	{
@@ -49,7 +48,7 @@ public class SetBinCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
 	 */
 	@Override
 	public String getName()
@@ -60,7 +59,7 @@ public class SetBinCmd extends AbstractCommand
 	/**
 	 * Creates a hexadecimal command.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getCommandString()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
 	 */
 	@Override
 	public String getCommandString()
