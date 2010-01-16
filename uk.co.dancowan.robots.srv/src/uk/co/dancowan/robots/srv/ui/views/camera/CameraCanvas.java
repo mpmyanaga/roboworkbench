@@ -98,7 +98,7 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	 * as necessary and paint the incoming image to the buffer.
 	 * 
 	 * @param image incoming from a FrameDecoder
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#setImage(java.awt.Image)
+	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#setImage(Image, boolean)
 	 */
 	public void setImage(Image image, boolean isNew)
 	{
@@ -214,7 +214,7 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#get(int)
+	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#getTargetWidget()
 	 */
 	public Component getTargetWidget()
 	{

@@ -27,7 +27,7 @@ import org.eclipse.swt.widgets.Listener;
  * <p>Only one widget in the collection can be selected at any one time.</p>
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public class BinWidgetRadioManager implements Listener
 {
