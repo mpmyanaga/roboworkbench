@@ -143,8 +143,8 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 * uses an AWT <code>Image</code> placed on an AWT <code>Canvas</code> instance
 	 * to assist with rendering the streamed image from the SRV1 Camera.</p>
 	 * 
-	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getPartControl(Composite))
-	 * @param parent, the Composite to add widgets to
+	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getPartControl(Composite)
+	 * @param parent the Composite to add widgets to
 	 * @return Composite the container of view's controls
 	 */
 	@Override
@@ -177,8 +177,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 
 		final Composite pollComposite = getPollComposite(part);
 		final Composite locationComposite = getLocationComposite(part);
-		final Composite actionComposite = getActionComposite(part);
+		final Composite actionComposite = getResolutionComposite(part);
 		mColourBinComposite = mColourBinPanel.getPanel(part);
+		//mColourBinComposite = new PatternPanel().getPanel(part);
 
 		// Image Canvas/Frame layout
 		FormData data = new FormData();
@@ -227,6 +228,10 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		return part;
 	}
 
+	/**
+	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getID()
+	 */
+	@Override
 	public String getID()
 	{
 		return ID;
@@ -352,8 +357,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 */
 	private Composite getPollComposite(Composite parent)
 	{
-		final Composite pollComposite = new Group(parent, SWT.NONE);
+		final Group pollComposite = new Group(parent, SWT.NONE);
 		pollComposite.setLayout(new GridLayout(3, true));
+		pollComposite.setText("Polling");
 
 		final Button poll = new Button(pollComposite, SWT.TOGGLE);
 		poll.setText("Poll");
@@ -508,12 +514,13 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	/*
 	 * Creates the Composite and listeners for image scaling and overlays
 	 */
-	private Composite getActionComposite(Composite parent)
+	private Composite getResolutionComposite(Composite parent)
 	{
-		final Composite actionComposite = new Group(parent, SWT.NONE);
-		actionComposite.setLayout(new GridLayout(4, true));
+		final Group resolution = new Group(parent, SWT.NONE);
+		resolution.setLayout(new GridLayout(4, true));
+		resolution.setText("Resolution");
 		
-		final Button scale = new Button(actionComposite, SWT.CHECK);
+		final Button scale = new Button(resolution, SWT.CHECK);
 		scale.setText("Fit to Screen");
 		scale.addSelectionListener(new SelectionAdapter()
 		{
@@ -528,7 +535,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		});
 		scale.setLayoutData(new GridData());
 
-		final Button medium = new Button(actionComposite, SWT.RADIO);
+		final Button medium = new Button(resolution, SWT.RADIO);
 		medium.setText("640 x 512");
 		medium.setToolTipText("Set image resolution to 640x480 pixels");
 		medium.addSelectionListener(new SelectionAdapter()
@@ -545,7 +552,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		});
 		medium.setLayoutData(new GridData());
 
-		final Button small = new Button(actionComposite, SWT.RADIO);
+		final Button small = new Button(resolution, SWT.RADIO);
 		small.setText("320 x 256");
 		small.setToolTipText("Set image resolution to 320x256 pixels");
 		small.addSelectionListener(new SelectionAdapter()
@@ -564,7 +571,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		small.setSelection(true);
 		mLastSize = small;
 
-		final Button tiny = new Button(actionComposite, SWT.RADIO);
+		final Button tiny = new Button(resolution, SWT.RADIO);
 		tiny.setText("160 x 128");
 		tiny.setToolTipText("Set image resolution to 160x128 pixels");
 		tiny.addSelectionListener(new SelectionAdapter()
@@ -581,9 +588,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		});
 		tiny.setLayoutData(new GridData());
 
-		actionComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		actionComposite.pack();
-		return actionComposite;
+		resolution.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		resolution.pack();
+		return resolution;
 	}
 
 	/*
@@ -600,44 +607,45 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 */
 	private Composite getLocationComposite(Composite parent)
 	{
-		final Composite locationComposite = new Group(parent, SWT.NONE);
-		locationComposite.setLayout(new GridLayout(6, false));
+		final Group location = new Group(parent, SWT.NONE);
+		location.setLayout(new GridLayout(6, false));
+		location.setText("Sampling");
 
-		getLabel(locationComposite, "FPS:");
-		mFPSText = getText(locationComposite);
+		getLabel(location, "FPS:");
+		mFPSText = getText(location);
 
-		getLabel(locationComposite, "Frame:");
-		mFrameText = getText(locationComposite);
+		getLabel(location, "Frame:");
+		mFrameText = getText(location);
 
-		getLabel(locationComposite, "");
-		getLabel(locationComposite, "");
+		getLabel(location, "");
+		getLabel(location, "");
 
-		getLabel(locationComposite, "X-loc:");
-		final Text xLocText = getText(locationComposite);
+		getLabel(location, "X-loc:");
+		final Text xLocText = getText(location);
 
-		getLabel(locationComposite, "R:");
-		final Text rText = getText(locationComposite);
+		getLabel(location, "R:");
+		final Text rText = getText(location);
 
-		getLabel(locationComposite, "        Y:");
-		final Text yText = getText(locationComposite);
+		getLabel(location, "        Y:");
+		final Text yText = getText(location);
 
-		getLabel(locationComposite, "Y-loc:");
-		final Text yLocText = getText(locationComposite);
+		getLabel(location, "Y-loc:");
+		final Text yLocText = getText(location);
 
-		getLabel(locationComposite, "G:");
-		final Text gText = getText(locationComposite);
+		getLabel(location, "G:");
+		final Text gText = getText(location);
 
-		getLabel(locationComposite, "U:");
-		final Text uText = getText(locationComposite);
+		getLabel(location, "U:");
+		final Text uText = getText(location);
 
-		getLabel(locationComposite, "");
-		getLabel(locationComposite, "");
+		getLabel(location, "");
+		getLabel(location, "");
 
-		getLabel(locationComposite, "B:");
-		final Text bText = getText(locationComposite);
+		getLabel(location, "B:");
+		final Text bText = getText(location);
 
-		getLabel(locationComposite, "V:");
-		final Text vText = getText(locationComposite);
+		getLabel(location, "V:");
+		final Text vText = getText(location);
 
 		mCameraCanvas.addMouseMotionListener(new MouseMotionAdapter()
 		{
@@ -696,9 +704,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 			}
 		});
 
-		locationComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		locationComposite.pack();
-		return locationComposite;
+		location.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		location.pack();
+		return location;
 	}
 
 	/*
