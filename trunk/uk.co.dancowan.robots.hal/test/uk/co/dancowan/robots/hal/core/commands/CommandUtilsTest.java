@@ -27,8 +27,6 @@ public class CommandUtilsTest extends TestCase
 {
 	/**
 	 * C'tor.
-	 * 
-	 * @see junit.framework.TextCase(java.lang.String)
 	 */
 	public CommandUtilsTest(String name)
 	{

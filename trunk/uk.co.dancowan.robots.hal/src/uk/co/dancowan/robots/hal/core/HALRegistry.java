@@ -32,7 +32,7 @@ import uk.co.dancowan.robots.hal.logger.LoggingService;
  * <p>As <code>Component</code> instances are registered those which are <code>Thread
  * </code>s are also auto-started as necessary.</p>
  * 
- * @see package uk.co.dancowan.robots.hal.core.Component 
+ * @see uk.co.dancowan.robots.hal.core.Component 
  * @author Dan Cowan
  * @since version 1.0.0
  */
@@ -87,8 +87,8 @@ public class HALRegistry
 	 * <p>Throws an <code>IllegalArgumentException</code> if another
 	 * components of the same class has already been registered.</p>
 	 * 
-	 * @throws IllegalArgumentException
 	 * @param component
+	 * @throws IllegalArgumentException
 	 */
 	public void register(Component component)
 	{

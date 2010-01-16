@@ -49,7 +49,7 @@ public interface Component
 	 * <p>This method can be used to register listeners on the newly registered
 	 * <code>Component</code>.</p>
 	 * 
-	 * @param Component the newly registered Component
+	 * @param component the newly registered Component
 	 */
 	public void componentAdded(Component component);
 
@@ -61,7 +61,7 @@ public interface Component
 	 * <p>This method should be used to remove listeners previously registered
 	 * <code>Component</code> and otherwise tidy up any relationship.</p>
 	 * 
-	 * @param Component the Component just removed
+	 * @param component the Component just removed
 	 */
 	public void componentRemoved(Component component);
 }
