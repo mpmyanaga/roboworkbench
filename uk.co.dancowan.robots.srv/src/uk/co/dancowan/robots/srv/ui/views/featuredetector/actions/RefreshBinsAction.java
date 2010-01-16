@@ -40,7 +40,7 @@ public class RefreshBinsAction extends Action
 	 */
 	public RefreshBinsAction(Composite composite)
 	{
-		super("Bins", Action.AS_PUSH_BUTTON);
+		super("Bins", AS_PUSH_BUTTON);
 
 		mRepaintComposite = composite;
 		setToolTipText("Refresh colour bins");
