@@ -32,7 +32,7 @@ public class RefreshBlobsAction extends Action
 	 */
 	public RefreshBlobsAction()
 	{
-		super("Blobs", Action.AS_PUSH_BUTTON);
+		super("Blobs", AS_PUSH_BUTTON);
 
 		setToolTipText("Refresh blobs");
 		setImageDescriptor(SRVActivator.getImageDescriptor("icons/cmd_grab_blobs.gif"));
