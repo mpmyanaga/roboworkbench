@@ -39,7 +39,7 @@ public class InputRenderer implements ExtendedModifyListener
 	/**
 	 * C'tor.
 	 *
-	 * @param text the StyledText widget to parse
+	 * @param console the CommandConsole to render upon
 	 */
 	public InputRenderer(CommandConsole console)
 	{

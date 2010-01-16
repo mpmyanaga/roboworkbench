@@ -43,7 +43,7 @@ public class TextUtils
 	 * 
 	 * @param value
 	 * @param min
-	 * @return
+	 * @return int
 	 */
 	public static int collar(int value, int min)
 	{
