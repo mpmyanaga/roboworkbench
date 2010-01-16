@@ -55,10 +55,10 @@ public class MotorCommandGenerator
 	 * Motor values are between 0 and 127 forwards and 128 and 256 for
 	 * reverse. Duration is in 10 millisecond units.</p>
 	 * 
-	 * @throws IllegalArgumentExceptio if parameters are out of bounds.
 	 * @param left left motor value
 	 * @param right right motor value
 	 * @param duration duration of command in 10ms units
+	 * @throws IllegalArgumentException if parameters are out of bounds.
 	 * @return MotorCmd the command to execute
 	 */
 	public static MotorsCmd getCommand(int left, int right, int duration)
@@ -120,7 +120,7 @@ public class MotorCommandGenerator
 	{
 		int halfway = mHeight/2;
 		int direction = xLoc > mWidth/2 ? 0 : 1;
-		int boundary = (int) (25 * (double)xLoc/(double)(mWidth/2));
+		int boundary = (int) (25 * (double)xLoc/(mWidth/2));
 		if (yLoc > halfway && yLoc < halfway + boundary)
 		{
 			// increment and wrap at 256 to reverse at same speed

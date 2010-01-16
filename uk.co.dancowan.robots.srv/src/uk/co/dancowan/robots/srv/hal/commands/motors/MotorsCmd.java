@@ -13,6 +13,7 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.commands.motors;
 
+import uk.co.dancowan.robots.hal.core.CommandQ;
 import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
 
 /**
@@ -51,9 +52,9 @@ public class MotorsCmd extends AbstractCommand
 	/**
 	 * Write the command request to the connection
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#read()
-	 * @param srv the SRV1 instance
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 */
+	@Override
 	protected String getCommandString()
 	{
 		// root command is already hex
@@ -68,7 +69,7 @@ public class MotorsCmd extends AbstractCommand
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.srv1.commands.AbstractCommand#getName()
+	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
 	 */
 	@Override
 	public String getName()
