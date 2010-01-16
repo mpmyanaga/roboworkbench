@@ -24,15 +24,16 @@ import uk.co.dancowan.robots.ui.Activator;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 
 /**
- * Class used to initialize default preference values for the SRV plugin.
+ * Class used to initialise default preference values for the SRV plugin.
  */
 public class PreferenceInitializer extends AbstractPreferenceInitializer
 {
 	/**
-	 * Initialize defaults.
+	 * Initialise defaults.
 	 * 
 	 * @see org.eclipse.core.runtime.preferences.AbstractPreferenceInitializer#initializeDefaultPreferences()
 	 */
+	@Override
 	public void initializeDefaultPreferences()
 	{
 		// Camera view, behaviour and appearance
@@ -43,6 +44,10 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 		store.setDefault(PreferenceConstants.CAMERA_POLL_DELAY, 200);
 		store.setDefault(PreferenceConstants.CAMERA_OUTPUT_FORMAT, "jpeg");
 		store.setDefault(PreferenceConstants.CAMERA_OUTPUT_FORMAT, System.getProperty("user.home"));
+
+		// Pattern recognition
+		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_COLOUR, ColourManager.getColour(SWT.COLOR_BLACK).getRGB());
+		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_COLOUR, ColourManager.getColour(SWT.COLOR_GRAY).getRGB());
 
 		// Blob Overlay
 		PreferenceConverter.setValue(store, PreferenceConstants.BLOB_OVERLAY_COLOUR, ColourManager.getColour(SWT.COLOR_RED).getRGB());
