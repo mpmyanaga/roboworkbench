@@ -20,14 +20,14 @@ import uk.co.dancowan.robots.srv.hal.camera.YUV;
  * colour.
  * 
  * @author Dan Cowan
- * @ since version 1.0.0
+ * @since version 1.0.0
  */
 public interface ColourBinListener
 {
 	/**
 	 * Fired when the bin's colour changes.
 	 * 
-	 * @param YUV the new bin colour
+	 * @param newColour YUV, the new bin colour
 	 */
 	public void colourChanged(YUV newColour);
 }
