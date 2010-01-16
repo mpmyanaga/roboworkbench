@@ -14,8 +14,6 @@
 package uk.co.dancowan.robots.srv;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -48,7 +46,6 @@ public class SRVConfig
 	 * avoid onerous characters.</p>
 	 * 
 	 * <p>May throw an <code>IOException</code> while reading from file.</p>
-	 * @throws IOException
 	 * @return Map of notify tokens
 	 */
 	public static Map<String, String> loadNotifyTokens()
@@ -92,7 +89,6 @@ public class SRVConfig
 	 * avoid onerous characters.</p>
 	 * 
 	 * <p>May throw an <code>IOException</code> while reading from file.</p>
-	 * @throws IOException
 	 */
 	public static void loadConfig()
 	{
@@ -124,39 +120,5 @@ public class SRVConfig
 			ERROR_LOGGER.finest("Config.loadConfig() : " + e.getMessage());
 		}
 		sIsReady = true;
-	}
-
-	/**
-	 * Write the properties to file.
-	 * 
-	 * <p>Properties are stored in the form:
-	 * <pre>    name=value</pre>
-	 * in a simple text file. Property names and values should avoid onerous
-	 * characters.</p>
-	 * 
-	 * @throws IOException
-	 */
-	public static void saveConfig()
-	{
-		BufferedWriter writer;
-		try
-		{
-			writer = new BufferedWriter (new FileWriter(CONFIG_FILE));
-			INFO_LOGGER.fine("Config writing to file:");
-
-			for(String property : sProperties.keySet())
-			{
-				String value = sProperties.get(property);
-				INFO_LOGGER.finer("    " + property + SEP + value);
-				writer.write(property + SEP + value);
-				writer.newLine();
-			}
-	
-			writer.close();
-		}
-		catch (IOException e)
-		{
-			ERROR_LOGGER.finest("Config.saveConfig() : " + e.getMessage());
-		}
 	}
 }
