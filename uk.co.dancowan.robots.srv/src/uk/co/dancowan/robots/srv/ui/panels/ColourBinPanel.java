@@ -20,10 +20,7 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Group;
 
 import uk.co.dancowan.robots.srv.hal.featuredetector.FeatureDetector;
-import uk.co.dancowan.robots.srv.ui.views.camera.BinWidgetRadioManager;
 import uk.co.dancowan.robots.srv.ui.views.camera.CameraCanvas;
-import uk.co.dancowan.robots.srv.ui.views.camera.ColourBinEditor;
-import uk.co.dancowan.robots.srv.ui.views.camera.ColourBinWidget;
 
 /**
  * Class manages a view sub-panel for the low level colour vision in the SRV1.
@@ -35,7 +32,7 @@ public class ColourBinPanel implements Panel
 {
 	public static final String ID = "uk.co.dancowan.robots.ui.ColourBinPanel";
 
-	private final BinWidgetRadioManager mBinSet;
+	private final ColourBinWidgetRadioManager mBinSet;
 	private final CameraCanvas mCameraCanvas;
 
 	/**
@@ -49,7 +46,7 @@ public class ColourBinPanel implements Panel
 	public ColourBinPanel(CameraCanvas canvas)
 	{
 		mCameraCanvas = canvas;
-		mBinSet = new BinWidgetRadioManager();
+		mBinSet = new ColourBinWidgetRadioManager();
 	}
 
 	/**
