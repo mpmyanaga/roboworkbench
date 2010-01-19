@@ -96,8 +96,6 @@ public class GrabBlobCmd extends AbstractCommand
 	}
 
 	/**
-	 * Read the data from the connection into an Image.
-	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 * @param cmdQ the CommandQ instance
 	 */
