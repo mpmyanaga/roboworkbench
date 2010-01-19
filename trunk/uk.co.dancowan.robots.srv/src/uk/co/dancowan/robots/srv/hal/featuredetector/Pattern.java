@@ -56,7 +56,17 @@ public class Pattern
 	{
 		mListeners = new ArrayList<PatternListener>();
 		mIndex = index;
-		mPattern = new String[8];
+		mPattern = new String[]{"00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000", "00000000",};
+	}
+
+	/**
+	 * Returns this <code>Pattern</code>'s index in memory.
+	 * 
+	 * @return int
+	 */
+	public int getIndex()
+	{
+		return mIndex;
 	}
 
 	/**
@@ -116,6 +126,18 @@ public class Pattern
 	}
 
 	/**
+	 * Sets this pattern to match the passed <code>Pattern</code>.
+	 * @param pattern
+	 */
+	public void set(Pattern pattern)
+	{
+		for (int i = 0; i < 8; i ++)
+		{
+			mPattern[i] = pattern.get(i);
+		}
+	}
+
+	/**
 	 * Send a grabBinCmd for this colour bin and set the colour accordingly.
 	 */
 	public void refreshPattern()
@@ -165,6 +187,29 @@ public class Pattern
 		{
 			listener.patternUpdated();
 		}
+	}
+
+	public String toHex()
+	{
+		StringBuffer sb = new StringBuffer();
+		for (int i = 0; i < 8; i ++)
+			sb.append(parseRow(get(i)));
+
+		return sb.toString();
+	}
+
+	private String parseRow(String row)
+	{
+		int decimal = 0;
+		for (int i = 0; i < 8; i  ++)
+		{
+			if (row.charAt(i) != '0')
+				decimal += (Math.pow(2, 7 - i));
+		}
+		String hex = Integer.toHexString(decimal);
+		if (hex.length() == 1)
+			hex = "0" + hex;
+		return hex;
 	}
 
 	/*
