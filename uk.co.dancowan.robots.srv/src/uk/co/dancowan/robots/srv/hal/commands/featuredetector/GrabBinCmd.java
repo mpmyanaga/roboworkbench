@@ -35,7 +35,7 @@ public class GrabBinCmd extends AbstractCommand
 	private int mBin;
 
 	/**
-	 * Sets the <code>PalletteItem</code> upon which this command operates
+	 * Sets the <code>ColourBin</code> upon which this command operates
 	 * 
 	 * @param bin
 	 */
