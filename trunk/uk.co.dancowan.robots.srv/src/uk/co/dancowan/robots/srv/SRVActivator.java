@@ -22,7 +22,6 @@ import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
 import uk.co.dancowan.robots.srv.services.NotifyService;
-import uk.co.dancowan.robots.srv.services.WCSServer;
 
 /**
  * The activator class controls the plug-in life cycle
@@ -43,11 +42,6 @@ public class SRVActivator extends AbstractUIPlugin
 		sInstance = this;
 
 		SRVConfig.loadConfig();
-		if ("yes".equals(SRVConfig.sProperties.get("start.wcs")))
-		{
-			// Start WebCamSat components
-			WCSServer.getInstance().start();
-		}
 		if ("yes".equals(SRVConfig.sProperties.get("start.notify")))
 		{
 			// Start NotifyService
