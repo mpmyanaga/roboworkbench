@@ -14,6 +14,7 @@
 package uk.co.dancowan.robots.srv.ui.panels;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import org.eclipse.swt.SWT;
@@ -37,10 +38,12 @@ public class PatternPanel implements Panel
 	public static final String ID = "uk.co.dancowan.robots.ui.PatternPanel";
 
 	private final List<PatternWidget> mPatterns;
+	private final FeatureWidgetRadioManager mManager;
 
 	public PatternPanel()
 	{
 		mPatterns = new ArrayList<PatternWidget>();
+		mManager = new FeatureWidgetRadioManager();
 	}
 
 	/**
@@ -50,6 +53,15 @@ public class PatternPanel implements Panel
 	public String getID()
 	{
 		return ID;
+	}
+
+	/**
+	 * Return the <code>PatternWidget</code> collection handled by the <code>Panel</code>.
+	 * @return List<PatternWidget>
+	 */
+	public List<PatternWidget> getPatternWidgets()
+	{
+		return Collections.unmodifiableList(mPatterns);
 	}
 
 	/**
@@ -66,9 +78,10 @@ public class PatternPanel implements Panel
 		for (int i = 0; i < 16; i ++)
 		{
 			Pattern pattern = memory.getPattern(i);
-			PatternWidget pw = new PatternWidget(panel, pattern);
+			PatternWidget pw = new PatternWidget(panel, pattern, false);
 			pw.setLayoutData(new GridData(GridData.FILL_BOTH));
 			mPatterns.add(pw);
+			mManager.addWidget(pw);
 		}
 		return panel;
 	}
