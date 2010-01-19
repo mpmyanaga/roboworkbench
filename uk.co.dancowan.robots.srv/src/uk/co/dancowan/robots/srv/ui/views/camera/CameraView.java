@@ -27,10 +27,15 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 
+import org.eclipse.jface.action.GroupMarker;
+import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -74,11 +79,16 @@ import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
 import uk.co.dancowan.robots.srv.hal.camera.YUV;
 import uk.co.dancowan.robots.srv.hal.commands.camera.SetResolutionCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.EdgeDetectionCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.HorizonDetectionCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.ObsticleDetectionCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.ReferenceCmd;
+import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SegmentationCmd;
 import uk.co.dancowan.robots.srv.ui.panels.ColourBinPanel;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
+import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.DetectionModeAction;
 import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBinsAction;
 import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBlobsAction;
-import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshPatternsAction;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
@@ -714,10 +724,26 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 */
     private void createToolbar()
     {
+    	IContributionItem actions = new GroupMarker("actions");
+    	IContributionItem modes = new Separator("modes");
     	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-    	mgr.add(new RefreshBinsAction(mColourBinComposite));
-    	mgr.add(new RefreshBlobsAction());
-    	mgr.add(new RefreshPatternsAction());
+    	mgr.add(actions);
+    	mgr.add(modes);
+    	mgr.appendToGroup("actions", new RefreshBinsAction(mColourBinComposite));
+    	mgr.appendToGroup("actions", new RefreshBlobsAction());
+
+    	List<DetectionModeAction> modeActions = new ArrayList<DetectionModeAction>();
+    	modeActions.add(new DetectionModeAction(new ReferenceCmd(), "Grab frame and enable frame referening mode", "icons/feature_difference.png"));
+    	modeActions.add(new DetectionModeAction(new SegmentationCmd(), "Enable colour segmentation mode", "icons/feature_segment.gif"));
+    	modeActions.add(new DetectionModeAction(new EdgeDetectionCmd(), "Enable edge detection mode", "icons/feature_edge.gif"));
+    	modeActions.add(new DetectionModeAction(new HorizonDetectionCmd(), "Enable horizon detection mode", "icons/feature_horizon.gif"));
+    	modeActions.add(new DetectionModeAction(new ObsticleDetectionCmd(), "Enable obstacle detection mode", "icons/feature_obstacle.png"));
+
+    	for (DetectionModeAction action : modeActions)
+    	{
+    		action.setFamily(modeActions);
+    		mgr.appendToGroup("modes", action);
+    	}
 	}
 
 	/*
