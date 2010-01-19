@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import uk.co.dancowan.robots.hal.logger.LoggingService;
-import uk.co.dancowan.robots.srv.services.WCSServer;
 
 /**
  * Takes pixel information from the serial <code>InputStream</code> and creates an
@@ -273,8 +272,6 @@ public class FrameDecoder extends Thread
 		}
 
 		mTracker.removeImage(image);
-
-		WCSServer.getInstance().getImageStreamer().newFrame(mImageBytes);
 	}
 
 	/*
