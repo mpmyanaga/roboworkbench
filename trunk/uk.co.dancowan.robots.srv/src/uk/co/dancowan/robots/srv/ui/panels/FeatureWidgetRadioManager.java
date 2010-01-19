@@ -22,7 +22,7 @@ import org.eclipse.swt.widgets.Listener;
 
 
 /**
- * Class to manage selection state of a collection of <code>ColourBinWidget</code>s
+ * Class to manage selection state of a collection of <code>FeatureWidget</code>s
  * as if they were radio buttons.
  * 
  * <p>Only one widget in the collection can be selected at any one time.</p>
@@ -30,26 +30,26 @@ import org.eclipse.swt.widgets.Listener;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class ColourBinWidgetRadioManager implements Listener
+public class FeatureWidgetRadioManager implements Listener
 {
-	private final List<ColourBinWidget> mBins;
+	private final List<FeatureWidget> mFeatures;
 
 	/**
 	 * C'tor.
 	 */
-	public ColourBinWidgetRadioManager()
+	public FeatureWidgetRadioManager()
 	{
-		mBins = new ArrayList<ColourBinWidget>();
+		mFeatures = new ArrayList<FeatureWidget>();
 	}
 
 	/**
 	 * Add the widget to the internal collection to be managed.
 	 * 
-	 * @param widget the ColourBinWidget to manage
+	 * @param widget the FeatureWidget to manage
 	 */
-	public void addWidget(ColourBinWidget widget)
+	public void addWidget(FeatureWidget widget)
 	{
-		mBins.add(widget);
+		mFeatures.add(widget);
 		widget.addListener(SWT.Selection, this);
 	}
 
@@ -59,12 +59,12 @@ public class ColourBinWidgetRadioManager implements Listener
 	@Override
 	public void handleEvent(Event event)
 	{
-		if (event.widget instanceof ColourBinWidget)
+		if (event.widget instanceof FeatureWidget)
 		{
-			ColourBinWidget w = (ColourBinWidget) event.widget;
+			FeatureWidget w = (FeatureWidget) event.widget;
 			if (w.getSelection())
 			{
-				for (ColourBinWidget widget : mBins)
+				for (FeatureWidget widget : mFeatures)
 				{
 					if (w != widget && widget.getSelection())
 					{
@@ -81,7 +81,7 @@ public class ColourBinWidgetRadioManager implements Listener
 	 */
 	public void dispose()
 	{
-		for (ColourBinWidget bin : mBins)
+		for (FeatureWidget bin : mFeatures)
 		{
 			bin.dispose();
 		}
@@ -91,7 +91,7 @@ public class ColourBinWidgetRadioManager implements Listener
 	 * Silently deselect the passed widget by removing its listeners
 	 * and adding them back after setting state.
 	 */
-	private void silentSelect(ColourBinWidget widget)
+	private void silentSelect(FeatureWidget widget)
 	{
 		Listener[] listeners = widget.getListeners(SWT.Selection);
 		for (Listener listener : listeners)
