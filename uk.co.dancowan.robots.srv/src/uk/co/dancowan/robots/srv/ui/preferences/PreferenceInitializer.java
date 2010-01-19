@@ -47,7 +47,8 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// Pattern recognition
 		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_COLOUR, ColourManager.getColour(SWT.COLOR_BLACK).getRGB());
-		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_COLOUR, ColourManager.getColour(SWT.COLOR_GRAY).getRGB());
+		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_BACKGROUND_COLOUR, ColourManager.getColour(SWT.COLOR_GRAY).getRGB());
+		PreferenceConverter.setValue(store, PreferenceConstants.PATTERN_EDITOR_GRID_COLOUR, ColourManager.getColour(SWT.COLOR_DARK_GRAY).getRGB());
 
 		// Blob Overlay
 		PreferenceConverter.setValue(store, PreferenceConstants.BLOB_OVERLAY_COLOUR, ColourManager.getColour(SWT.COLOR_RED).getRGB());

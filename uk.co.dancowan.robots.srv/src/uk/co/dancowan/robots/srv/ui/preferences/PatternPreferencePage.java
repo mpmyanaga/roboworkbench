@@ -48,7 +48,8 @@ public class PatternPreferencePage extends FieldEditorPreferencePage implements 
 		new Label(getFieldEditorParent(), SWT.NONE);
 		new Label(getFieldEditorParent(), SWT.NONE);
 		addField(new ColorFieldEditor(PreferenceConstants.PATTERN_COLOUR, "&Pattern colour ", getFieldEditorParent()));
-		addField(new ColorFieldEditor(PreferenceConstants.PATTERN_BACKGROUND, "&Pattern background colour ", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.PATTERN_BACKGROUND_COLOUR, "&Pattern background colour ", getFieldEditorParent()));
+		addField(new ColorFieldEditor(PreferenceConstants.PATTERN_EDITOR_GRID_COLOUR, "&Editor's &grid colour ", getFieldEditorParent()));
 	}
 
 	/**

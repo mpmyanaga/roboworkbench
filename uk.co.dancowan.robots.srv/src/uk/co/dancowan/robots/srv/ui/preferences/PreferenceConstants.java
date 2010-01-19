@@ -40,7 +40,10 @@ public class PreferenceConstants
 	public static final String PATTERN_COLOUR = "robots.ui.srv.patterns.patternColour";
 
 	// Pattern colour
-	public static final String PATTERN_BACKGROUND = "robots.ui.srv.patterns.patternBackground";
+	public static final String PATTERN_BACKGROUND_COLOUR = "robots.ui.srv.patterns.patternBackground";
+
+	// Pattern editor's grid colourcolour
+	public static final String PATTERN_EDITOR_GRID_COLOUR = "robots.ui.srv.patterns.editorGridColour";
 
 	// Blob overlay colour
 	public static final String BLOB_OVERLAY_COLOUR = "robots.ui.srv.overlays.blob.overlayColour";
