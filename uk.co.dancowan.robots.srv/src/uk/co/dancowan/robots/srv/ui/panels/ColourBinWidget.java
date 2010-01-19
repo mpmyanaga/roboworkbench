@@ -44,7 +44,7 @@ import uk.co.dancowan.robots.ui.utils.ColourManager;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class ColourBinWidget extends Composite implements ColourBinListener, PaintListener
+public class ColourBinWidget extends Composite implements ColourBinListener, PaintListener, FeatureWidget
 {
 	private final ColourBin mBin;
 
