@@ -32,7 +32,7 @@ public class ColourBinPanel implements Panel
 {
 	public static final String ID = "uk.co.dancowan.robots.ui.ColourBinPanel";
 
-	private final ColourBinWidgetRadioManager mBinSet;
+	private final FeatureWidgetRadioManager mBinSet;
 	private final CameraCanvas mCameraCanvas;
 
 	/**
@@ -46,7 +46,7 @@ public class ColourBinPanel implements Panel
 	public ColourBinPanel(CameraCanvas canvas)
 	{
 		mCameraCanvas = canvas;
-		mBinSet = new ColourBinWidgetRadioManager();
+		mBinSet = new FeatureWidgetRadioManager();
 	}
 
 	/**
