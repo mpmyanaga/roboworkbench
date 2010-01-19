@@ -17,9 +17,9 @@
             name="Motors View">
       </view>
       <view
-            name="WebCamSat View"
-            class="uk.co.dancowan.robots.srv.ui.views.wcs.WCSView"
-            id="uk.co.dancowan.robots.srv.WCSView">
+            name="Feature View"
+            class="uk.co.dancowan.robots.srv.ui.views.featuredetector.FeatureView"
+            id="uk.co.dancowan.robots.srv.FeatureView">
       </view>
    </extension>
 
