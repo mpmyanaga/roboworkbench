@@ -36,12 +36,14 @@ public class FeatureDetector extends AbstractComponent
 {
 	public static final String ID = "SRV Feature Detector";
 	public static final int BIN_COUNT = 8;
+	public static final int PATTERN_COUNT = 16;
 
 	private final PatternMemory mPatternMemory;
 	private final List<ColourBin> mColourBins;
 
 	private List<Blob> mBlobs;
-	private int mBin;
+	private int mFocusBinIndex;
+	private int mFocusPatternIndex;
 	private boolean mInterupt;
 	private boolean mWasRunning;
 
@@ -53,9 +55,12 @@ public class FeatureDetector extends AbstractComponent
 	public FeatureDetector()
 	{
 		mPatternMemory = new PatternMemory();
-		mBin = 0;
+		mFocusPatternIndex = 0;
+
 		mColourBins = new ArrayList<ColourBin>();
+		mFocusBinIndex = 0;
 		mBlobs = new ArrayList<Blob>();
+
 		mInterupt = false;
 		mWasRunning = false;
 
@@ -69,6 +74,7 @@ public class FeatureDetector extends AbstractComponent
 	{
 		refreshColourBins();
 		refreshBlobs();
+		refreshPatterns();
 	}
 
 	/**
@@ -97,7 +103,17 @@ public class FeatureDetector extends AbstractComponent
 	 */
 	public ColourBin getFocusBin()
 	{
-		return mColourBins.get(mBin);
+		return mColourBins.get(mFocusBinIndex);
+	}
+
+	/**
+	 * Return the <code>Pattern</code> with current focus.
+	 * 
+	 * @return ColourBin
+	 */
+	public Pattern getFocusPattern()
+	{
+		return mPatternMemory.getPattern(mFocusPatternIndex);
 	}
 
 	/**
@@ -117,17 +133,33 @@ public class FeatureDetector extends AbstractComponent
 	 * Set the focus bin to the passed index.
 	 *
 	 * <p>Throws and IndexOutOfBoundsException if the bin index
-	 * is out of bounds. 0 <= index <= 15.</p>
+	 * is out of bounds. 0 <= index <= 7.</p>
 	 * 
 	 * @throws IndexOutOfBoundsException
 	 */
 	public void setFocusBin(int index)
 	{
-		if (index < 0 || index > BIN_COUNT)
+		if (index < 0 || index >= BIN_COUNT)
 			throw new IndexOutOfBoundsException("Colour bin index out of bounds.");
 
-		mBin = index;
+		mFocusBinIndex = index;
 		refreshBlobs();
+	}
+
+	/**
+	 * Set the focus pattern to the passed index.
+	 *
+	 * <p>Throws and IndexOutOfBoundsException if the pattern index
+	 * is out of bounds. 0 <= index <= 15.</p>
+	 * 
+	 * @throws IndexOutOfBoundsException
+	 */
+	public void setFocusPattern(int index)
+	{
+		if (index < 0 || index >= PATTERN_COUNT)
+			throw new IndexOutOfBoundsException("Colour bin index out of bounds.");
+
+		mFocusPatternIndex = index;
 	}
 
 	/**
@@ -163,7 +195,7 @@ public class FeatureDetector extends AbstractComponent
 	 */
 	public void refreshBlobs()
 	{
-		Command cmd = new GrabBlobCmd(mBin);
+		Command cmd = new GrabBlobCmd(mFocusBinIndex);
 		cmd.addListener(new CommandListener()
 		{
 			@Override
@@ -205,6 +237,29 @@ public class FeatureDetector extends AbstractComponent
 		{
 			bin.refreshBin();
 		}
+		interuptCamera(false);
+	}
+
+	/**
+	 * Refresh each pattern from the hardware.
+	 */
+	public void refreshPatterns()
+	{
+		interuptCamera(true);
+		mPatternMemory.refreshPatterns();
+		interuptCamera(false);
+	}
+
+	/**
+	 * Refresh the pattern for the passed index in pattern memory.
+	 * 
+	 * @param index
+	 */
+	public void refreshPattern(int index)
+	{
+		interuptCamera(true);
+		Pattern pattern = mPatternMemory.getPattern(index);
+		pattern.refreshPattern();
 		interuptCamera(false);
 	}
 
