@@ -14,5 +14,6 @@ Require-Bundle: org.eclipse.ui,
 Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-ClassPath: .
 Export-Package: uk.co.dancowan.robots.ui,
+ uk.co.dancowan.robots.ui.handlers,
  uk.co.dancowan.robots.ui.utils,
  uk.co.dancowan.robots.ui.views
