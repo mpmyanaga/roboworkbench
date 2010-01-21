@@ -19,7 +19,7 @@
       <view
             name="Feature View"
             class="uk.co.dancowan.robots.srv.ui.views.featuredetector.FeatureView"
-            id="uk.co.dancowan.robots.srv.FeatureView">
+            id="uk.co.dancowan.robots.srv.featureView">
       </view>
    </extension>
 
@@ -44,6 +44,68 @@
       <toc
             file="doc/tocreference.xml">
       </toc>
+   </extension>
+
+   <extension
+         point="org.eclipse.ui.commands">
+      <command
+            categoryId="uk.co.dancowan.robots.ui.commands.viewCategory"
+            id="uk.co.dancowan.robots.srv.commands.showCameraView"
+            name="Show Camera View">
+      </command>
+      <command
+            categoryId="uk.co.dancowan.robots.ui.commands.viewCategory"
+            id="uk.co.dancowan.robots.srv.commands.showFeatureView"
+            name="Show Feature View">
+      </command>
+      <command
+            categoryId="uk.co.dancowan.robots.ui.commands.viewCategory"
+            id="uk.co.dancowan.robots.srv.commands.showMotorsView"
+            name="Show Motor View">
+      </command>
+   </extension>
+   <extension
+         point="org.eclipse.ui.handlers">
+      <handler
+            class="uk.co.dancowan.robots.srv.ui.views.camera.ShowCameraViewHandler"
+            commandId="uk.co.dancowan.robots.srv.commands.showCameraView">
+      </handler>
+      <handler
+            class="uk.co.dancowan.robots.srv.ui.views.featuredetector.ShowFeatureViewHandler"
+            commandId="uk.co.dancowan.robots.srv.commands.showFeatureView">
+      </handler>
+      <handler
+            class="uk.co.dancowan.robots.srv.ui.views.motors.ShowMotorsViewHandler"
+            commandId="uk.co.dancowan.robots.srv.commands.showMotorsView">
+      </handler>
+   </extension>
+   <extension
+         point="org.eclipse.ui.menus">
+      <menuContribution
+            locationURI="menu:window?after=robotExtensions">
+         <menu
+               id="uk.co.dancowan.robots.ui.menus.srv1Views"
+               label="SRV1"
+               mnemonic="S">
+            <command
+                  commandId="uk.co.dancowan.robots.srv.commands.showCameraView"
+                  icon="icons/view_camera.png"
+                  id="uk.co.dancowan.robots.ui.menus.showView"
+                  mnemonic="C">
+            </command>
+            <command
+                  commandId="uk.co.dancowan.robots.srv.commands.showFeatureView"
+                  id="uk.co.dancowan.robots.ui.menus.showView"
+                  mnemonic="F">
+            </command>
+            <command
+                  commandId="uk.co.dancowan.robots.srv.commands.showMotorsView"
+                  icon="icons/view_motors.png"
+                  id="uk.co.dancowan.robots.ui.menus.showView"
+                  mnemonic="M">
+            </command>
+         </menu>
+      </menuContribution>
    </extension>
 
    <extension
