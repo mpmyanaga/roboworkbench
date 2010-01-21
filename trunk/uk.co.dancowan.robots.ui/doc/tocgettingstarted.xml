@@ -2,7 +2,7 @@
 <?NLS TYPE="org.eclipse.help.toc"?>
 
 <toc label="Getting Started" link_to="toc.xml#gettingstarted"> 
-	<topic label="Main Topic"  href="doc/gettingstarted/maintopic.html"> 
+	<topic label="Introduction"  href="doc/gettingstarted/gs_introduction.html"> 
 		<topic label="Sub Topic" href="doc/gettingstarted/subtopic.html" /> 
 	</topic>
 	<topic label="Main Topic 2">
