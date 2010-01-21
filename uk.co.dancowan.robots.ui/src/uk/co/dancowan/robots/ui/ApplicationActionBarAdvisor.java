@@ -13,14 +13,13 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.ui;
 
-import org.eclipse.jface.action.IContributionItem;
+import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IMenuManager;
 import org.eclipse.jface.action.MenuManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.ui.IWorkbenchActionConstants;
 import org.eclipse.ui.IWorkbenchWindow;
 import org.eclipse.ui.actions.ActionFactory;
-import org.eclipse.ui.actions.ContributionItemFactory;
 import org.eclipse.ui.actions.ActionFactory.IWorkbenchAction;
 import org.eclipse.ui.application.ActionBarAdvisor;
 import org.eclipse.ui.application.IActionBarConfigurer;
@@ -35,7 +34,6 @@ import org.eclipse.ui.application.IActionBarConfigurer;
 public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 {
 	private IWorkbenchAction mExitAction;
-	private IContributionItem mShowAction;
 	private IWorkbenchAction mPreferencesAction;
 	//private IWorkbenchAction mAboutAction;
 	private IWorkbenchAction mHelpAction;
@@ -68,8 +66,6 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 		//mAboutAction = ActionFactory.ABOUT.create(window);
 		//register(mAboutAction);
 
-		mShowAction = ContributionItemFactory.VIEWS_SHORTLIST.create(window);
-
 		mPreferencesAction = ActionFactory.PREFERENCES.create(window);
 		register(mPreferencesAction);
 
@@ -97,7 +93,9 @@ public class ApplicationActionBarAdvisor extends ActionBarAdvisor
 		
 		fileMenu.add(mExitAction);
 		
-		windowMenu.add(mShowAction);
+		windowMenu.add(new GroupMarker("defaultParts"));
+		windowMenu.add(new Separator());
+		windowMenu.add(new GroupMarker("robotExtensions"));
 		windowMenu.add(new Separator());
 		windowMenu.add(mPreferencesAction);
 		
