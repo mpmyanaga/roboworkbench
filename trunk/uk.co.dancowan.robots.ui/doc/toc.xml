@@ -4,6 +4,7 @@
 <toc label="RoboWorkbench Help Contents" topic="doc/introduction.html">
    <topic label="Getting Started">
       <anchor id="gettingstarted"/>
+      <link toc="doc/tocgettingstarted.xml"/>
    </topic>
    <topic href="doc/concepts/toc.html" label="Concepts">
       <anchor id="concepts"/>
