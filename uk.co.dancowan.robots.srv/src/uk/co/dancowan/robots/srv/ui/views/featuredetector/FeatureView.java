@@ -16,6 +16,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.preference.IPreferenceStore;
+import org.eclipse.jface.util.IPropertyChangeListener;
+import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -33,6 +36,7 @@ import org.eclipse.swt.widgets.Display;
 import uk.co.dancowan.robots.hal.core.Command;
 import uk.co.dancowan.robots.hal.core.CommandEvent;
 import uk.co.dancowan.robots.hal.core.CommandListener;
+import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.commands.featuredetector.NNGrabCmd;
 import uk.co.dancowan.robots.srv.hal.commands.featuredetector.NNInitCmd;
@@ -44,6 +48,7 @@ import uk.co.dancowan.robots.srv.hal.featuredetector.Pattern;
 import uk.co.dancowan.robots.srv.ui.panels.PatternEditor;
 import uk.co.dancowan.robots.srv.ui.panels.PatternPanel;
 import uk.co.dancowan.robots.srv.ui.panels.PatternWidget;
+import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshPatternsAction;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
@@ -53,15 +58,24 @@ import uk.co.dancowan.robots.ui.views.ScrolledView;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class FeatureView extends ScrolledView
+public class FeatureView extends ScrolledView implements IPropertyChangeListener
 {
-	public static final String ID = "robots.srv.FeatureView";
+	public static final String ID = "uk.co.dancowan.robots.srv.featureView";
 
 	private static final Point MIN_SIZE = new Point(300, 140);
 
 	private PatternPanel mPatternPanel;
 	private PatternEditor mEditor;
 
+	private int mThreshold;
+	private boolean mMultiple;
+
+	public FeatureView()
+	{
+		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
+		mThreshold = store.getInt(PreferenceConstants.PATTERN_THRESHOLD);
+		mMultiple = store.getBoolean(PreferenceConstants.PATTERN_ALLOW_MULTIPLE);
+	}
 	/**
 	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getID()
 	 */
@@ -121,6 +135,18 @@ public class FeatureView extends ScrolledView
 	public Point getMinSize()
 	{
 		return MIN_SIZE;
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public void propertyChange(PropertyChangeEvent event)
+	{
+		if (PreferenceConstants.PATTERN_ALLOW_MULTIPLE.equals(event.getProperty()))
+			mMultiple = (Boolean) event.getNewValue();
+		else if (PreferenceConstants.PATTERN_THRESHOLD.equals(event.getProperty()))
+			mThreshold = (Integer) event.getNewValue();
 	}
 
 	/*
@@ -227,9 +253,7 @@ public class FeatureView extends ScrolledView
      */
     private class MatchListener implements CommandListener
     {
-		private static final int THRESHOLD = 10;
-
-		@Override
+    	@Override
 		public void commandCompleted(CommandEvent event)
 		{
 			String result = event.getMessage();
@@ -278,7 +302,7 @@ public class FeatureView extends ScrolledView
 				{
 					if (scores[i] > highest)
 					{
-						if (scores[i] > highest + THRESHOLD)
+						if (scores[i] > highest + mThreshold)
 							matches.clear();
 						highest = scores[i];
 						highestIndex = i;
@@ -291,9 +315,16 @@ public class FeatureView extends ScrolledView
 				}
 			}
 
-			for (int match : matches)
+			if (mMultiple)
 			{
-				mPatternPanel.getPatternWidgets().get(match).matched();
+				for (int match : matches)
+				{
+					mPatternPanel.getPatternWidgets().get(match).matched();
+				}
+			}
+			else
+			{
+				mPatternPanel.getPatternWidgets().get(highestIndex).matched();
 			}
 
 			final PatternWidget widget = mPatternPanel.getPatternWidgets().get(highestIndex);
