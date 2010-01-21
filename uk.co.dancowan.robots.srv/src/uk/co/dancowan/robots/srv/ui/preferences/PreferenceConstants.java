@@ -42,8 +42,14 @@ public class PreferenceConstants
 	// Pattern colour
 	public static final String PATTERN_BACKGROUND_COLOUR = "robots.ui.srv.patterns.patternBackground";
 
-	// Pattern editor's grid colourcolour
+	// Pattern editor's grid colour
 	public static final String PATTERN_EDITOR_GRID_COLOUR = "robots.ui.srv.patterns.editorGridColour";
+
+	// Allow similar matches
+	public static final String PATTERN_ALLOW_MULTIPLE = "robots.ui.srv.patterns.allowMultiple";
+
+	// Similarity threshold in pixels
+	public static final String PATTERN_THRESHOLD = "robots.ui.srv.patterns.threshold";
 
 	// Blob overlay colour
 	public static final String BLOB_OVERLAY_COLOUR = "robots.ui.srv.overlays.blob.overlayColour";
