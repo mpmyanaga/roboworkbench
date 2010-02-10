@@ -15,7 +15,6 @@ package uk.co.dancowan.robots.hal.core.commands;
 
 
 import junit.framework.TestCase;
-import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
 
 /**
  * TextUtils unit test suite.
