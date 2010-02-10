@@ -20,11 +20,21 @@ public class FileUtils
 		{
 			IWorkbench workbench = Activator.getDefault().getWorkbench();
 			IEditorDescriptor editor = workbench.getEditorRegistry().getDefaultEditor(file.getName());
+			
+			// try an external editor
 			if (editor == null)
 			{
 				external = true;
 				editor = workbench.getEditorRegistry().findEditor(IEditorRegistry.SYSTEM_EXTERNAL_EDITOR_ID);
 			}
+
+			// try the Basic text editor
+			if (editor == null)
+			{
+				external = true;
+				editor = workbench.getEditorRegistry().getDefaultEditor(".txt");
+			}
+
 			if (editor != null)
 			{
 				String editorId = editor.getId();
