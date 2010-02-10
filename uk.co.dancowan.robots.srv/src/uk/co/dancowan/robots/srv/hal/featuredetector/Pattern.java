@@ -155,9 +155,6 @@ public class Pattern
 			{
 				// NOP
 			}
-			/**
-			 * @see uk.co.dancowan.robots.hal.core.CommandListener#commandCompleted(uk.co.dancowan.robots.hal.core.CommandEvent)
-			 */
 			@Override
 			public void commandCompleted(CommandEvent e)
 			{
@@ -217,7 +214,7 @@ public class Pattern
 	 */
 	private void decodePatternInfo(String info)
 	{
-		String[] lines = info.split("\r");
+		String[] lines = info.split("\r\n");
 		for (int i = 1; i < lines.length; i ++)
 		{
 			String line = lines[i];
@@ -231,7 +228,8 @@ public class Pattern
 	 */
 	private String parseLine(String line)
 	{
-		assert line.length() == 24 : "Bad line length: " + line.length() + "/24";
+		if (line.length() != 24)// "Bad line length"
+			return "";
 
 		StringBuilder sb = new StringBuilder();
 		for (int i = 2; i < 24; i += 3)
