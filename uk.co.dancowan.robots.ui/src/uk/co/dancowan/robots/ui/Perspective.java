@@ -31,7 +31,7 @@ public class Perspective implements IPerspectiveFactory
 {
 	private static final String TOP_LEFT_FOLDER = "TOP_LEFT";
 	private static final String LEFT_FOLDER = "LEFT";
-	private static final String TOP_RIGHT_FOLDER = "TOP_RIGHT";
+	private static final String BOTTOM_RIGHT_FOLDER = "BOTTOM_RIGHT";
 	private static final String BOTTOM_LEFT_FOLDER = "BOTTOM_LEFT";
 
 	/**
@@ -46,14 +46,14 @@ public class Perspective implements IPerspectiveFactory
 	public void createInitialLayout(IPageLayout layout)
 	{
 		String editorArea = layout.getEditorArea();
-		layout.setEditorAreaVisible(false);
+		layout.setEditorAreaVisible(true);
 		layout.setFixed(false);
 
 		IFolderLayout topLeft = layout.createFolder(TOP_LEFT_FOLDER, IPageLayout.LEFT, 0.32f, editorArea);
 		IFolderLayout left = layout.createFolder(LEFT_FOLDER, IPageLayout.BOTTOM, 0.3f, TOP_LEFT_FOLDER);
 		IFolderLayout bottomLeft = layout.createFolder(BOTTOM_LEFT_FOLDER, IPageLayout.BOTTOM, 0.6f, LEFT_FOLDER);
 
-		/*IFolderLayout topRight =*/ layout.createFolder(TOP_RIGHT_FOLDER, IPageLayout.LEFT, 0.68f, editorArea);
+		/*IFolderLayout topRight =*/ layout.createFolder(BOTTOM_RIGHT_FOLDER, IPageLayout.BOTTOM, 0.32f, editorArea);
 		
 		topLeft.addView(ConnectionView.ID);
 		left.addView(CommandConsole.ID);
