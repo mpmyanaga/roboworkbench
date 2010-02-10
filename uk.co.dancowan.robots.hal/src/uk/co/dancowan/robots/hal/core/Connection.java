@@ -14,9 +14,9 @@
 package uk.co.dancowan.robots.hal.core;
 
 import gnu.io.CommPortIdentifier;
+import gnu.io.PortInUseException;
 import gnu.io.SerialPort;
 import gnu.io.UnsupportedCommOperationException;
-import gnu.io.PortInUseException;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
@@ -312,16 +312,23 @@ public class Connection implements Component
 	 * 
 	 * @see java.io.InputStream#available()
 	 * @return the length of the InputStream remaining
-	 * @throws IOException
 	 */
-	public int available() throws IOException
+	public int available()
 	{
-		if (mInputStream != null)
+		try
 		{
-			return mInputStream.available();
+			if (mInputStream != null)
+			{
+				return mInputStream.available();
+			}
+			else
+			{
+				return 0;
+			}
 		}
-		else
+		catch (IOException e)
 		{
+			fireErrorEvent(e.getMessage());
 			return 0;
 		}
 	}
@@ -337,9 +344,17 @@ public class Connection implements Component
 	 */	
 	public int read(byte[] chunk, int pos, int len) throws IOException
 	{
-		int read = mInputStream.read(chunk, pos, len);
-		fireRXEvent(new String(chunk));
-		return read;
+		try
+		{
+			int read = mInputStream.read(chunk, pos, len);
+			fireRXEvent(new String(chunk));
+			return read;
+		}
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -353,9 +368,17 @@ public class Connection implements Component
 	 */	
 	public int read() throws IOException
 	{
-		int read = mInputStream.read();
-		fireRXEvent(new String(Character.toChars(read)));
-		return read;
+		try
+		{
+			int read = mInputStream.read();
+			fireRXEvent(new String(Character.toChars(read)));
+			return read;
+		}
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -393,13 +416,21 @@ public class Connection implements Component
 	 */	
 	public void write(byte[] bytes) throws IOException
 	{
-		mOutputStream.write(bytes);
-
-		if (isNetworkPort())
+		try
 		{
-			flushOutput();
+			mOutputStream.write(bytes);
+	
+			if (isNetworkPort())
+			{
+				flushOutput();
+			}
+			fireTXEvent(new String(bytes));
 		}
-		fireTXEvent(new String(bytes));
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -413,13 +444,21 @@ public class Connection implements Component
 	 */	
 	public void write(byte single) throws IOException
 	{
-		mOutputStream.write(single);
-
-		if (isNetworkPort())
+		try
 		{
-			flushOutput();
+			mOutputStream.write(single);
+	
+			if (isNetworkPort())
+			{
+				flushOutput();
+			}
+			fireRXEvent(Byte.toString(single));
 		}
-		fireRXEvent(Byte.toString(single));
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
@@ -430,29 +469,37 @@ public class Connection implements Component
 	 */
 	public void write(String cmd) throws IOException
 	{
-		if (cmd == null || "".equals(cmd))
+		try
 		{
-			return;
-		}
-
-		if (isConnected())
-		{
-			int length = cmd.length() / 2;
+			if (cmd == null || "".equals(cmd))
+			{
+				return;
+			}
 	
-			byte[] cmdBytes = new byte[length];
-			int index = 0;
-			for (int i = 0; i < cmd.length() / 2; i++)
+			if (isConnected())
 			{
-				String cb = cmd.substring(2*i, 2*i + 2);
-				cmdBytes[index++] = (byte) Integer.parseInt(cb, 16);
+				int length = cmd.length() / 2;
+		
+				byte[] cmdBytes = new byte[length];
+				int index = 0;
+				for (int i = 0; i < cmd.length() / 2; i++)
+				{
+					String cb = cmd.substring(2*i, 2*i + 2);
+					cmdBytes[index++] = (byte) Integer.parseInt(cb, 16);
+				}
+	
+				write(cmdBytes);
+				if (isNetworkPort())
+				{
+					flushOutput();
+				}
+				fireRXEvent(new String(cmdBytes));
 			}
-
-			write(cmdBytes);
-			if (isNetworkPort())
-			{
-				flushOutput();
-			}
-			fireRXEvent(new String(cmdBytes));
+		}
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
 		}
 	}
 
@@ -478,14 +525,23 @@ public class Connection implements Component
 	 * @throws IOException
 	 * @return String the remaining bytes that were 'flushed' from the stream
 	 */
-	public String flushIntput() throws IOException
+	public String flushInput() throws IOException
 	{
-		StringBuilder sb = new StringBuilder("Flushed: ");
-		while (isConnected() && mInputStream.available() > 0)
+		try
 		{
-			sb.append(mInputStream.read());
+			StringBuilder sb = new StringBuilder("Flushed: ");
+			while (isConnected() && mInputStream.available() > 0)
+			{
+				sb.append(mInputStream.read());
+			}
+			return sb.toString();
+
 		}
-		return sb.toString();
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
 	}
 
 	/**
