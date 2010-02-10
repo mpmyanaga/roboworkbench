@@ -40,7 +40,7 @@ public class ClearAction extends Action
 		mTarget = target;
 		
 		setToolTipText("Clear contents");
-		setImageDescriptor(Activator.getImageDescriptor("icons/cmd_clear.gif"));
+		setImageDescriptor(Activator.getImageDescriptor("icons/action_clear.gif"));
 	}
 
 	/**
