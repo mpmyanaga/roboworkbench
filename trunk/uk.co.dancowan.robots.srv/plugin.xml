@@ -17,9 +17,10 @@
             name="Motors View">
       </view>
       <view
-            name="Feature View"
             class="uk.co.dancowan.robots.srv.ui.views.featuredetector.FeatureView"
-            id="uk.co.dancowan.robots.srv.featureView">
+            icon="icons/view_pattern.gif"
+            id="uk.co.dancowan.robots.srv.featureView"
+            name="Feature View">
       </view>
    </extension>
 
@@ -96,6 +97,7 @@
             <command
                   commandId="uk.co.dancowan.robots.srv.commands.showFeatureView"
                   id="uk.co.dancowan.robots.ui.menus.showView"
+                  icon="icons/view_pattern.gif"
                   mnemonic="F">
             </command>
             <command
@@ -349,5 +351,17 @@
       <overlay
             class="uk.co.dancowan.robots.srv.ui.views.camera.overlays.BlobOverlay">
       </overlay>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="uk.co.dancowan.robots.srv.editors.PicoCEditor"
+            contributorClass="uk.co.dancowan.robots.srv.editors.PicoCActionContributor"
+            default="true"
+            extensions="c, pcc"
+            icon="icons/editor_picoC.gif"
+            id="uk.co.dancowan.robots.srv.editors.PicoCEditor"
+            name="PicoC Editor">
+      </editor>
    </extension>
 </plugin>
