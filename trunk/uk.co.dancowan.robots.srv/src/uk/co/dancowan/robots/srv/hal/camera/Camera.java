@@ -62,6 +62,7 @@ public class Camera implements ConnectionListener, Component
 	 */
 	public void setConsumer(CameraImageConsumer<java.awt.Component> consumer)
 	{
+		// Destroy any existing consumer and the poll thread which used it
 		if (mPollThread != null)
 		{
 			mPollThread.terminate();
@@ -90,7 +91,7 @@ public class Camera implements ConnectionListener, Component
 	}
 
 	/**
-	 * Returns the configured <code>FeatureDetector</code> object.
+	 * Returns the <code>FeatureDetector</code> subsystem object.
 	 * 
 	 * @return FeatureDetector
 	 */
