@@ -733,11 +733,11 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
     	mgr.appendToGroup("actions", new RefreshBlobsAction());
 
     	List<DetectionModeAction> modeActions = new ArrayList<DetectionModeAction>();
-    	modeActions.add(new DetectionModeAction(new ReferenceCmd(), "Grab frame and enable frame referening mode", "icons/feature_difference.png"));
-    	modeActions.add(new DetectionModeAction(new SegmentationCmd(), "Enable colour segmentation mode", "icons/feature_segment.gif"));
-    	modeActions.add(new DetectionModeAction(new EdgeDetectionCmd(), "Enable edge detection mode", "icons/feature_edge.gif"));
-    	modeActions.add(new DetectionModeAction(new HorizonDetectionCmd(), "Enable horizon detection mode", "icons/feature_horizon.gif"));
-    	modeActions.add(new DetectionModeAction(new ObsticleDetectionCmd(), "Enable obstacle detection mode", "icons/feature_obstacle.png"));
+    	modeActions.add(new DetectionModeAction(new ReferenceCmd(), "Grab frame and enable frame referening mode", "icons/cmd_feature-difference.png"));
+    	modeActions.add(new DetectionModeAction(new SegmentationCmd(), "Enable colour segmentation mode", "icons/cmd_feature-segment.gif"));
+    	modeActions.add(new DetectionModeAction(new EdgeDetectionCmd(), "Enable edge detection mode", "icons/cmd_feature-edge.gif"));
+    	modeActions.add(new DetectionModeAction(new HorizonDetectionCmd(), "Enable horizon detection mode", "icons/cmd_feature-horizon.gif"));
+    	modeActions.add(new DetectionModeAction(new ObsticleDetectionCmd(), "Enable obstacle detection mode", "icons/cmd_feature-obstacle.png"));
 
     	for (DetectionModeAction action : modeActions)
     	{
