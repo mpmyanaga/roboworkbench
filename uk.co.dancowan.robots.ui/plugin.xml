@@ -34,7 +34,6 @@
       </product>
    </extension>
 
-  
    <extension
          point="org.eclipse.ui.perspectives">
       <perspective
@@ -64,6 +63,14 @@
             icon="icons/view_keypad.gif"
             id="uk.co.dancowan.robots.ui.keypadView"
             name="Keypad">
+      </view>
+      <view
+            allowMultiple="false"
+            icon="icons/view_browser.gif"
+            class="uk.co.dancowan.robots.ui.views.filebrowser.FileBrowserView"
+            id="uk.co.dancowan.robots.ui.fileBrowserView"
+            name="File Bbrowser"
+            restorable="true">
       </view>
    </extension>
    <extension
@@ -132,6 +139,11 @@
             id="uk.co.dancowan.robots.ui.commands.showCommandConsole"
             name="Show Command Console">
       </command>
+      <command
+            categoryId="uk.co.dancowan.robots.ui.commands.viewCategory"
+            id="uk.co.dancowan.robots.ui.commands.showFileBrowserView"
+            name="Show File Browser View">
+      </command>
    </extension>
    <extension
          point="org.eclipse.ui.handlers">
@@ -146,6 +158,10 @@
       <handler
             class="uk.co.dancowan.robots.ui.views.keypad.ShowKeypadViewHandler"
             commandId="uk.co.dancowan.robots.ui.commands.showKeypadView">
+      </handler>
+      <handler
+            class="uk.co.dancowan.robots.ui.views.filebrowser.ShowFileBrowserViewHandler"
+            commandId="uk.co.dancowan.robots.ui.commands.showFileBrowserView">
       </handler>
    </extension>
    <extension
@@ -170,6 +186,23 @@
                id="uk.co.dancowan.robots.ui.menus.showKeypadView"
                mnemonic="K">
          </command>
+         <command
+               commandId="uk.co.dancowan.robots.ui.commands.showFileBrowserView"
+               icon="icons/view_browser.gif"
+               id="uk.co.dancowan.robots.ui.menus.showFileBrowserView"
+               mnemonic="B">
+         </command>
       </menuContribution>
+   </extension>
+   <extension
+         point="org.eclipse.ui.editors">
+      <editor
+            class="uk.co.dancowan.robots.ui.editors.BasicTextEditor"
+            default="true"
+            extensions="txt"
+            icon="icons/editor_basic-text.gif"
+            id="uk.co.dancowan.robots.ui.editors.BasicTextEditor"
+            name="Text Editor">
+      </editor>
    </extension>
 </plugin>
