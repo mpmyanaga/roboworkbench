@@ -42,7 +42,7 @@ public class ScrollLockAction extends Action
 		mState = false;
 		
 		setToolTipText("Lock scrollbar");
-		setImageDescriptor(Activator.getImageDescriptor("icons/cmd_scroll_lock.png"));
+		setImageDescriptor(Activator.getImageDescriptor("icons/action_scroll_lock.png"));
 	}
 
 	/**
