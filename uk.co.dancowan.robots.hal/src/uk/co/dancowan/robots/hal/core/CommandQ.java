@@ -253,7 +253,7 @@ public class CommandQ extends Thread implements Component
 				mCurrentCommand.interrupt();
 				try
 				{
-					mConnection.flushIntput();
+					mConnection.flushInput();
 					mConnection.flushOutput();
 				}
 				catch (IOException e)
