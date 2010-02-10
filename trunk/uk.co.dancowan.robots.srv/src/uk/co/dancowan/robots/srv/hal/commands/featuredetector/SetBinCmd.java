@@ -13,11 +13,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.commands.featuredetector;
 
-import java.io.IOException;
-
-import uk.co.dancowan.robots.hal.core.CommandQ;
-import uk.co.dancowan.robots.hal.core.Connection;
-import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
 import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 
 /**
@@ -27,9 +22,8 @@ import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class SetBinCmd extends AbstractCommand
+public class SetBinCmd extends AbstractByteCommand
 {
-	public static final String ID = "setBin";
 	private static final String COMMAND = "vc";
 
 	private final ColourBin mBin;
@@ -41,19 +35,7 @@ public class SetBinCmd extends AbstractCommand
 	 */
 	public SetBinCmd(ColourBin bin)
 	{
-		// expect newline char
-		super(-1, false);
-
 		mBin = bin;
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return ID + "(" + mBin.getParameterString() + ")";
 	}
 
 	/**
@@ -67,22 +49,5 @@ public class SetBinCmd extends AbstractCommand
 		StringBuilder sb = new StringBuilder(COMMAND);
 		sb.append(mBin.getParameterString());
 		return sb.toString();
-	}
-
-	/**
-	 * Writes the byte translation of the result of a call to <code>
-	 * getCommandString()</code> to the output stream.
-	 * 
-	 * @param srv the SRV1 instance
-	 */
-	@Override
-	protected void write(CommandQ srv) throws IOException
-	{
-		Connection connection = srv.getConnection();
-		if (connection.isConnected())
-		{
-			connection.write(getCommandString().getBytes());
-			connection.writeComplete();
-		}
 	}
 }

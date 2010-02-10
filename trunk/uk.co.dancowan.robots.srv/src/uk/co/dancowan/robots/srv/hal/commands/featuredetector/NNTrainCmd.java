@@ -13,12 +13,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.commands.featuredetector;
 
-import java.io.IOException;
-
-import uk.co.dancowan.robots.hal.core.CommandQ;
-import uk.co.dancowan.robots.hal.core.Connection;
-import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
-import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
 
 /**
  * Trains the embedded neural network using stored patterns.
@@ -26,31 +20,9 @@ import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class NNTrainCmd extends AbstractCommand
+public class NNTrainCmd extends AbstractByteCommand
 {
-	public static final String ID = "NNTrain";
-	private static final int TIMEOUT = 300;
-
-	private static final byte[] HEADER = new byte[] {'#', '#', 'n', 't'};
 	private static final String COMMAND = "nt";
-
-
-	/**
-	 * C'tor
-	 */
-	public NNTrainCmd()
-	{
-		super(-1);
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return ID + "()";
-	}
 
 	/**
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
@@ -59,91 +31,5 @@ public class NNTrainCmd extends AbstractCommand
 	protected String getCommandString()
 	{
 		return COMMAND;
-	}
-
-	/**
-	 * Writes the byte translation of the result of a call to <code>
-	 * getCommandString()</code> to the output stream.
-	 * 
-	 * @param cmdQ the CommandQ instance
-	 */
-	@Override
-	protected void write(CommandQ cmdQ) throws IOException
-	{
-		Connection connection = cmdQ.getConnection();
-		if (connection.isConnected())
-		{
-			connection.write(getCommandString().getBytes());
-			connection.writeComplete();
-		}
-	}
-
-	/**
-	 * Read the data from the connection.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
-	 * @param cmdQ the CommandQ instance
-	 */
-	@Override
-	protected String read(CommandQ cmdQ) throws IOException
-	{
-		Connection connection = cmdQ.getConnection();
-		StringBuilder sb = new StringBuilder();
-		sb.append(consumeHeader(connection));
-		
-		int timeout = 0;
-		int lineCount = 0;
-		int expectedLines = 17;
-		while (timeout < TIMEOUT && shouldRun())
-		{
-			// wait for some data to process
-			if (connection.available() <= 0)
-			{
-				timeout++;
-				try
-				{
-					Thread.sleep(50);
-				}
-				catch (InterruptedException ie)
-				{
-					//NOP
-				}
-				continue;
-			}
-
-			char c2 = (char) connection.read();
-			while (connection.available() > 0)
-			{
-				char c1 = (char) connection.read();
-				if (CommandUtils.isEnd(c1) && CommandUtils.isEnd(c2)) // looking for /r/n sequence
-				{
-					lineCount ++;
-				}
-				else
-				{
-					sb.append(c2);
-					c2 = c1; // shuffle down the lookahead sequence
-				}
-				if (lineCount == expectedLines)
-				{
-					connection.readComplete();
-					return sb.toString();
-				}
-			}
-		}
-		failed(shouldRun() ? "Timed out reading response." : "Interrupted");
-		connection.readComplete();
-		return sb.toString();
-	}
-
-	/**
-	 * Overrides method in AbstractCommand to supply larger header.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
-	 */
-	@Override
-	public byte[] getHeader()
-	{
-		return HEADER;
 	}
 }

@@ -13,11 +13,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.hal.commands.featuredetector;
 
-import java.io.IOException;
-
-import uk.co.dancowan.robots.hal.core.CommandQ;
-import uk.co.dancowan.robots.hal.core.Connection;
-import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
 
 /**
  * Enable horizon detection mode.
@@ -25,29 +20,9 @@ import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class HorizonDetectionCmd extends AbstractCommand
+public class HorizonDetectionCmd extends AbstractByteCommand
 {
-	public static final String ID = "Horizon";
-
-	private static final byte[] HEADER = new byte[] {'#', '#', 'g'};
 	private static final String COMMAND = "g3";
-
-	/**
-	 * C'tor
-	 */
-	public HorizonDetectionCmd()
-	{
-		super(4);
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return ID + "()";
-	}
 
 	/**
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getCommandString()
@@ -56,33 +31,5 @@ public class HorizonDetectionCmd extends AbstractCommand
 	protected String getCommandString()
 	{
 		return COMMAND;
-	}
-
-	/**
-	 * Writes the byte translation of the result of a call to <code>
-	 * getCommandString()</code> to the output stream.
-	 * 
-	 * @param cmdQ the CommandQ instance
-	 */
-	@Override
-	protected void write(CommandQ cmdQ) throws IOException
-	{
-		Connection connection = cmdQ.getConnection();
-		if (connection.isConnected())
-		{
-			connection.write(getCommandString().getBytes());
-			connection.writeComplete();
-		}
-	}
-
-	/**
-	 * Overrides method in AbstractCommand to supply larger header.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
-	 */
-	@Override
-	public byte[] getHeader()
-	{
-		return HEADER;
 	}
 }
