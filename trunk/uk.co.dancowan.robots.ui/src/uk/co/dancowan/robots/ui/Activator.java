@@ -18,7 +18,9 @@ import java.util.logging.Level;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.eclipse.jface.dialogs.ErrorDialog;
 import org.eclipse.jface.resource.ImageDescriptor;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.ui.plugin.AbstractUIPlugin;
 import org.osgi.framework.BundleContext;
 
@@ -122,5 +124,16 @@ public class Activator extends AbstractUIPlugin
 	public static ImageDescriptor getImageDescriptor(String path)
 	{
 		return imageDescriptorFromPlugin(PLUGIN_ID, path);
+	}
+
+	/**
+	 * Opens an ErrorDialog to display the passed message.
+	 * 
+	 * @param title
+	 * @param message
+	 */
+	public static void hanldeError(String title, String message)
+	{
+		ErrorDialog.openError(Display.getDefault().getActiveShell(), title, message, null);
 	}
 }
