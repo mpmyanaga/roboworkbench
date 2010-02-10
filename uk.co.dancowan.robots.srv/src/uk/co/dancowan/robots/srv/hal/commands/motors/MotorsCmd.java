@@ -24,8 +24,6 @@ import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
  */
 public class MotorsCmd extends AbstractCommand
 {
-	public static final String ID = "motors";
-
 	private static final String COMMAND = "4D";
 
 	private int mDuration;
@@ -41,8 +39,7 @@ public class MotorsCmd extends AbstractCommand
 	 */
 	public MotorsCmd(int left, int right, int duration)
 	{
-		//translation to hex is local, fixed response, no newline
-		super(2, false);
+		super(false);
 		
 		mLeftMotor = left;
 		mRightMotor = right;
@@ -66,14 +63,5 @@ public class MotorsCmd extends AbstractCommand
 		sb.append(Integer.toHexString(mDuration));
 		
 		return sb.toString();
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getName()
-	 */
-	@Override
-	public String getName()
-	{
-		return ID + "(" + mLeftMotor + ", " + mRightMotor + ", " + mDuration + ")";
 	}
 }

@@ -31,8 +31,6 @@ import uk.co.dancowan.robots.srv.hal.camera.FrameDecoder;
  */
 public class GrabImageCmd extends AbstractCommand
 {
-	public static final String ID = "grabImage()";
-
 	// low priority interruptible command
 	private static final int PRIORITY = 1000;
 
@@ -92,8 +90,8 @@ public class GrabImageCmd extends AbstractCommand
 	protected String read(CommandQ srv) throws IOException
 	{
 		int pos = 0;
-
 		String header = "-";
+
 		Connection connection = srv.getConnection();
 		if (mFrameSize == 0)
 		{
@@ -158,23 +156,40 @@ public class GrabImageCmd extends AbstractCommand
 		return header;
 	}
 
-	/**
+	/*
 	 * Returns the result header: ##IMJ
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getHeader()
 	 */
-	@Override
-	protected byte[] getHeader()
+	private byte[] getHeader()
 	{
 		return FRAME_HEADER;
 	}
 
-	/**
-	 * see uk.co.dancowan.srv1q.commands.AbstractCommand#getName()
+	/*
+	 * Reads the input stream to consume the command's header.
 	 */
-	@Override
-	public String getName()
+	private String consumeHeader(Connection connection) throws IOException
 	{
-		return ID;
+		StringBuilder sb = new StringBuilder();
+		int mark = 0;
+		int count = 0;
+		byte[] header = getHeader();
+		while(mark < header.length && shouldRun() && count < READ_LOOP_TIMEOUT)
+		{
+			count ++;
+			while (connection.available() > 0 && mark < getHeader().length)
+			{
+				byte b = (byte) connection.read();
+				if (getHeader()[mark] == (char) b)
+				{
+					mark++;
+					sb.append((char) b);
+				}
+				else
+				{
+					mark = 0;
+				}
+			}
+		}
+		return sb.toString();
 	}
 }

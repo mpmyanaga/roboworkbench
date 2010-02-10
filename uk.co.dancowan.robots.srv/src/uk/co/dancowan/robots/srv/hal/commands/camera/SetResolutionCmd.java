@@ -23,14 +23,10 @@ import uk.co.dancowan.robots.hal.core.commands.SendString;
  */
 public class SetResolutionCmd extends SendString
 {
-	public static final String ID = "setResolution";
-
 	public static final String TINY = "a";
 	public static final String SMALL = "b";
 	public static final String MEDIUM = "c";
 	public static final String LARGE = "d";
-
-	private String mResolution;
 
 	/**
 	 * C'tor.
@@ -46,18 +42,6 @@ public class SetResolutionCmd extends SendString
 	public SetResolutionCmd(String resolution)
 	{
 		// Command is decimal, so translate = true
-		// Command response is fixed, no new line
-		super(resolution, 2, true);
-
-		mResolution = resolution;
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.hal.core.commands.SendString#getName() 
-	 */
-	@Override
-	public String getName()
-	{
-		return ID + "(" + mResolution + ")";
+		super(resolution, true);
 	}
 }
