@@ -84,7 +84,7 @@ public class CommandUtils
 				lowNibble = (byte) (input[i] & 0x0F);
 				result.append(HEX_DIGITS[highNibble]);
 				result.append(HEX_DIGITS[lowNibble]);
-				result.append(" ");
+				//result.append(" ");
 			}
 		}
 		return result.toString();
