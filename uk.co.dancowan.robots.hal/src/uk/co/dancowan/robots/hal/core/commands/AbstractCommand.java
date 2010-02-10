@@ -39,33 +39,18 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 {
 	private static final Logger INFO_LOGGER = Logger.getLogger(LoggingService.INFO_LOGGER);
 
-	private static final int READ_LOOP_TIMEOUT = 300;
+	protected static final int READ_LOOP_TIMEOUT = 300;
+
 	private static final int DEFAULT_PRIORITY = 100;
-	private static final byte[] DEFAULT_HEADER = new byte[]{'#'};
 
 	private final List<CommandListener> mListeners;
 	private final List<CommandListener> mRemovals;
 	
 	private final Object mMutex = new Object();
-	private boolean mShouldRun;
 	private final boolean mIsInterruptable;
 
-	private int mExpectCharacterCount;
-
-	/**
-	 * C'tor
-	 * 
-	 * @param isInteruptable boolean
-	 */
-	public AbstractCommand(int expectCharCount, boolean isInteruptable)
-	{
-		mIsInterruptable = isInteruptable;
-		mExpectCharacterCount = expectCharCount;
-
-		mListeners = new ArrayList<CommandListener>();
-		mRemovals = new ArrayList<CommandListener>();
-		mShouldRun = true;
-	}
+	private boolean mShouldRun;
+	private boolean mNoResult;
 
 	/**
 	 * C'tor
@@ -74,33 +59,23 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 */
 	public AbstractCommand(boolean isInteruptable)
 	{
-		this(-1, isInteruptable);
+		mIsInterruptable = isInteruptable;
+
+		mListeners = new ArrayList<CommandListener>();
+		mRemovals = new ArrayList<CommandListener>();
+		mShouldRun = true;
+		mNoResult = false;
 	}
 
 	/**
 	 * C'tor
 	 * 
 	 * <p>Default command is not interruptable. Equivalent to:</p>
-	 * <pre><code>    new AbstractCommand(-1, false)</code></pre>
-	 * <p>Command expects to terminate reading a new line character.</p>
+	 * <pre><code>    new AbstractCommand(false)</code></pre>
 	 */
 	public AbstractCommand()
 	{
-		this(-1, false);
-	}
-
-	/**
-	 * C'tor
-	 * 
-	 * <p>Default command is not interruptable. Equivalent to:</p>
-	 * <pre><code>    new AbstractCommand(len, false)</code></pre>
-	 * <p>Command expects to terminate reading configured number of characters.</p>
-	 * 
-	 * @param expectedLength the number of characters to read as a response
-	 */
-	public AbstractCommand(int expectedLength)
-	{
-		this(expectedLength, false);
+		this(false);
 	}
 
 	/**
@@ -152,7 +127,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 				int timeout = 0;
 
 				// wait for some data to process
-				while (connection.available() <= 0 && timeout < 300 && mShouldRun)
+				while (connection.available() == 0 && timeout < 300 && mShouldRun)
 				{
 					timeout++;
 					try
@@ -165,10 +140,14 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 					}
 					continue;
 				}
-				if (connection.available() > 0)
-					fireCompletionEvent(read(cmdQ));
-				else
-					failed("Timed out waiting for initial response.");
+
+				if (! mNoResult)
+				{
+					if (connection.available() > 0)
+						fireCompletionEvent(read(cmdQ));
+					else
+						failed("Timed out waiting for initial response.");
+				}
 			}
 		}
 		catch (IOException e)
@@ -177,8 +156,18 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 		}
 		catch(Exception e)
 		{
+			e.printStackTrace();
 			failed(e.getMessage());
 		}
+	}
+
+	/**
+	 * Method should be called by the constructor of extending classes
+	 * that expect no result to their command.
+	 */
+	protected void noResult()
+	{
+		mNoResult = true;
 	}
 
 	/**
@@ -212,11 +201,11 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
 	 * @param cmdQ the CommandQ instance
 	 */
+	//@Override
 	protected String read(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
 		StringBuilder sb = new StringBuilder();
-		sb.append(consumeHeader(connection));
 		
 		int timeout = 0;
 		while (timeout < READ_LOOP_TIMEOUT && shouldRun())
@@ -240,28 +229,11 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 			while (connection.available() > 0)
 			{
 				char c = (char) connection.read();
-				if (mExpectCharacterCount == -1)
-				{
-					if (CommandUtils.isEnd(c))
-					{
-						connection.readComplete();
-						return sb.toString();
-					}
-					else
-					{
-						sb.append(c);					
-					}
-				}
-				else // expected character count
-				{
-					sb.append(c);
-					if (sb.length() == mExpectCharacterCount)
-					{
-						connection.readComplete();
-						return sb.toString();
-					}
-				}
+				sb.append(c);
+				
 			}
+			connection.readComplete();
+			return sb.toString();
 		}
 		failed(shouldRun() ? "Timed out reading response." : "Interrupted");
 		connection.readComplete();
@@ -273,8 +245,10 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.Command
 	 */
-	@Override
-	public abstract String getName();
+	public String getName()
+	{
+		return getCommandString();
+	}
 
 	/**
 	 * Called to announce this command failed.
@@ -357,7 +331,7 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	protected void fireExecuteEvent()
 	{
 		removeListeners();
-		INFO_LOGGER.finer(getName());
+		INFO_LOGGER.finer(getCommandString());
 		for (CommandListener listener : mListeners)
 		{
 			listener.commandExecuted(new CommandEvent(this, " executed."));
@@ -394,48 +368,6 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 			listener.commandCompleted(new CommandEvent(this, result));
 		}
 		removeListeners();
-	}
-
-	/**
-	 * Returns the commands response header.
-	 * 
-	 * @return byte[]
-	 */
-	protected byte[] getHeader()
-	{
-		return DEFAULT_HEADER;
-	}
-
-	/**
-	 * Reads the input stream to consume the command's header.
-	 * 
-	 * @param connection
-	 * @return String the header characters
-	 */
-	protected String consumeHeader(Connection connection) throws IOException
-	{
-		StringBuilder sb = new StringBuilder();
-		int mark = 0;
-		int count = 0;
-		byte[] header = getHeader();
-		while(mark < header.length && shouldRun() && count < READ_LOOP_TIMEOUT)
-		{
-			count ++;
-			while (connection.available() > 0 && mark < getHeader().length && mShouldRun)
-			{
-				byte b = (byte) connection.read();
-				if (getHeader()[mark] == (char) b)
-				{
-					mark++;
-					sb.append((char) b);
-				}
-				else
-				{
-					mark = 0;
-				}
-			}
-		}
-		return sb.toString();
 	}
 
 	/**
