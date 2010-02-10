@@ -49,7 +49,7 @@ import uk.co.dancowan.robots.srv.ui.panels.PatternEditor;
 import uk.co.dancowan.robots.srv.ui.panels.PatternPanel;
 import uk.co.dancowan.robots.srv.ui.panels.PatternWidget;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
-import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshPatternsAction;
+import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.GrabPatternsAction;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
 /**
@@ -205,7 +205,7 @@ public class FeatureView extends ScrolledView implements IPropertyChangeListener
     private void createToolbar()
     {
     	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-    	mgr.add(new RefreshPatternsAction());
+    	mgr.add(new GrabPatternsAction());
 	}
 
     /*
