@@ -133,10 +133,9 @@ public class KeyProvider
 	 */
 	private Button createButton(final CommandButtonDescriptor desc, Composite parent)
 	{
-		int rl = desc.getReturn();
 		final boolean encode = desc.shouldEncode();
-		final Command onCmd = new SendString(desc.getOnHex(), rl, encode);
-		final Command offCmd = desc.getOffHex() == null ? null : new SendString(desc.getOffHex(), rl, encode);
+		final Command onCmd = new SendString(desc.getOnHex(), encode);
+		final Command offCmd = desc.getOffHex() == null ? null : new SendString(desc.getOffHex(), encode);
 		
 		int swt = desc.getType().equals("push") ? SWT.PUSH : SWT.TOGGLE;
 		final Button button = new Button(parent, swt);
