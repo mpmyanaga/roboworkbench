@@ -11,9 +11,7 @@ Additional configurable overlays may be contributed via the defined extension po
 
 Two drive systems are avaialable: joystick-like and graphical command. The graphical command interface allows you to set left and right motor speeds and directions along with a duration before sending. The joystick-like interface allows you to click to send a command derived from the mouse location within a graphic.</description>
    </context>
-   <context id="WebCamSat" title="WebCamSat">
-      <description>The WCS View contains a browser pointed at the embedded WCS server.
-
-This view is another way to viw images streamed from the SRV1 robot.</description>
+   <context id="featuresView" title="Features View">
+      <description>A view for exploring and editing the SRV1&apos;s pattern memory along with training and matching with the feed forward neural network.</description>
    </context>
 </contexts>
