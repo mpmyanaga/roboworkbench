@@ -15,6 +15,7 @@ package uk.co.dancowan.robots.ui.views.filebrowser;
 
 import java.io.File;
 
+import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.viewers.DoubleClickEvent;
 import org.eclipse.jface.viewers.IDoubleClickListener;
 import org.eclipse.jface.viewers.IStructuredSelection;
@@ -25,16 +26,16 @@ import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 
+import uk.co.dancowan.robots.ui.Activator;
+import uk.co.dancowan.robots.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.ui.utils.FileUtils;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
 /**
- * Eclipse <code>View</code> implementation exposes motor drive commands
- * in several aspects.
+ * Eclipse <code>View</code> implementation renders the local file system as a navigable tree
  * 
- * <p>Command pad also exposes a number of configurable function keys which
- * can be used with atomic commands from the <code>AtomicCommandFactory</code>
- * class.</p>
+ * <p>Root directory of the tree is set from the preference:</p>
+ * <pre>FILE_BROWSER_ROOT (robots.ui.views.FileBroswerRoot)</pre>
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -74,7 +75,6 @@ public class FileBrowserView extends ScrolledView
 		final TreeViewer viewer = new TreeViewer(part, SWT.FULL_SELECTION);
 		viewer.setContentProvider(new FileSystemContentProvider());
 		viewer.setLabelProvider(new FileSystemLabelProvider());
-		viewer.setInput(new File(System.getProperty("user.home")));
 		viewer.addDoubleClickListener(new IDoubleClickListener()
 		{
 			@Override
@@ -96,6 +96,9 @@ public class FileBrowserView extends ScrolledView
 				}
 			}
 		});
+		IPreferenceStore store = Activator.getDefault().getPreferenceStore();
+		String root = store.getString(PreferenceConstants.FILE_BROWSER_ROOT);
+		viewer.setInput(new File(root));
 
 		return part;
 	}
