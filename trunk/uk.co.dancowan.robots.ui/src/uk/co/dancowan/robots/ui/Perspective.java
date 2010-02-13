@@ -50,9 +50,8 @@ public class Perspective implements IPerspectiveFactory
 		layout.setFixed(false);
 
 		IFolderLayout topLeft = layout.createFolder(TOP_LEFT_FOLDER, IPageLayout.LEFT, 0.32f, editorArea);
-		IFolderLayout left = layout.createFolder(LEFT_FOLDER, IPageLayout.BOTTOM, 0.3f, TOP_LEFT_FOLDER);
-		IFolderLayout bottomLeft = layout.createFolder(BOTTOM_LEFT_FOLDER, IPageLayout.BOTTOM, 0.6f, LEFT_FOLDER);
-
+		IFolderLayout left = layout.createFolder(LEFT_FOLDER, IPageLayout.BOTTOM, 0.17f, TOP_LEFT_FOLDER);
+		IFolderLayout bottomLeft = layout.createFolder(BOTTOM_LEFT_FOLDER, IPageLayout.BOTTOM, 0.60f, LEFT_FOLDER);
 		/*IFolderLayout topRight =*/ layout.createFolder(BOTTOM_RIGHT_FOLDER, IPageLayout.BOTTOM, 0.32f, editorArea);
 		
 		topLeft.addView(ConnectionView.ID);
