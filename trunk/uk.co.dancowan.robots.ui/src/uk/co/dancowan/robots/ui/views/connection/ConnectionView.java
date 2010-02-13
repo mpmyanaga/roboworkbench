@@ -13,28 +13,17 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.ui.views.connection;
 
-import java.util.ArrayList;
 import java.util.List;
 
-import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
-import org.eclipse.jface.util.IPropertyChangeListener;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.custom.StyleRange;
-import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
-import org.eclipse.swt.events.MenuAdapter;
-import org.eclipse.swt.events.MenuEvent;
 import org.eclipse.swt.events.ModifyEvent;
 import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
-import org.eclipse.swt.graphics.Color;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -44,8 +33,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Menu;
-import org.eclipse.swt.widgets.MenuItem;
 import org.eclipse.swt.widgets.Text;
 
 import uk.co.dancowan.robots.hal.core.Connection;
@@ -54,12 +41,7 @@ import uk.co.dancowan.robots.hal.core.HALRegistry;
 import uk.co.dancowan.robots.ui.Activator;
 import uk.co.dancowan.robots.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
-import uk.co.dancowan.robots.ui.utils.TextUtils;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
-import uk.co.dancowan.robots.ui.views.actions.ClearAction;
-import uk.co.dancowan.robots.ui.views.actions.Clearable;
-import uk.co.dancowan.robots.ui.views.actions.Lockable;
-import uk.co.dancowan.robots.ui.views.actions.ScrollLockAction;
 
 
 /**
@@ -73,49 +55,29 @@ import uk.co.dancowan.robots.ui.views.actions.ScrollLockAction;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class ConnectionView extends ScrolledView implements ConnectionListener, IPropertyChangeListener, Lockable, Clearable
+public class ConnectionView extends ScrolledView implements ConnectionListener
 {
-	private static final int UNLIMITED = -1;
-
 	public static final String ID = "uk.co.dancowan.robots.ui.connectionView";
 
-	private static final Point MIN_SIZE = new Point(300, 140);
-
-	private final Connection mConnection;
+	private static final Point MIN_SIZE = new Point(300, 70);
 
 	private Button mConnectButton;
-	private StyledText mText;
-
-	private boolean mPin;
-	private boolean mShowTX;
-	private boolean mShowRX;
-	private long mMaxBufferSize;
-	private boolean mWrap;
-
-	private Color mTXColour;
-	private Color mRXColour;
-	private Color mMessageColour;
-	private Color mErrorColour;
 
 	/**
 	 * C'tor.
 	 * 
 	 * <p>Must be no-args for Eclipse extension point.</p>
 	 * 
-	 * <p>The constructor for the view will get a reference to the <code>
-	 * Connection</code> object from the base HAL, assuming one has been
-	 * registered. The view is initialised from the plugin's preference store.</p>
+	 * <p>The view is initialised from the plugin's preference store.</p>
 	 */
 	public ConnectionView()
 	{
-		mConnection = HALRegistry.getInsatnce().getCommandQ().getConnection();
-		mConnection.addConnectionListener(this);
-
-		Activator.getDefault().getPreferenceStore().addPropertyChangeListener(this);
-		initializeFromPreferences();
+		HALRegistry.getInsatnce().getCommandQ().getConnection().addConnectionListener(this);
 	}
 
 	/**
+	 * Creates and lays out the widgets for this view.
+	 * 
 	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getPartControl(org.eclipse.swt.widgets.Composite)
 	 */
 	public Control getPartControl(Composite parent)
@@ -133,8 +95,8 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				mConnection.setComPort(comPort.getText());
-				mConnection.setNetwork(false);
+				getConnection().setComPort(comPort.getText());
+				getConnection().setNetwork(false);
 				networkComposite.setVisible(false);
 				comPortComposite.setVisible(true);
 			}
@@ -147,7 +109,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				mConnection.setNetwork(true);
+				getConnection().setNetwork(true);
 				networkComposite.setVisible(true);
 				comPortComposite.setVisible(false);	
 			}
@@ -160,17 +122,9 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				connect(! mConnection.isConnected());
+				connect(! getConnection().isConnected());
 			}
 		});
-
-		mText = new StyledText(part, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.READ_ONLY);
-		mText.setWordWrap(mWrap);
-		mText.setText("RoboWorkbench Connection console");
-		mText.append(TextUtils.CR);
-		mText.append("=======================");
-		mText.append(TextUtils.CR);
-		mText.setMenu(getContextMenu());
 
 		//Com port Radio Button layout
 		FormData data = new FormData();
@@ -183,38 +137,29 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 		data = new FormData();
 		data.top = new FormAttachment(0, 9);
 		data.left = new FormAttachment(comPort, 5, SWT.RIGHT);
-		data.right = new FormAttachment(comPort, 120, SWT.RIGHT);
+		data.right = new FormAttachment(comPort, 80, SWT.RIGHT);
 		network.setLayoutData(data);
 
 		//Connect Button layout
 		data = new FormData();
 		data.top = new FormAttachment(0, 5);
-		data.left = new FormAttachment(network, 5, SWT.RIGHT);
+		data.left = new FormAttachment(100, -107);
 		data.right = new FormAttachment(100, -5);
 		mConnectButton.setLayoutData(data);
 
 		data = new FormData();
-		data.top = new FormAttachment(comPort, 16, SWT.BOTTOM);
+		data.top = new FormAttachment(comPort, 8, SWT.BOTTOM);
 		data.left = new FormAttachment(0, 5);
 		data.right = new FormAttachment(100, -5);
-		data.bottom = new FormAttachment(comPort, 48, SWT.BOTTOM);
+		data.bottom = new FormAttachment(comPort, 40, SWT.BOTTOM);
 		comPortComposite.setLayoutData(data);
 
 		data = new FormData();
-		data.top = new FormAttachment(comPort, 16, SWT.BOTTOM);
+		data.top = new FormAttachment(comPort, 8, SWT.BOTTOM);
 		data.left = new FormAttachment(0, 5);
 		data.right = new FormAttachment(100, 0);
-		data.bottom = new FormAttachment(comPort, 48, SWT.BOTTOM);
+		data.bottom = new FormAttachment(comPort, 40, SWT.BOTTOM);
 		networkComposite.setLayoutData(data);
-
-		data = new FormData();
-		data.top = new FormAttachment(networkComposite, 5, SWT.BOTTOM);
-		data.left = new FormAttachment(0, 5);
-		data.right = new FormAttachment(100, -5);
-		data.bottom = new FormAttachment(100, -5);
-		mText.setLayoutData(data);
-
-		createToolbar();
 
 		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
 		String mode = prefs.getString(PreferenceConstants.CONNECTION_MODE);
@@ -237,12 +182,17 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 		return part;
 	}
 
+	/**
+	 * Returns the view's unique identifier.
+	 */
 	public String getID()
 	{
 		return ID;
 	}
 
 	/**
+	 * Returns the minimum size of this view.
+	 * 
 	 * @see uk.co.dancowan.robots.ui.views.ScrolledView#getMinSize()
 	 */
 	@Override
@@ -252,214 +202,81 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	}
 
 	/**
-	 * Sets widget state according to connection events.
+	 * ConnectionListener interface implementation updates button state.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#connected()
-	 */
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
+	 */	
 	@Override
 	public void connected()
 	{
-		final StringBuilder sb = new StringBuilder("Connected to ");
-		if (mConnection.isNetworkPort())
-		{
-			sb.append(mConnection.getHost());
-			sb.append(":");
-			sb.append(mConnection.getNetworkPort());
-		}
-		else
-		{
-			sb.append("com port: ");
-			sb.append(mConnection.getComPort());
-		}
-		insertMessage(sb.toString(), mMessageColour);
-		newLine();
+		if (!mConnectButton.isDisposed())
+			mConnectButton.setText("Disconnect");
 	}
 
 	/**
-	 * Sets widget state according to connection events.
+	 * ConnectionListener interface implementation updates button state.
 	 * 
-	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#disconnected()
-	 */
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
+	 */	
 	@Override
 	public void disconnected()
 	{
-		String message = "Disconnected";
-		insertMessage(message, mMessageColour);
-		newLine();
+		if (!mConnectButton.isDisposed())
+			mConnectButton.setText("Connect");
 	}
 
 	/**
-	 * Sets widget state according to connection events.
+	 * Implementation of the ConnectionListener interface, ensures the connection is closed
+	 * and resets the connect button state.
+	 * 
+	 * <p>May be called by a command failing within the execution thread.</p>
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
 	 */
 	@Override
-	public void error(final String message)
+	public void error(String error)
 	{
-		insertMessage(message, mErrorColour);
-		newLine();
-	}
-
-	/**
-	 * Sets widget state according to connection events.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#rx(java.lang.String)
-	 */
-	public void rx(final String message)
-	{
-		if (mShowRX)
-			insertMessage(message.toString(), mRXColour);
-	}
-
-	/**
-	 * Sets widget state according to connection events.
-	 * 
-	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#tx(java.lang.String)
-	 */
-	public void tx(String message)
-	{
-		if (mShowTX)
-			insertMessage(message, mTXColour);
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.ui.views.actions.Lockable#pin()
-	 */
-	@Override
-	public void pin()
-	{
-		mPin = true;
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.ui.views.actions.Lockable#release()
-	 */
-	@Override
-	public void release()
-	{
-		mPin = false;
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.ui.views.actions.Clearable#clear()
-	 */
-	public void clear()
-	{
-		mText.setText("");
-	}
-
-	/**
-	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent event)
-	{
-		if (PreferenceConstants.CONNECTION_BUFFER_SIZE.equals(event.getProperty()))
+		// error may be thrown from the command execution thread
+		Display.getDefault().syncExec(new Runnable()
 		{
-			int buffer = (Integer) event.getNewValue();
-			setBufferSizeK(buffer);
-		}
-		else if (PreferenceConstants.CONNECTION_UNLIMITED_BUFFER.equals(event.getProperty()))
-		{
-			boolean unlimited = (Boolean) event.getNewValue();
-			if (unlimited)
+			@Override
+			public void run()
 			{
-				setBufferSizeK(UNLIMITED);
+				connect(false);
+				if (!mConnectButton.isDisposed())
+					mConnectButton.setText("Connect");
 			}
-			else
-			{
-				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-				setBufferSizeK(prefs.getInt(PreferenceConstants.CONNECTION_BUFFER_SIZE));
-			}
-		}
-		else if (PreferenceConstants.CONNECTION_SHOW_TX.equals(event.getProperty()))
-		{
-			mShowTX = (Boolean) event.getNewValue();
-		}
-		else if (PreferenceConstants.CONNECTION_SHOW_RX.equals(event.getProperty()))
-		{
-			mShowRX = (Boolean) event.getNewValue();
-		}
-		else if (PreferenceConstants.CONNECTION_WRAP.equals(event.getProperty()))
-		{
-			mWrap = (Boolean) event.getNewValue();
-			if (! mText.isDisposed())
-				mText.setWordWrap(mWrap);
-		}
-		else if (PreferenceConstants.CONNECTION_TX_COLOUR.equals(event.getProperty()))
-		{
-			RGB rgb = (RGB) event.getNewValue();
-			mTXColour = ColourManager.getInstance().getColour(rgb);
-		}
-		else if (PreferenceConstants.CONNECTION_RX_COLOUR.equals(event.getProperty()))
-		{
-			RGB rgb = (RGB) event.getNewValue();
-			mRXColour = ColourManager.getInstance().getColour(rgb);
-		}
-		else if (PreferenceConstants.CONNECTION_MESSAGE_COLOUR.equals(event.getProperty()))
-		{
-			RGB rgb = (RGB) event.getNewValue();
-			mMessageColour = ColourManager.getInstance().getColour(rgb);
-		}
-		else if (PreferenceConstants.CONNECTION_ERROR_COLOUR.equals(event.getProperty()))
-		{
-			RGB rgb = (RGB) event.getNewValue();
-			mErrorColour = ColourManager.getInstance().getColour(rgb);
-		}
+		});
 	}
 
-	/*
-	 * Initialise widgets from preferences.
-	 */
-	private void initializeFromPreferences()
-	{
-		IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-
-		boolean unlimited = prefs.getBoolean(PreferenceConstants.CONNECTION_UNLIMITED_BUFFER);
-		if (unlimited)
-		{
-			setBufferSizeK(UNLIMITED);
-		}
-		else
-		{
-			setBufferSizeK(prefs.getInt(PreferenceConstants.CONNECTION_BUFFER_SIZE));
-		}
-
-		mPin = prefs.getBoolean(PreferenceConstants.CONNECTION_PIN);
-		mShowTX = prefs.getBoolean(PreferenceConstants.CONNECTION_SHOW_TX);
-		mShowRX = prefs.getBoolean(PreferenceConstants.CONNECTION_SHOW_RX);
-		mWrap = prefs.getBoolean(PreferenceConstants.CONNECTION_WRAP);
-
-		mTXColour = ColourManager.getInstance().getColour(PreferenceConverter.getColor(prefs, PreferenceConstants.CONNECTION_TX_COLOUR));
-		mRXColour = ColourManager.getInstance().getColour(PreferenceConverter.getColor(prefs, PreferenceConstants.CONNECTION_RX_COLOUR));
-		mMessageColour = ColourManager.getInstance().getColour(PreferenceConverter.getColor(prefs, PreferenceConstants.CONNECTION_MESSAGE_COLOUR));
-		mErrorColour = ColourManager.getInstance().getColour(PreferenceConverter.getColor(prefs, PreferenceConstants.CONNECTION_ERROR_COLOUR));
-	}
-
-	/*
-	 * Sets the internal buffer size of this log viewer in kb.
-	 *
-	 * <p>Buffer size should be > 0. A value of -1 will set no limit on the buffer size.</p>
+	/**
+	 * ConnectionListener interface implementation does nothing.
 	 * 
-	 * @throws IllegalArgumentException if the buffer size < 1k and != -1
-	 */
-	private void setBufferSizeK(long maxLength)
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
+	 */	
+	@Override
+	public void rx(String readChars)
 	{
-		if (maxLength != UNLIMITED)
-		{
-			if (maxLength < 1)
-				throw new IllegalArgumentException("Buffer length out of bounds (must be > -1) :" + maxLength);
-			maxLength *= 1024;
-		}
-		mMaxBufferSize = maxLength;
+		// NOP
+	}
+
+	/**
+	 * ConnectionListener interface implementation does nothing.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
+	 */	
+	@Override
+	public void tx(String writeChars)
+	{
+		// NOP	
 	}
 
 	/*
-	 * Write a new line char to the console window.
+	 * Helper method to get the connection object.
 	 */
-	private void newLine()
+	private Connection getConnection()
 	{
-		insertMessage(TextUtils.CR, mMessageColour);
+		return HALRegistry.getInsatnce().getCommandQ().getConnection();
 	}
 
 	/*
@@ -470,105 +287,14 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 	private void connect(final boolean connect)
 	{
 		if (connect)
-			mConnection.openConnection();
+			getConnection().openConnection();
 		else
-			mConnection.closeConnection();
+			getConnection().closeConnection();
 
-		if (mConnection.isConnected())
+		if (getConnection().isConnected())
 			mConnectButton.setText("Disconnect");
 		else
 			mConnectButton.setText("Connect");
-	}
-
-	/*
-	 * Create toolbar.
-	 */
-    private void createToolbar()
-    {
-    	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-    	mgr.add(new ScrollLockAction(this));
-    	mgr.add(new ClearAction(this));
-	}
-
-	/*
-	 * Gets the StyledText widget's context menu
-	 */
-	private Menu getContextMenu()
-	{
-		final Menu menu = new Menu(mText);
-
-		final MenuItem showTX = new MenuItem(menu, SWT.CHECK);
-		showTX.setText("Show TX");
-		showTX.setSelection(mShowTX);
-		showTX.addSelectionListener(new SelectionAdapter()
-		{	
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (mShowTX)
-					mShowTX = false;
-				else
-					mShowTX = true;
-				showTX.setSelection(mShowTX);
-				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-				prefs.setValue(PreferenceConstants.CONNECTION_SHOW_TX, mShowTX);
-			}
-		});
-
-		final MenuItem showRX = new MenuItem(menu, SWT.CHECK);
-		showRX.setText("Show RX");
-		showRX.setSelection(mShowRX);
-		showRX.addSelectionListener(new SelectionAdapter()
-		{	
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (mShowRX)
-					mShowRX = false;
-				else
-					mShowRX = true;
-				showRX.setSelection(mShowRX);
-				IPreferenceStore prefs = Activator.getDefault().getPreferenceStore();
-				prefs.setValue(PreferenceConstants.CONNECTION_SHOW_RX, mShowRX);
-			}
-		});
-
-		new MenuItem(menu, SWT.SEPARATOR);
-
-		final MenuItem copy = new MenuItem(menu, SWT.PUSH);
-		copy.setText("Copy");
-		copy.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				mText.copy();
-			}
-		});
-
-		final MenuItem clear = new MenuItem(menu, SWT.PUSH);
-		clear.setText("Clear");
-		//clear.setImage(image);
-		clear.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				clear();
-			}
-		});
-
-		menu.addMenuListener(new MenuAdapter()
-		{
-			@Override
-			public void menuShown(MenuEvent e)
-			{
-				showTX.setSelection(mShowTX);
-				showRX.setSelection(mShowRX);
-			}
-		});
-
-		return menu;
 	}
 
 	/*
@@ -603,11 +329,11 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 				{
 					final Text text = (Text) e.getSource();
 					final String host = text.getText();
-					mConnection.setHost(host);
+					getConnection().setHost(host);
 				}
 			}
 		});
-		ipAddress.setText(mConnection.getHost());
+		ipAddress.setText(getConnection().getHost());
 
 		final Label portLabel = new Label(networkComposite, SWT.RIGHT);
 		portLabel.setText("Port:");
@@ -646,7 +372,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 					try
 					{
 						int port = Integer.parseInt(p);
-						mConnection.setNetworkPort(port);
+						getConnection().setNetworkPort(port);
 					}
 					catch (NumberFormatException nfe)
 					{
@@ -655,32 +381,32 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 				}
 			}
 		});
-		port.setText(Integer.toString(mConnection.getNetworkPort()));
+		port.setText(Integer.toString(getConnection().getNetworkPort()));
 
 		//IPAddress label layout
 		FormData data = new FormData();
-		data.top = new FormAttachment(0, 9);
+		data.top = new FormAttachment(0, 4);
 		data.left = new FormAttachment(0, 5);
 		data.right = new FormAttachment(0, 60);
 		ipLabel.setLayoutData(data);
 
 		//IPAddress Text field layout
 		data = new FormData();
-		data.top = new FormAttachment(0, 5);
+		data.top = new FormAttachment(0, 0);
 		data.left = new FormAttachment(ipLabel, 5, SWT.RIGHT);
 		data.right = new FormAttachment(portLabel, -5, SWT.LEFT);
 		ipAddress.setLayoutData(data);
 
 		//Port Label layout
 		data = new FormData();
-		data.top = new FormAttachment(0, 9);
+		data.top = new FormAttachment(0, 4);
 		data.left = new FormAttachment(port, -48, SWT.LEFT);
 		data.right = new FormAttachment(port, -5, SWT.LEFT);
 		portLabel.setLayoutData(data);
 
 		//Port Text field layout
 		data = new FormData();
-		data.top = new FormAttachment(0, 5);
+		data.top = new FormAttachment(0, 0);
 		data.left = new FormAttachment(100, -65);
 		data.right = new FormAttachment(100, -5);
 		port.setLayoutData(data);
@@ -700,13 +426,13 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 		final Label portLabel = new Label(comPortComposite, SWT.NONE);
 		portLabel.setText("Port: ");
 		FormData data = new FormData();
-		data.top = new FormAttachment(0, 9);
-		data.left = new FormAttachment(0, 5);
+		data.top = new FormAttachment(0, 4);
+		data.left = new FormAttachment(0, 2);
 		data.right = new FormAttachment(0, 48);
 		portLabel.setLayoutData(data);
 		
 		final Combo ports = new Combo(comPortComposite, SWT.DROP_DOWN | SWT.READ_ONLY);
-		List<String> portList = mConnection.getSerialPorts();
+		List<String> portList = getConnection().getSerialPorts();
 		ports.setItems(portList.toArray(new String[portList.size()]));
 		ports.select(1);
 		ports.addModifyListener(new ModifyListener()
@@ -718,130 +444,17 @@ public class ConnectionView extends ScrolledView implements ConnectionListener, 
 				{
 					Combo source = (Combo) e.getSource();
 					String newPort = source.getItem(source.getSelectionIndex());
-					mConnection.setComPort(newPort);
+					getConnection().setComPort(newPort);
 				}
 			}
 		});
 		data = new FormData();
-		data.top = new FormAttachment(0, 5);
+		data.top = new FormAttachment(0, 0);
 		data.left = new FormAttachment(portLabel, 5, SWT.RIGHT);
-		data.right = new FormAttachment(portLabel, 60, SWT.RIGHT);
+		data.right = new FormAttachment(portLabel, 68, SWT.RIGHT);
 		ports.setLayoutData(data);
 
 		comPortComposite.pack();
 		return comPortComposite;
-	}
-
-	/*
-	 * Append an incoming message to the StyledText widget.
-	 * 
-	 * Trim the buffer length the the max size as necessary.
-	 */
-	private void insertMessage(final String message, final Color colour)
-	{
-		Display.getDefault().asyncExec(new Runnable()
-		{
-			@Override
-			public void run()
-			{
-				if ( ! mText.isDisposed())
-				{
-					String msg = message;
-
-					int length = msg.length();
-					int start = mText.getText().length();
-					StyleRange range = new StyleRange(start, length, colour, ColourManager.getColour(SWT.COLOR_WHITE));
-					mText.append(msg);
-					mText.setStyleRange(range);
-
-					trimBuffer();
-				}
-			}
-		});	
-	}
-
-	/*
-	 * Trim the buffer to the max length
-	 */
-	private void trimBuffer()
-	{
-		// check buffer size and trim as necessary
-		while (mMaxBufferSize != UNLIMITED && mText.getText().length() > mMaxBufferSize)
-		{
-			int start = (int) (mText.getText().length() - mMaxBufferSize);
-			String newStr = mText.getText().substring(start);
-
-			List<StyleRange> newRanges = replaceRanges(start, (int)mMaxBufferSize, mText.getStyleRanges());
-			mText.setText(newStr);
-			mText.replaceStyleRanges(0, (int) mMaxBufferSize, newRanges.toArray(new StyleRange[newRanges.size()]));
-		}
-
-		mText.setCaretOffset((int) mMaxBufferSize);
-		if (!mPin)
-			mText.showSelection();
-	}
-
-	/*
-	 * Adjusts the styles to match the widget's content when the content is trimmed to
-	 * a maximum length.
-	 */
-	private List<StyleRange> replaceRanges(int start, int length, StyleRange[] ranges)
-	{
-		// inbound ranges are initially expected to cover 0 to > length
-		// start and length mark the substring which will be shifted to 0 -> length
-		// outbound ranges should cover 0 to length if possible, or r1.start to length
-
-		List<StyleRange> newRanges = new ArrayList<StyleRange>();
-		StyleRange first = ranges[0]; // the initial range: may need clipping at the front
-
-		if (first.start < start)
-		{
-			// range starts before new text start, clip front
-			int len = first.length - (start - first.start);
-			// check the fit of the length
-			if (len > length)
-				len = length;
-			if (len > 0)
-			{
-				StyleRange firstRep = new StyleRange(0, len, first.foreground, first.background);
-				newRanges.add(firstRep);
-			}
-		}
-		else
-		{
-			// range starts after new text start : new range start adjusted
-			int st = first.start - start;
-			if (st < 0)
-				st = 0;
-			int len = first.length;
-			// check the fit of the length
-			if (len > length)
-				len = length;
-			StyleRange firstRep = new StyleRange(st, len, first.foreground, first.background);
-			newRanges.add(firstRep);
-		}
-
-		for (int i = 1; i < ranges.length; i ++)
-		{
-			StyleRange next = ranges[i];
-			if (next.start > start + length) // escape if next rang is out of bounds (should never happen)
-				return newRanges;
-
-			// range starts after new text start : new range start adjusted
-			int st = next.start - start;
-			int len = next.length;
-			if (st < 0)
-			{
-				len += st; // (len = len - abs(st)
-				st = 0;
-			}
-			// check the fit of the length
-			if (len > start + next.length)
-				len = length;
-			StyleRange nextRep = new StyleRange(st, len, next.foreground, next.background);
-			newRanges.add(nextRep);
-		}
-
-		return newRanges;
 	}
 }
