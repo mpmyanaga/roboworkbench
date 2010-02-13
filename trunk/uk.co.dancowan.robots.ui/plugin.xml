@@ -90,6 +90,14 @@
       </page>
    </extension>
    <extension
+         point="org.eclipse.ui.preferencePages">
+      <page
+            class="uk.co.dancowan.robots.ui.preferences.FileBrowserPreferencePage"
+            id="uk.co.dancowan.robots.ui.preferences.FileBrowserPreferencePage"
+            name="File Browser">
+      </page>
+   </extension>
+   <extension
          point="org.eclipse.core.runtime.preferences">
       <initializer
             class="uk.co.dancowan.robots.ui.preferences.PreferenceInitializer">
