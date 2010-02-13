@@ -43,16 +43,9 @@ public class PreferenceInitializer extends AbstractPreferenceInitializer
 
 		// Connection view, behaviour and appearance
 		store.setDefault(PreferenceConstants.CONNECTION_ON_START, true);
-		store.setDefault(PreferenceConstants.CONNECTION_PIN, false);
-		store.setDefault(PreferenceConstants.CONNECTION_SHOW_TX, false);
-		store.setDefault(PreferenceConstants.CONNECTION_SHOW_RX, false);
-		store.setDefault(PreferenceConstants.CONNECTION_BUFFER_SIZE, 10);
-		store.setDefault(PreferenceConstants.CONNECTION_UNLIMITED_BUFFER, true);
 		store.setDefault(PreferenceConstants.CONNECTION_MODE, PreferenceConstants.NETWORK);
-		store.setDefault(PreferenceConstants.CONNECTION_WRAP, true);
-		PreferenceConverter.setValue(store, PreferenceConstants.CONNECTION_TX_COLOUR, ColourManager.getColour(SWT.COLOR_DARK_GRAY).getRGB());
-		PreferenceConverter.setValue(store, PreferenceConstants.CONNECTION_RX_COLOUR, ColourManager.getColour(SWT.COLOR_GRAY).getRGB());
-		PreferenceConverter.setValue(store, PreferenceConstants.CONNECTION_MESSAGE_COLOUR, ColourManager.getColour(SWT.COLOR_BLUE).getRGB());
-		PreferenceConverter.setValue(store, PreferenceConstants.CONNECTION_ERROR_COLOUR, ColourManager.getColour(SWT.COLOR_RED).getRGB());
+
+		// File browser
+		store.setDefault(PreferenceConstants.FILE_BROWSER_ROOT, System.getProperty("user.home"));
 	}
 }
