@@ -21,6 +21,7 @@ import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
 import org.eclipse.jface.action.IToolBarManager;
+import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -29,6 +30,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
 import org.eclipse.swt.events.KeyAdapter;
+import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Color;
@@ -42,18 +44,25 @@ import org.eclipse.swt.widgets.Control;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.Text;
 import org.eclipse.ui.IMemento;
 import org.eclipse.ui.IViewSite;
 import org.eclipse.ui.PartInitException;
 
+import uk.co.dancowan.robots.hal.core.Command;
+import uk.co.dancowan.robots.hal.core.Connection;
+import uk.co.dancowan.robots.hal.core.ConnectionListener;
+import uk.co.dancowan.robots.hal.core.HALRegistry;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.ui.Activator;
+import uk.co.dancowan.robots.ui.editors.actions.CommandAction;
 import uk.co.dancowan.robots.ui.preferences.PreferenceConstants;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
 import uk.co.dancowan.robots.ui.utils.TextUtils;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 import uk.co.dancowan.robots.ui.views.actions.ClearAction;
 import uk.co.dancowan.robots.ui.views.actions.Clearable;
+import uk.co.dancowan.robots.ui.views.actions.EscCmd;
 import uk.co.dancowan.robots.ui.views.actions.Lockable;
 import uk.co.dancowan.robots.ui.views.actions.ScrollLockAction;
 
@@ -68,7 +77,7 @@ import uk.co.dancowan.robots.ui.views.actions.ScrollLockAction;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class CommandConsole extends ScrolledView implements IPropertyChangeListener, Lockable, Clearable
+public class CommandConsole extends ScrolledView implements IPropertyChangeListener, Lockable, Clearable, ConnectionListener
 {
 	public static final String ID = "uk.co.dancowan.robots.ui.commandConsole";
 
@@ -79,6 +88,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 	private static final int UNLIMITED = -1;
 
 	private StyledText mText;
+	private Text mCommandText;
 	private RGB mOutputColour;
 	private RGB mErrorColour;
 	private Logger mConfiguredLogger;
@@ -100,6 +110,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 	public CommandConsole()
 	{
 		mCommandLine = new CommandLine();
+		HALRegistry.getInsatnce().getCommandQ().getConnection().addConnectionListener(this);
 	}
 
 	/**
@@ -130,22 +141,43 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		part.setLayout(new FormLayout());
 
 		mText = new StyledText(part, SWT.H_SCROLL | SWT.V_SCROLL | SWT.BORDER | SWT.FULL_SELECTION | SWT.READ_ONLY);
-		mText.setText("RoboWorkbench Command Console");
-		mText.append(TextUtils.CR);
-		mText.append("======================");
-		mText.append(TextUtils.CR);
 		mText.setWordWrap(mWrap);
 		mInputRenderer = new InputRenderer(this);
 		mText.addExtendedModifyListener(mInputRenderer);
 		mText.setMenu(getContextMenu());
 
-		mText.addKeyListener(new KeyAdapter()
+		setInitialText();
+
+		mCommandText = new Text(part, SWT.SINGLE | SWT.BORDER);
+		mCommandText.addKeyListener(new KeyAdapter()
 		{
 			@Override
-			public void keyReleased(org.eclipse.swt.events.KeyEvent e)
+			public void keyReleased(KeyEvent e)
 			{
-				if (e.keyCode == 13)
-					new CommandLineShell(mCommandLine, mText, getDisplayRelativeLocation(mText));
+				if (e.keyCode == 27) // send escape
+				{
+					Command cmd = new EscCmd();
+					HALRegistry.getInsatnce().getCommandQ().addCommand(cmd);
+				}
+				else if (e.keyCode == 13) // enter - execute command
+				{
+					mCommandLine.setText(mCommandText.getText());
+					mCommandLine.execute();
+					mText.append(mCommandText.getText() + TextUtils.CR);
+					mCommandText.setText("");
+				}
+				else if (e.keyCode == 16777217) // up cursor key - do history
+				{
+					String str = mCommandLine.last();
+					if (str != null)
+						mCommandText.setText(str);
+				}
+				else if (e.keyCode == 16777218) // up cursor key - do history
+				{
+					String str = mCommandLine.next();
+					if (str != null)
+						mCommandText.setText(str);
+				}
 			}
 		});
 
@@ -153,8 +185,15 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		data.top = new FormAttachment(0, 5);
 		data.left = new FormAttachment(0, 5);
 		data.right = new FormAttachment(100, -5);
-		data.bottom = new FormAttachment(100, -5);
+		data.bottom = new FormAttachment(mCommandText, -2, SWT.TOP);
 		mText.setLayoutData(data);
+
+		data = new FormData();
+		data.top = new FormAttachment(100, -21);
+		data.left = new FormAttachment(0, 5);
+		data.right = new FormAttachment(100, -5);
+		data.bottom = new FormAttachment(100, -5);
+		mCommandText.setLayoutData(data);
 
 		if (mShowExceptions)
 			attachToLogger(LoggingService.ROOT_LOGGER);
@@ -163,7 +202,6 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 
 		createToolbar();
 
-		//PlatformUI.getWorkbench().getHelpSystem().setHelp(part, ID);
 		part.pack();
 		return part;
 	}
@@ -237,6 +275,81 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 		mPin = false;
 	}
 
+	public StyledText getWidget()
+	{
+		return mText;
+	}
+
+	/**
+	 * Sets widget state according to connection events.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#connected()
+	 */
+	@Override
+	public void connected()
+	{
+		Connection connection = HALRegistry.getInsatnce().getCommandQ().getConnection();
+		final StringBuilder sb = new StringBuilder("Connected to ");
+		if (connection.isNetworkPort())
+		{
+			sb.append(connection.getHost());
+			sb.append(":");
+			sb.append(connection.getNetworkPort());
+		}
+		else
+		{
+			sb.append("com port: ");
+			sb.append(connection.getComPort());
+		}
+		insertMessage(sb.toString(), false);
+		newLine();
+	}
+
+	/**
+	 * Sets widget state according to connection events.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#disconnected()
+	 */
+	@Override
+	public void disconnected()
+	{
+		String message = "Disconnected";
+		insertMessage(message, false);
+		newLine();
+	}
+
+	/**
+	 * Sets widget state according to connection events.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#error(java.lang.String)
+	 */
+	@Override
+	public void error(final String message)
+	{
+		insertMessage(message, true);
+		newLine();
+	}
+
+	/**
+	 * No-op
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#rx(java.lang.String)
+	 */
+	public void rx(final String message)
+	{
+		// NOP
+	}
+
+	/**
+	 * No-op
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.ConnectionListener#tx(java.lang.String)
+	 */
+	public void tx(String message)
+	{
+		// NOP
+	}
+
 	/**
 	 * @see org.eclipse.jface.util.IPropertyChangeListener#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
 	 */
@@ -284,13 +397,24 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 	 * Recursive call calculates the position of the passed control relative
 	 * to the display.
 	 */
-	private Point getDisplayRelativeLocation(Control control)
+	/*package*/ Point getDisplayRelativeLocation(Control control)
 	{
 		if (control.getParent() == null) //assuming this is a shell
 			return control.getLocation();
 		Point pTree = getDisplayRelativeLocation(control.getParent());
 		Point pThis = control.getLocation();
 		return new Point(pTree.x + pThis.x, pTree.y + pThis.y);
+	}
+
+	/*
+	 * Set the initial text in the widget
+	 */
+	private void setInitialText()
+	{
+		mText.setText("RoboWorkbench Command Console");
+		mText.append(TextUtils.CR);
+		mText.append("======================");
+		mText.append(TextUtils.CR);
 	}
 
 	/*
@@ -340,6 +464,8 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
     private void createToolbar()
     {
     	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
+    	mgr.add(new CommandAction(new EscCmd(), "ESC", "Send escape character.", Activator.getImageDescriptor("icons/cmd_escape.gif")));
+    	mgr.add(new Separator());
     	mgr.add(new ScrollLockAction(this));
     	mgr.add(new ClearAction(this));
 	}
