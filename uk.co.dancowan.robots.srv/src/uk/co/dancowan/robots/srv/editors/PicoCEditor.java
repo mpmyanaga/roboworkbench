@@ -50,7 +50,8 @@ public class PicoCEditor extends BasicTextEditor
 	{
 		super.createPartControl(parent);
 		mModel = new Model(getText());
-		setText(getText().getText()); // bit of a hack to reset the text once the model is created
+		//HACK to set string in the text a second time once the model is created
+		mModel.setText(getText().getText());
 	}
 
 	/**
