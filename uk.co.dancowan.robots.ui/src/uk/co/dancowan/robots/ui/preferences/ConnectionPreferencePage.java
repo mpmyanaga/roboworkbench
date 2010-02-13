@@ -14,15 +14,9 @@
 package uk.co.dancowan.robots.ui.preferences;
 
 import org.eclipse.jface.preference.BooleanFieldEditor;
-import org.eclipse.jface.preference.ColorFieldEditor;
-import org.eclipse.jface.preference.FieldEditor;
 import org.eclipse.jface.preference.FieldEditorPreferencePage;
-import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.IntegerFieldEditor;
 import org.eclipse.jface.preference.RadioGroupFieldEditor;
-import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.ui.IWorkbench;
 import org.eclipse.ui.IWorkbenchPreferencePage;
@@ -41,8 +35,6 @@ import uk.co.dancowan.robots.ui.Activator;
  */
 public class ConnectionPreferencePage extends FieldEditorPreferencePage implements IWorkbenchPreferencePage
 {
-	private IntegerFieldEditor mBufferEditor;
-
 	/**
 	 * C'tor
 	 * 
@@ -65,47 +57,6 @@ public class ConnectionPreferencePage extends FieldEditorPreferencePage implemen
 
 		String [][] data = new String[][]{{"Network", PreferenceConstants.NETWORK}, {"Com Port", PreferenceConstants.COM}};
 		addField(new RadioGroupFieldEditor(PreferenceConstants.CONNECTION_MODE, "&Mode ", 2, data, getFieldEditorParent(), true));
-
-		Label label = new Label(getFieldEditorParent(), SWT.SEPARATOR | SWT.HORIZONTAL);
-		GridData gData = new GridData(GridData.FILL_HORIZONTAL);
-		gData.horizontalSpan = 2;
-		label.setLayoutData(gData);
-
-		addField(new ColorFieldEditor(PreferenceConstants.CONNECTION_MESSAGE_COLOUR, "Message stream colour ", getFieldEditorParent()));
-		addField(new ColorFieldEditor(PreferenceConstants.CONNECTION_ERROR_COLOUR, "Error stream colour ", getFieldEditorParent()));
-		addField(new ColorFieldEditor(PreferenceConstants.CONNECTION_TX_COLOUR, "TX stream colour ", getFieldEditorParent()));
-		addField(new ColorFieldEditor(PreferenceConstants.CONNECTION_RX_COLOUR, "RX stream colour ", getFieldEditorParent()));
-
-		label = new Label(getFieldEditorParent(), SWT.SEPARATOR | SWT.HORIZONTAL);
-		gData = new GridData(GridData.FILL_HORIZONTAL);
-		gData.horizontalSpan = 2;
-		label.setLayoutData(gData);
-
-		addField(new BooleanFieldEditor(PreferenceConstants.CONNECTION_UNLIMITED_BUFFER, "&Limit log buffer ", getFieldEditorParent()));
-		mBufferEditor = new IntegerFieldEditor(PreferenceConstants.CONNECTION_BUFFER_SIZE, "&Buffer size (k): ", getFieldEditorParent());
-		mBufferEditor.setValidRange(1, 1024);
-		addField(mBufferEditor);
-		
-		addField(new BooleanFieldEditor(PreferenceConstants.CONNECTION_WRAP, "&Wrap lines ", getFieldEditorParent()));
-
-		setFromPreferences();
-	}
-
-	/**
-	 * Implementation changes widget enablement depending on preference changes within the page.
-	 * 
-	 * @see org.eclipse.jface.preference.FieldEditorPreferencePage#propertyChange(org.eclipse.jface.util.PropertyChangeEvent)
-	 */
-	@Override
-	public void propertyChange(PropertyChangeEvent event)
-	{
-		super.propertyChange(event);
-
-		if (PreferenceConstants.CONNECTION_UNLIMITED_BUFFER.equals(((FieldEditor)event.getSource()).getPreferenceName()))
-		{
-			boolean enabled = (Boolean) event.getNewValue();
-			mBufferEditor.setEnabled(enabled, getFieldEditorParent());
-		}
 	}
 
 	/**
@@ -116,15 +67,5 @@ public class ConnectionPreferencePage extends FieldEditorPreferencePage implemen
 	public void init(IWorkbench workbench)
 	{
 		// NOP
-	}
-
-	/*
-	 * Set initial widget enablement from preference store.
-	 */
-	private void setFromPreferences()
-	{
-		IPreferenceStore prefs = getPreferenceStore();
-		boolean enabled = prefs.getBoolean(PreferenceConstants.CONNECTION_UNLIMITED_BUFFER);
-		mBufferEditor.setEnabled(enabled, getFieldEditorParent());
 	}
 }
