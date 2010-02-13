@@ -14,10 +14,21 @@
 package uk.co.dancowan.robots.ui.views.filebrowser;
 
 import java.io.File;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
 
 import org.eclipse.jface.viewers.ITreeContentProvider;
 import org.eclipse.jface.viewers.Viewer;
 
+/**
+ * JFace content provider for the FileBrowserView renders a tree representing
+ * the file system.
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
+ */
 public class FileSystemContentProvider implements ITreeContentProvider
 {
 	private File mInput;
@@ -36,8 +47,7 @@ public class FileSystemContentProvider implements ITreeContentProvider
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
-		
+		// Nothing created, nothing to destroy
 	}
 
 	@Override
@@ -61,7 +71,7 @@ public class FileSystemContentProvider implements ITreeContentProvider
 			File file = (File) parentElement;
 			if (file.isDirectory())
 			{
-				return file.listFiles();
+				return sort(file.listFiles());
 			}
 		}
 		return new Object[]{};
@@ -100,5 +110,35 @@ public class FileSystemContentProvider implements ITreeContentProvider
 			}
 		}
 		return false;
+	}
+
+	/*
+	 * Order the children
+	 */
+	private File[] sort(File[] files)
+	{
+		List<File> fileList = new ArrayList<File>();
+		for (File file : files)
+			fileList.add(file);
+		Collections.sort(fileList, new FileComparator());
+
+		return fileList.toArray(new File[fileList.size()]);
+	}
+
+	/*
+	 * Directories before files, alphabetic sort of names.
+	 */
+	private class FileComparator implements Comparator<File>
+	{
+		@Override
+		public int compare(File file1, File file2)
+		{
+			if (file1.isDirectory() && ! file2.isDirectory())
+				return -1;
+			else if ( ! file1.isDirectory() && file2.isDirectory())
+				return 1;
+			else
+				return file1.getName().compareTo(file2.getName());
+		}	
 	}
 }
