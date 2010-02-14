@@ -287,14 +287,14 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	private void connect(final boolean connect)
 	{
 		if (connect)
-			getConnection().openConnection();
+		{
+			Thread connectionThread = new ConnectionThread();
+			connectionThread.start();
+		}
 		else
+		{
 			getConnection().closeConnection();
-
-		if (getConnection().isConnected())
-			mConnectButton.setText("Disconnect");
-		else
-			mConnectButton.setText("Connect");
+		}
 	}
 
 	/*
