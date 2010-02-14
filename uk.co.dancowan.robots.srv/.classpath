@@ -17,5 +17,6 @@
 		</accessrules>
 	</classpathentry>
 	<classpathentry kind="lib" path="C:/Program Files/eclipse-rcp/plugins/org.junit_3.8.2.v20090203-1005/junit.jar"/>
+	<classpathentry kind="lib" path="lib/antlr-runtime-3.2.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
