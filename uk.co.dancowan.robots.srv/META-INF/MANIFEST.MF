@@ -15,4 +15,5 @@ Bundle-RequiredExecutionEnvironment: JavaSE-1.6
 Bundle-Vendor: Dan Cowan
 Bundle-ClassPath: lib/,
  .,
- lib/wstreamd_embed.jar
+ lib/wstreamd_embed.jar,
+ lib/antlr-runtime-3.2.jar
