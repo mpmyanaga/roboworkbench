@@ -13,46 +13,103 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.editors;
 
-import java.util.ArrayList;
 import java.util.List;
 
+import org.antlr.runtime.CommonToken;
+import org.eclipse.swt.SWT;
 import org.eclipse.swt.custom.StyleRange;
 import org.eclipse.swt.custom.StyledText;
+import org.eclipse.swt.graphics.Color;
+import org.eclipse.swt.widgets.Display;
 
-import uk.co.dancowan.robots.ui.utils.TextUtils;
+import uk.co.dancowan.robots.srv.editors.output.PicoCLexer;
+import uk.co.dancowan.robots.ui.utils.ColourManager;
 
+/**
+ * Class mediates between the <code>StyledText</code> widget of the editor and the additional
+ * editor features such as syntax highlighting.
+ * 
+ * @author Dan Cowan
+ * @since version 1.0.0
+ */
 public class Model
 {
 	private final StyledText mTarget;
-	private final List<String> mLines;
-	private final CTokenizer mTokenizer;
 
+	private Thread mLexerThread;
+
+	/**
+	 * C'tor
+	 * @param text the editor's StyledText widget
+	 */
 	public Model(StyledText text)
 	{
 		mTarget = text;
-		mLines = new ArrayList<String>();
-		mTokenizer = new CTokenizer();
 	}
 
+	/**
+	 * Sets the passed text in the model and starts a tokenizer thread
+	 * for syntax highlighting
+	 * 
+	 * @param input
+	 */
 	public void setText(String input)
 	{
-		String[] lines = input.split(TextUtils.CR);
-		for (String line : lines)
+		if (mLexerThread != null)
 		{
-			mLines.add(line);
+			mLexerThread.interrupt();
+			mLexerThread = null;
 		}
-		createStyles(input);
+		try
+		{
+			mLexerThread = new LexerThread(this, input);
+			mLexerThread.start();
+		}
+		catch (Exception e)
+		{
+			e.printStackTrace();
+		}
 	}
 
-	private void createStyles(String line)
+	/**
+	 * Called from the tokenizing thread to set <code>StyleRange<code<code>> objects
+	 * in the <code>StyledText</code> widget of the editor
+	 * 
+	 * @param tokens
+	 */
+	public void createStyles(List<CommonToken> tokens)
 	{
-		List<Token> tokens = mTokenizer.tokenize(line);
-		for (Token token : tokens)
+		for (final CommonToken token : tokens)
 		{
-			System.err.println("Token '" + token.getContent() + "' offset  " + token.getOffset() + " length " + token.getLength() + " style " + token.getStyle());
-			StyleRange range = token.getStyle();
-			if (range != null)
-				mTarget.setStyleRange(range);
+			Display.getDefault().asyncExec(new Runnable()
+			{
+				@Override
+				public void run()
+				{
+					StyleRange range = createStyle(token);
+					mTarget.setStyleRange(range);
+				}
+			});
 		}
+		mLexerThread = null;
+	}
+
+	/*
+	 * Create a StyledRange for the given CommonToken
+	 */
+	private StyleRange createStyle(CommonToken token)
+	{
+		int start = token.getStartIndex();
+		int length = (token.getStopIndex() + 1) - start;
+		Color colour;
+		switch (token.getType())
+		{
+			case PicoCLexer.ID: colour = ColourManager.getColour(SWT.COLOR_BLUE) ;break;// ident
+			case PicoCLexer.COMMENT: colour = ColourManager.getColour(SWT.COLOR_GRAY) ;break;// comment
+			case PicoCLexer.STRING: colour = ColourManager.getColour(SWT.COLOR_DARK_GREEN) ;break;// string
+			case PicoCLexer.KEYWORD: colour = ColourManager.getColour(SWT.COLOR_DARK_BLUE) ;break;// keyword
+			default : colour = ColourManager.getColour(SWT.COLOR_BLACK);
+		}
+		return new StyleRange(start, length, colour, ColourManager.getColour(SWT.COLOR_WHITE));
 	}
 }
