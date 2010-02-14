@@ -13,6 +13,8 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.editors;
 
+import org.eclipse.swt.events.ModifyEvent;
+import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 
@@ -50,6 +52,15 @@ public class PicoCEditor extends BasicTextEditor
 	{
 		super.createPartControl(parent);
 		mModel = new Model(getText());
+		getText().addModifyListener(new ModifyListener()
+		{	
+			@Override
+			public void modifyText(ModifyEvent e)
+			{
+				mModel.setText(getText().getText());
+			}
+		});
+
 		//HACK to set string in the text a second time once the model is created
 		mModel.setText(getText().getText());
 	}
