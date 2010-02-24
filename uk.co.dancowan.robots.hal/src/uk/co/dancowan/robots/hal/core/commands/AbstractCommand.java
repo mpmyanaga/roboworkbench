@@ -187,12 +187,9 @@ public abstract class AbstractCommand implements Command, Comparable<Command>
 	protected void write(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
-		if (connection.isConnected())
-		{
-			String cmd = getCommandString();
-			connection.write(cmd);
-			connection.writeComplete();
-		}
+		String cmd = getCommandString();
+		connection.write(cmd);
+		connection.writeComplete();
 	}
 
 	/**
