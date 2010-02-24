@@ -23,7 +23,6 @@ import org.eclipse.ui.part.EditorActionBarContributor;
 import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.commands.picoc.BufferContentProvider;
 import uk.co.dancowan.robots.srv.hal.commands.picoc.ClearFlashCmd;
-import uk.co.dancowan.robots.srv.hal.commands.picoc.EscCmd;
 import uk.co.dancowan.robots.srv.hal.commands.picoc.ReadFlashCmd;
 import uk.co.dancowan.robots.srv.hal.commands.picoc.RunFlashCmd;
 import uk.co.dancowan.robots.srv.hal.commands.picoc.SendCmd;
@@ -35,6 +34,7 @@ import uk.co.dancowan.robots.ui.editors.actions.CutStyledTextAction;
 import uk.co.dancowan.robots.ui.editors.actions.PasteStyledTextAction;
 import uk.co.dancowan.robots.ui.editors.actions.SaveAsEditorAction;
 import uk.co.dancowan.robots.ui.editors.actions.SaveEditorAction;
+import uk.co.dancowan.robots.ui.views.actions.EscCmd;
 
 /**
  * ActionBarContributor attaches local file actions to global handlers and adds additional
@@ -81,7 +81,7 @@ public class PicoCActionContributor extends EditorActionBarContributor implement
 		mClear = new CommandAction(new ClearFlashCmd(), "Clear", "Clear the flash buffer", SRVActivator.getImageDescriptor("icons/cmd_clear.gif"));
 		mList = new CommandAction(new ShowFlashCmd(), "List", "List flash buffer to terminal", SRVActivator.getImageDescriptor("icons/cmd_picoC-list.gif"));
 		mRun = new CommandAction(new RunFlashCmd(), "Run", "Start picoC  interpreter", SRVActivator.getImageDescriptor("icons/cmd_picoC-run.png"));
-		mStop = new CommandAction(new EscCmd(), "Stop", "Stop picoC interpreter", SRVActivator.getImageDescriptor("icons/cmd_stop.png"));
+		mStop = new CommandAction(new EscCmd(true), "Stop", "Stop picoC interpreter", SRVActivator.getImageDescriptor("icons/cmd_stop.png"));
 	}
 
 	/**
