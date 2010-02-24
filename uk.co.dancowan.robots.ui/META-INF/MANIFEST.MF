@@ -18,4 +18,5 @@ Export-Package: uk.co.dancowan.robots.ui,
  uk.co.dancowan.robots.ui.editors.actions,
  uk.co.dancowan.robots.ui.handlers,
  uk.co.dancowan.robots.ui.utils,
- uk.co.dancowan.robots.ui.views
+ uk.co.dancowan.robots.ui.views,
+ uk.co.dancowan.robots.ui.views.actions
