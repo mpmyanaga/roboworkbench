@@ -156,7 +156,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 			{
 				if (e.keyCode == 27) // send escape
 				{
-					Command cmd = new EscCmd();
+					Command cmd = new EscCmd(false);
 					HALRegistry.getInsatnce().getCommandQ().addCommand(cmd);
 				}
 				else if (e.keyCode == 13) // enter - execute command
@@ -326,8 +326,11 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
 	@Override
 	public void error(final String message)
 	{
-		insertMessage(message, true);
-		newLine();
+		if (message != null)
+		{
+			insertMessage(message, true);
+			newLine();
+		}
 	}
 
 	/**
@@ -464,7 +467,7 @@ public class CommandConsole extends ScrolledView implements IPropertyChangeListe
     private void createToolbar()
     {
     	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-    	mgr.add(new CommandAction(new EscCmd(), "ESC", "Send escape character.", Activator.getImageDescriptor("icons/cmd_escape.gif")));
+    	mgr.add(new CommandAction(new EscCmd(false), "ESC", "Send escape character.", Activator.getImageDescriptor("icons/cmd_escape.gif")));
     	mgr.add(new Separator());
     	mgr.add(new ScrollLockAction(this));
     	mgr.add(new ClearAction(this));
