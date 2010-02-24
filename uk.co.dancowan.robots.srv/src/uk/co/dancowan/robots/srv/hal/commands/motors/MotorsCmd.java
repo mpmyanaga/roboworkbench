@@ -47,6 +47,17 @@ public class MotorsCmd extends AbstractCommand
 	}
 
 	/**
+	 * Implementation returns "m".
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.Command#getName()
+	 */
+	@Override
+	public String getName()
+	{
+		return "m";
+	}
+
+	/**
 	 * Write the command request to the connection
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#read(CommandQ)
