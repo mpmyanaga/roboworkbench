@@ -28,6 +28,8 @@ public class SetResolutionCmd extends SendString
 	public static final String MEDIUM = "c";
 	public static final String LARGE = "d";
 
+	private final String mResolution;
+
 	/**
 	 * C'tor.
 	 *
@@ -43,5 +45,18 @@ public class SetResolutionCmd extends SendString
 	{
 		// Command is decimal, so translate = true
 		super(resolution, true);
+
+		mResolution = resolution;
+	}
+
+	/**
+	 * Implementation returns resolution command.
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.Command#getName()
+	 */
+	@Override
+	public String getName()
+	{
+		return mResolution;
 	}
 }
