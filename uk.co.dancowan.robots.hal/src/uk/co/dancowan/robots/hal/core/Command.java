@@ -92,12 +92,6 @@ public interface Command
 	/**
 	 * Return this commands display name.
 	 * 
-	 * <p>Commands are often named to look like methods:
-	 * <pre>    getImage()
-	 *    motors()</pre>
-	 * Key parameters may be rendered:
-	 * <pre>    motors(100 100 200)</pre></p>
-	 * 
 	 * <p>Essentially users are free to return whatever string they'd like to see appear
 	 * in the Command Console on execution.</p>
 	 * 
