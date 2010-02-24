@@ -21,10 +21,23 @@ import uk.co.dancowan.robots.hal.core.commands.AbstractCommand;
 
 public class EscCmd extends AbstractCommand
 {
+	private static final String ESC = "ESC";
+
+	/**
+	 * C'tor
+	 * 
+	 * <p>Command anticipates no result string
+	 */
+	public EscCmd(Boolean result)
+	{
+		if (! result)
+			noResult();
+	}
+
 	@Override
 	protected String getCommandString()
 	{
-		return "ESC";
+		return ESC;
 	}
 
 	/**
@@ -36,10 +49,18 @@ public class EscCmd extends AbstractCommand
 	protected void write(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
-		if (connection.isConnected())
-		{
-			connection.write((byte) 27);
-			connection.writeComplete();
-		}
+		connection.write((byte) 27);
+		connection.writeComplete();
+	}
+
+	/**
+	 * Implementation returns "".
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.Command#getName()
+	 */
+	@Override
+	public String getName()
+	{
+		return ESC;
 	}
 }
