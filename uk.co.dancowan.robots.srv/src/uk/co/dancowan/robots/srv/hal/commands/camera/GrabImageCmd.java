@@ -60,6 +60,17 @@ public class GrabImageCmd extends AbstractCommand
 	}
 
 	/**
+	 * Implementation returns "I".
+	 * 
+	 * @see uk.co.dancowan.robots.hal.core.Command#getName()
+	 */
+	@Override
+	public String getName()
+	{
+		return COMMAND;
+	}
+
+	/**
 	 * Low priority command.
 	 * 
 	 * @see uk.co.dancowan.robots.hal.core.commands.AbstractCommand#getPriority()
