@@ -31,10 +31,7 @@ public abstract class AbstractByteCommand extends AbstractCommand
 	protected void write(CommandQ cmdQ) throws IOException
 	{
 		Connection connection = cmdQ.getConnection();
-		if (connection.isConnected())
-		{
-			connection.write(getCommandString().getBytes());
-			connection.writeComplete();
-		}
+		connection.write(getCommandString().getBytes());
+		connection.writeComplete();
 	}
 }
