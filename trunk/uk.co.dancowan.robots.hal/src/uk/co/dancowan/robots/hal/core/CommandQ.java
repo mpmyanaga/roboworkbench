@@ -122,7 +122,7 @@ public class CommandQ extends Thread implements Component
 						}
 						else
 						{
-							mCurrentCommand.failed("Not connected.");
+							mCurrentCommand.failed("No connection available.");
 						}
 					}
 				}
@@ -198,19 +198,16 @@ public class CommandQ extends Thread implements Component
 	{
 		if (cmd != null)
 		{
-			if (mConnection.isConnected())
+			if (mCommandQ.contains(cmd))
 			{
-				if (mCommandQ.contains(cmd))
-				{
-					LOGGER.finest(cmd.getName() + " already in the command queue, command not added.");
-				}
-				else
-				{
-					if (!mCommandQ.offer(cmd))
-						LOGGER.finest("CommandQ overloaded, " + cmd.getName() + " not added.");
-				}
-				checkInteruptions();
+				LOGGER.finest(cmd.getName() + " already in the command queue, command not added.");
 			}
+			else
+			{
+				if (!mCommandQ.offer(cmd))
+					LOGGER.finest("CommandQ overloaded, " + cmd.getName() + " not added.");
+			}
+			checkInteruptions();
 		}
 	}
 
