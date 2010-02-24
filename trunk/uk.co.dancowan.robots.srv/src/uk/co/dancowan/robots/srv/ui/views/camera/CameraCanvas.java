@@ -25,6 +25,7 @@ import javax.swing.ImageIcon;
 import org.eclipse.swt.graphics.Rectangle;
 
 import uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer;
+import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
 import uk.co.dancowan.robots.srv.ui.views.camera.overlays.OverlayManager;
 
 /**
@@ -44,7 +45,7 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 
 	private final OverlayManager mOverlayManager;
 
-	private final CameraView mView;
+	private final CameraListener mCameraListener;
 	private BufferedImage mImageBuffer;
 	private Image mRawImage;
 
@@ -57,9 +58,9 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	/**
 	 * C'tor.
 	 */
-	public CameraCanvas(CameraView view)
+	public CameraCanvas(CameraListener listener)
 	{
-		mView = view;
+		mCameraListener = listener;
 
 		mOverlayManager = new OverlayManager();
 
@@ -120,7 +121,7 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 		g.drawImage(image, 0, 0, null);
 		g.dispose();
 
-		mView.newImage();
+		mCameraListener.newImage();
 	}
 
 	/**
