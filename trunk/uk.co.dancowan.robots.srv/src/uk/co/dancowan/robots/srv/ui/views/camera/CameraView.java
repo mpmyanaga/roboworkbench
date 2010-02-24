@@ -13,9 +13,6 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.ui.views.camera;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Frame;
 import java.awt.MenuItem;
 import java.awt.PopupMenu;
 import java.awt.event.ActionEvent;
@@ -37,13 +34,9 @@ import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
-import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
 import org.eclipse.swt.SWT;
-import org.eclipse.swt.awt.SWT_AWT;
-import org.eclipse.swt.events.ControlAdapter;
-import org.eclipse.swt.events.ControlEvent;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
 import org.eclipse.swt.events.KeyAdapter;
@@ -53,9 +46,7 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.RGB;
 import org.eclipse.swt.graphics.Rectangle;
-import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -107,9 +98,13 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	public static final String ID = "uk.co.dancowan.robots.srv.cameraView";
 
 	private static final Point MIN_SIZE = new Point(600, 500);
+	private static final NumberFormat NF = NumberFormat.getNumberInstance();
+	{
+		NF.setMaximumFractionDigits(1);
+	}
 
 	private final ColourBinPanel mColourBinPanel;
-	private final CameraCanvas mCameraCanvas;
+	private final CameraPanel mCameraPanel;
 
 	private Composite mColourBinComposite;
 	private Text mFPSText;
@@ -122,7 +117,6 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	private boolean mReady;
 	private boolean mPoll;
 	private boolean mInit;
-	private Color mColour;
 
 	private String mOutputFormat;
 	private String mPath;
@@ -132,8 +126,8 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 */
 	public CameraView()
 	{
-		mCameraCanvas = new CameraCanvas(this);
-		mColourBinPanel = new ColourBinPanel(mCameraCanvas);
+		mCameraPanel = new CameraPanel();
+		mColourBinPanel = new ColourBinPanel(mCameraPanel.getCameraCanvas());
 
 		mReady = false;
 		mGrabberLock = false;
@@ -142,7 +136,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		store.addPropertyChangeListener(this);
 		initFromPrefs();
 
-		SrvHal.getCamera().setConsumer(mCameraCanvas);
+		SrvHal.getCamera().setConsumer(mCameraPanel.getCameraCanvas());
 	}
 
 	/**
@@ -164,32 +158,11 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		part.setLayout(new FormLayout());
 
 		// This SWT Composite embeds the AWT Frame, and Canvas widgets
-		final Composite awtComposite = new Composite(part, SWT.EMBEDDED);
-		awtComposite.setLayout(new FillLayout());
-		awtComposite.setSize(320, 256);
-		awtComposite.addControlListener(new ControlAdapter()
-		{
-			@Override
-			public void controlResized(ControlEvent e)
-			{
-				if (e.getSource() instanceof Composite)
-				{
-					Composite c = (Composite) e.getSource();
-					mCameraCanvas.setDisplaySize(c.getSize().x - 20, c.getSize().y - 20);
-					mCameraCanvas.paintImage();
-				}
-			}
-		});
-		final Frame awtFrame = SWT_AWT.new_Frame(awtComposite);
-		awtFrame.setBackground(mColour);
-		awtFrame.setLayout(new BorderLayout(3, 3));
-		awtFrame.add("Center", mCameraCanvas);
-
+		final Composite awtComposite = mCameraPanel.getPanel(part);
 		final Composite pollComposite = getPollComposite(part);
 		final Composite locationComposite = getLocationComposite(part);
 		final Composite actionComposite = getResolutionComposite(part);
 		mColourBinComposite = mColourBinPanel.getPanel(part);
-		//mColourBinComposite = new PatternPanel().getPanel(part);
 
 		// Image Canvas/Frame layout
 		FormData data = new FormData();
@@ -283,25 +256,15 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 			// Called from Camera threads so async into SWT thread
 			Display.getDefault().asyncExec(new Runnable()
 			{
-				/**
-				 * @see java.lang.Runnable#run()
-				 */
 				@Override
 				public void run()
 				{
 					Camera cam = SrvHal.getCamera();
-					mFPSText.setText(formatFPS(cam.getFPS()));
+					mFPSText.setText(NF.format(cam.getFPS()));
 					mFrameText.setText(new Long(cam.getFrameTime()).toString());
 				}
 			});
 		}
-	}
-
-	private String formatFPS(double fps)
-	{
-		NumberFormat nf = NumberFormat.getNumberInstance();
-		nf.setMaximumFractionDigits(1);
-		return nf.format(fps);
 	}
 
 	/**
@@ -313,14 +276,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	@Override
 	public void propertyChange(PropertyChangeEvent event)
 	{
-		if (PreferenceConstants.CAMERA_BACKGROUND_COLOUR.equals(event.getProperty()))
-		{
-			RGB rgb = (RGB) event.getNewValue();
-			mColour = new Color(rgb.red, rgb.green, rgb.blue);
-			mCameraCanvas.setBackground(mColour);
-			mCameraCanvas.repaint(10);
-		}
-		else if (PreferenceConstants.CAMERA_DEFAULT_PATH.equals(event.getProperty()))
+		if (PreferenceConstants.CAMERA_DEFAULT_PATH.equals(event.getProperty()))
 		{
 			mPath = (String) event.getNewValue();
 		}
@@ -358,8 +314,6 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		mInit = store.getBoolean(PreferenceConstants.CAMERA_INIT_ON_CONNECT);
 		mPath = store.getString(PreferenceConstants.CAMERA_DEFAULT_PATH);
 		mOutputFormat = store.getString(PreferenceConstants.CAMERA_OUTPUT_FORMAT);
-		RGB rgb = PreferenceConverter.getColor(store, PreferenceConstants.CAMERA_BACKGROUND_COLOUR);
-		mColour = new Color(rgb.red, rgb.green, rgb.blue);
 	}
 
 	/*
@@ -501,7 +455,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 					File file = new File(path);
 					try
 					{
-						ImageIO.write(mCameraCanvas.getImage(), mOutputFormat, file);
+						ImageIO.write(mCameraPanel.getCameraCanvas().getImage(), mOutputFormat, file);
 						updatePath(path);
 					}
 					catch (IOException ioe)
@@ -540,7 +494,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
-				mCameraCanvas.setZoom(scale.getSelection());
+				mCameraPanel.getCameraCanvas().setZoom(scale.getSelection());
 			}
 		});
 		scale.setLayoutData(new GridData());
@@ -657,7 +611,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		getLabel(location, "V:");
 		final Text vText = getText(location);
 
-		mCameraCanvas.addMouseMotionListener(new MouseMotionAdapter()
+		mCameraPanel.getCameraCanvas().addMouseMotionListener(new MouseMotionAdapter()
 		{
 			/**
 			 * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
@@ -675,7 +629,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 
 						int pointerX = 0;
 						int pointerY = 0;
-						Rectangle bounds = mCameraCanvas.getOffsetBounds();
+						Rectangle bounds = mCameraPanel.getCameraCanvas().getOffsetBounds();
 						if (bounds.contains(x, y))
 						{
 							pointerX = x - bounds.x;
@@ -685,8 +639,8 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 							yLocText.setText(Integer.toString(pointerY));
 
 							//Grab a pixel at the mouse coordinates and calculate RGB and UYV values
-							BufferedImage image = mCameraCanvas.getImage();
-							int pixel = mCameraCanvas.getImage().getRGB(pointerX, pointerY);
+							BufferedImage image = mCameraPanel.getCameraCanvas().getImage();
+							int pixel = mCameraPanel.getCameraCanvas().getImage().getRGB(pointerX, pointerY);
 
 							if (! mGrabberLock)
 							{
@@ -769,8 +723,8 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		});
 		menu.add(setColour);
 
-		mCameraCanvas.add(menu);
-		mCameraCanvas.addMouseListener(new MouseAdapter()
+		mCameraPanel.getCameraCanvas().add(menu);
+		mCameraPanel.getCameraCanvas().addMouseListener(new MouseAdapter()
 		{
 			/**
 			 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
@@ -782,7 +736,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 				if (e.getButton() == MouseEvent.BUTTON3)
 				{
 					mGrabberLock = true;
-					menu.show(mCameraCanvas, e.getX(), e.getY());
+					menu.show(mCameraPanel.getCameraCanvas(), e.getX(), e.getY());
 				}
 			}
 		});
