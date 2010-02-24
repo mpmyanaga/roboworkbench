@@ -209,8 +209,16 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	@Override
 	public void connected()
 	{
-		if (!mConnectButton.isDisposed())
-			mConnectButton.setText("Disconnect");
+		// error may be thrown from the command execution thread
+		Display.getDefault().syncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				if (!mConnectButton.isDisposed())
+					mConnectButton.setText("Disconnect");
+			}
+		});
 	}
 
 	/**
@@ -221,8 +229,16 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	@Override
 	public void disconnected()
 	{
-		if (!mConnectButton.isDisposed())
-			mConnectButton.setText("Connect");
+		Display.getDefault().syncExec(new Runnable()
+		{
+			@Override
+			public void run()
+			{
+				
+				if (!mConnectButton.isDisposed())
+					mConnectButton.setText("Connect");
+			}
+		});
 	}
 
 	/**
