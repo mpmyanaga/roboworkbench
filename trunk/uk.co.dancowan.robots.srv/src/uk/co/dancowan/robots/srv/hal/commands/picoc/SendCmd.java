@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Display;
 import uk.co.dancowan.robots.hal.core.CommandQ;
 import uk.co.dancowan.robots.hal.core.commands.CommandChain;
 import uk.co.dancowan.robots.hal.core.commands.CommandUtils;
+import uk.co.dancowan.robots.ui.views.actions.EscCmd;
 
 /**
  * Series of commands to send editor content to the SRV1's flash buffer.
@@ -63,7 +64,7 @@ public class SendCmd extends CommandChain
 		addCommand(CommandUtils.getHexCommandForDec("E"));
 		addCommand(CommandUtils.getHexCommandForDec("I"));
 		addCommand(CommandUtils.getHexCommandForDec(provider.getResult()));
-		addCommand(new EscCmd());
+		addCommand(new EscCmd(true));
 		addCommand(CommandUtils.getHexCommandForDec("X"));
 
 		super.execute(cmdQ);
