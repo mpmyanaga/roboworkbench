@@ -23,7 +23,9 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.InetAddress;
 import java.net.Socket;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -54,6 +56,8 @@ public class Connection implements Component
 	private static final String CONNECTED = "connected";
 	private static final String DISCONNECTED = "disconnected";
 	private static final int BAUD_RATE = 115200;
+	private static final int PING_TIMEOUT = 1000;
+	private static final int COMMAND_TIMEOUT = 10000;
 
 	private OutputStream mOutputStream;
 	private InputStream mInputStream;
@@ -64,6 +68,7 @@ public class Connection implements Component
 	private Socket mSocket;
 	private SerialPort mSerialPort;
 	private boolean mIsNetwork;
+	private long mLastCmd;
 
 	private List<ConnectionListener> mConnectionListeners;
 
@@ -87,6 +92,7 @@ public class Connection implements Component
 		mIsNetwork = true;
 		
 		mConnectionListeners = new ArrayList<ConnectionListener>();
+		mLastCmd = System.currentTimeMillis();
 	}
 
 	/**
@@ -175,22 +181,52 @@ public class Connection implements Component
 		try
 		{
 			mOutputStream.close();
+			mOutputStream = null;
 		}
 		catch(IOException e)
 		{
-			// Aaaargh
+			// NOP
 		}
-		mOutputStream = null;
+		finally
+		{
+			if (mOutputStream != null)
+			{
+				try
+				{
+					mOutputStream.close();
+				}
+				catch (IOException e2)
+				{
+					// NOP
+				}
+			}
+			mOutputStream = null;
+		}
 
 		try
 		{
 			mInputStream.close();
+			mInputStream = null;
 		}
 		catch(IOException e)
 		{
-			// Again!!!
+			// NOP
 		}
-		mInputStream = null;
+		finally
+		{
+			if (mInputStream != null)
+			{
+				try
+				{
+					mInputStream.close();
+				}
+				catch (IOException e2)
+				{
+					// NOP
+				}
+			}
+			mInputStream = null;
+		}
 
 		try
 		{
@@ -198,7 +234,7 @@ public class Connection implements Component
 		}
 		catch(IOException e)
 		{
-			// Noooooooooo
+			// NOP
 		}
 		mSocket = null;
 		
@@ -394,7 +430,7 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Should be called by users after writing sequences of characters to
+	 * Must be called by users after writing sequences of characters to
 	 * the output stream once the write operations for the command are
 	 * complete.
 	 */
@@ -404,6 +440,7 @@ public class Connection implements Component
 		{
 			listener.tx(CommandUtils.CR);
 		}
+		mLastCmd = System.currentTimeMillis();
 	}
 
 	/**
@@ -418,13 +455,16 @@ public class Connection implements Component
 	{
 		try
 		{
-			mOutputStream.write(bytes);
-	
-			if (isNetworkPort())
+			if (mOutputStream != null)
 			{
-				flushOutput();
+				mOutputStream.write(bytes);
+		
+				if (isNetworkPort())
+				{
+					flushOutput();
+				}
+				fireTXEvent(new String(bytes));
 			}
-			fireTXEvent(new String(bytes));
 		}
 		catch (IOException e)
 		{
@@ -446,13 +486,16 @@ public class Connection implements Component
 	{
 		try
 		{
-			mOutputStream.write(single);
-	
-			if (isNetworkPort())
+			if (mOutputStream != null)
 			{
-				flushOutput();
+				mOutputStream.write(single);
+		
+				if (isNetworkPort())
+				{
+					flushOutput();
+				}
+				fireRXEvent(Byte.toString(single));
 			}
-			fireRXEvent(Byte.toString(single));
 		}
 		catch (IOException e)
 		{
@@ -476,25 +519,22 @@ public class Connection implements Component
 				return;
 			}
 	
-			if (isConnected())
+			int length = cmd.length() / 2;
+
+			byte[] cmdBytes = new byte[length];
+			int index = 0;
+			for (int i = 0; i < cmd.length() / 2; i++)
 			{
-				int length = cmd.length() / 2;
-		
-				byte[] cmdBytes = new byte[length];
-				int index = 0;
-				for (int i = 0; i < cmd.length() / 2; i++)
-				{
-					String cb = cmd.substring(2*i, 2*i + 2);
-					cmdBytes[index++] = (byte) Integer.parseInt(cb, 16);
-				}
-	
-				write(cmdBytes);
-				if (isNetworkPort())
-				{
-					flushOutput();
-				}
-				fireRXEvent(new String(cmdBytes));
+				String cb = cmd.substring(2*i, 2*i + 2);
+				cmdBytes[index++] = (byte) Integer.parseInt(cb, 16);
 			}
+
+			write(cmdBytes);
+			if (isNetworkPort())
+			{
+				flushOutput();
+			}
+			fireRXEvent(new String(cmdBytes));
 		}
 		catch (IOException e)
 		{
@@ -530,7 +570,7 @@ public class Connection implements Component
 		try
 		{
 			StringBuilder sb = new StringBuilder("Flushed: ");
-			while (isConnected() && mInputStream.available() > 0)
+			while (mInputStream != null && mInputStream.available() > 0)
 			{
 				sb.append(mInputStream.read());
 			}
@@ -556,6 +596,45 @@ public class Connection implements Component
 	public boolean isConnected()
 	{
 		return mOutputStream != null && mInputStream != null;
+	}
+
+	/**
+	 * Pings the host to test connection.
+	 * 
+	 * <p>Command uses a timeout and is blocking.</p>
+	 * 
+	 * @return boolean
+	 */
+	public boolean ping()
+	{
+		try
+		{
+			return InetAddress.getByName(mHost).isReachable(PING_TIMEOUT);
+		}
+		catch (UnknownHostException e)
+		{
+			return false;
+		}
+		catch (IOException e)
+		{
+			return false;
+		}
+	}
+
+	/**
+	 * Checks the status of the connection.
+	 * 
+	 * <p>Command returns true if a command has been sent within the last 10 seconds
+	 * and returns the result of a call to <code>Connection.ping()</code>. otherwise.</p>
+	 * 
+	 * @return boolean
+	 */
+	public boolean checkConnection()
+	{
+		if (System.currentTimeMillis() - mLastCmd > COMMAND_TIMEOUT)
+			return ping();
+		else
+			return true;
 	}
 
 	/**
@@ -586,6 +665,19 @@ public class Connection implements Component
 	public void componentRemoved(Component component)
 	{
 		// No Components effect this component.
+	}
+
+	/**
+	 * Callers can use this method to indicate that the connection has disconnected.
+	 * 
+	 * <p>Called by the <code>ConnectionThread</code> class which monitors the connection.
+	 * A <code>null</code> message may be sent to fire the listeners to change states
+	 * without reporting anything.</p>
+	 */
+	public void notifyDisconnection()
+	{
+		closeConnection();
+		fireErrorEvent(null);
 	}
 
 	/*
@@ -639,7 +731,6 @@ public class Connection implements Component
 
 					mSerialPort.setDTR(false);
 					mSerialPort.setRTS(false);
-
 					return true;
 				}
 			}
@@ -699,28 +790,42 @@ public class Connection implements Component
 	 */
 	private void closeSerialPort()
 	{
-		try
+		if (mOutputStream != null)
 		{
-			if (mOutputStream != null)
+			try
 			{
 				mOutputStream.close();
 			}
-			if (mInputStream != null)
+			catch (IOException e)
+			{
+				fireErrorEvent(e.getMessage());
+				ERROR_LOGGER.finest("Connection.closeSerialPort(): " + e.getMessage());
+			}
+			finally
+			{
+				mOutputStream = null;
+			}
+		}
+		if (mInputStream != null)
+		{
+			try
 			{
 				mInputStream.close();
 			}
-			if (mSerialPort != null)
+			catch (IOException e)
 			{
-				mSerialPort.close();
+				fireErrorEvent(e.getMessage());
+				ERROR_LOGGER.finest("Connection.closeSerialPort(): " + e.getMessage());
 			}
-			mOutputStream = null;
-			mInputStream = null;
-			mSerialPort = null;
+			finally
+			{
+				mInputStream = null;
+			}
 		}
-		catch (IOException e)
+		if (mSerialPort != null)
 		{
-			fireErrorEvent(e.getMessage());
-			ERROR_LOGGER.finest("SRV1Connection.closeSerialPort(): " + e.getMessage());
+			mSerialPort.close();
+			mSerialPort = null;
 		}
 	}
 
