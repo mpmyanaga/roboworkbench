@@ -61,6 +61,11 @@ public class SendString extends AbstractCommand
 		mCommand = command;
 	}
 
+	public String getName()
+	{
+		return mCommand;
+	}
+
 	/**
 	 * Returns thiis Command's internal command to send.
 	 * 
