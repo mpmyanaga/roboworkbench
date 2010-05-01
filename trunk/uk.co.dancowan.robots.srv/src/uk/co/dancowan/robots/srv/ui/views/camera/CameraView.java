@@ -13,26 +13,15 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.ui.views.camera;
 
-import java.awt.MenuItem;
-import java.awt.PopupMenu;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.text.NumberFormat;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.imageio.ImageIO;
 
 import org.eclipse.jface.action.GroupMarker;
 import org.eclipse.jface.action.IContributionItem;
 import org.eclipse.jface.action.IToolBarManager;
-import org.eclipse.jface.action.Separator;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
@@ -46,7 +35,6 @@ import org.eclipse.swt.events.ModifyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Point;
-import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FormAttachment;
 import org.eclipse.swt.layout.FormData;
 import org.eclipse.swt.layout.FormLayout;
@@ -59,33 +47,24 @@ import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
 
-import uk.co.dancowan.robots.hal.core.CommandEvent;
-import uk.co.dancowan.robots.hal.core.CommandListener;
 import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
-import uk.co.dancowan.robots.srv.hal.camera.YUV;
-import uk.co.dancowan.robots.srv.hal.commands.camera.SetResolutionCmd;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.EdgeDetectionCmd;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.HorizonDetectionCmd;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.ObsticleDetectionCmd;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.ReferenceCmd;
-import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SegmentationCmd;
 import uk.co.dancowan.robots.srv.ui.panels.ColourBinPanel;
+import uk.co.dancowan.robots.srv.ui.panels.PatternPanel;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
-import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.DetectionModeAction;
-import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBinsAction;
-import uk.co.dancowan.robots.srv.ui.views.featuredetector.actions.RefreshBlobsAction;
 import uk.co.dancowan.robots.ui.utils.ColourManager;
+import uk.co.dancowan.robots.ui.views.MultiPanel;
+import uk.co.dancowan.robots.ui.views.MultiPanelChangeListener;
+import uk.co.dancowan.robots.ui.views.Panel;
 import uk.co.dancowan.robots.ui.views.ScrolledView;
 
 /**
- * Instance of an Eclipse <code>ViewPart</code> to enable vision command
- * and camera output display in the application.
+ * Instance of an Eclipse <code>ViewPart</code> to enable vision related
+ * commands and view camera output in the application.
  * 
  * <p>Extends <code>ScrollableView</code> to enable scroll bars at a
  * preset minimum size.</p>
@@ -93,27 +72,21 @@ import uk.co.dancowan.robots.ui.views.ScrolledView;
  * @author Dan Cowan
  * @since version 1.0.0
  */
-public class CameraView extends ScrolledView implements IPropertyChangeListener, CameraListener
+public class CameraView extends ScrolledView implements IPropertyChangeListener, CameraListener, MultiPanelChangeListener
 {
 	public static final String ID = "uk.co.dancowan.robots.srv.cameraView";
 
-	private static final Point MIN_SIZE = new Point(600, 500);
+	private static final Point MIN_SIZE = new Point(450, 500);
 	private static final NumberFormat NF = NumberFormat.getNumberInstance();
 	{
 		NF.setMaximumFractionDigits(1);
 	}
 
-	private final ColourBinPanel mColourBinPanel;
 	private final CameraPanel mCameraPanel;
+	private final MultiPanel mPanels;
 
-	private Composite mColourBinComposite;
 	private Text mFPSText;
-	private Text mFrameText;
-	private Button mLastSize;
 
-	private boolean mGrabberLock;
-	private int mSampleX;
-	private int mSampleY;
 	private boolean mReady;
 	private boolean mPoll;
 	private boolean mInit;
@@ -126,11 +99,16 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	 */
 	public CameraView()
 	{
-		mCameraPanel = new CameraPanel();
-		mColourBinPanel = new ColourBinPanel(mCameraPanel.getCameraCanvas());
-
 		mReady = false;
-		mGrabberLock = false;
+		
+		mCameraPanel = new CameraPanel(this);
+
+		mPanels = new MultiPanel();
+		mPanels.addListener(this);
+		mPanels.addPanel(new ImageQualityPanel(mCameraPanel.getCameraCanvas()));
+		mPanels.addPanel(new ColourBinPanel(mCameraPanel.getCameraCanvas()));
+		mPanels.addPanel(new LocationPanel(mCameraPanel.getCameraCanvas()));
+		mPanels.addPanel(new PatternPanel());
 
 		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
 		store.addPropertyChangeListener(this);
@@ -157,12 +135,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		final Composite part = new Composite(parent, SWT.BORDER);
 		part.setLayout(new FormLayout());
 
-		// This SWT Composite embeds the AWT Frame, and Canvas widgets
-		final Composite awtComposite = mCameraPanel.getPanel(part);
+		final Composite awtComposite = mCameraPanel.getPanel(part); // SWT Composite embeds AWT Frame, and Canvas widgets
 		final Composite pollComposite = getPollComposite(part);
-		final Composite locationComposite = getLocationComposite(part);
-		final Composite actionComposite = getResolutionComposite(part);
-		mColourBinComposite = mColourBinPanel.getPanel(part);
+		final Composite multiPanel = mPanels.createControl(part);
 
 		// Image Canvas/Frame layout
 		FormData data = new FormData();
@@ -175,35 +150,18 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		// Poll Composite layout
 		data = new FormData();
 		data.top = new FormAttachment(awtComposite, 5, SWT.BOTTOM);
-		data.left = new FormAttachment(0, 5);
-		//data.bottom = new FormAttachment(awtComposite, 42, SWT.BOTTOM);
-		data.right = new FormAttachment(locationComposite, 0, SWT.RIGHT);
+		data.left = new FormAttachment(50, -130);
+		data.right = new FormAttachment(50, 130);
 		pollComposite.setLayoutData(data);
 
-		// Image size Composite layout
-		data = new FormData();
-		data.top = new FormAttachment(awtComposite, 5, SWT.BOTTOM);
-		data.right = new FormAttachment(100, -5);
-		data.bottom = new FormAttachment(pollComposite, 0, SWT.BOTTOM);
-		actionComposite.setLayoutData(data);
-
-		// Location data Composite layout
+		// MultiPanel Composite layout
 		data = new FormData();
 		data.top = new FormAttachment(pollComposite, 5, SWT.BOTTOM);
-		data.left = new FormAttachment(0, 5);
+		data.left = new FormAttachment(50, -200);
+		data.right = new FormAttachment(50, 200);
 		data.bottom = new FormAttachment(100, -5);
-		locationComposite.setLayoutData(data);
+		multiPanel.setLayoutData(data);
 
-		// Colour bin data Composite layout
-		data = new FormData();
-		data.top = new FormAttachment(actionComposite, 5, SWT.BOTTOM);
-		data.left = new FormAttachment(actionComposite, 0, SWT.LEFT);
-		data.right = new FormAttachment(100, -5);
-		data.bottom = new FormAttachment(100, -5);
-		mColourBinComposite.setLayoutData(data);
-
-		// Add menu and tool-bar
-		createPopupMenu(); //AWT popup menu
 		createToolbar();
 
 		part.computeSize(SWT.DEFAULT, SWT.DEFAULT);
@@ -237,9 +195,9 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	@Override
 	public void dispose()
 	{
-		mColourBinPanel.dispose();
-		super.dispose();
 		mReady = false;
+		super.dispose();
+		mPanels.dispose();
 	}
 
 	/**
@@ -253,15 +211,14 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	{
 		if (mReady)
 		{
-			// Called from Camera threads so async into SWT thread
+			// Called from FrameDecoder thread so async into SWT thread
 			Display.getDefault().asyncExec(new Runnable()
 			{
 				@Override
 				public void run()
 				{
-					Camera cam = SrvHal.getCamera();
-					mFPSText.setText(NF.format(cam.getFPS()));
-					mFrameText.setText(new Long(cam.getFrameTime()).toString());
+					Camera camera = SrvHal.getCamera();
+					mFPSText.setText(NF.format(camera.getFPS()));
 				}
 			});
 		}
@@ -284,6 +241,19 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		{
 			mOutputFormat = (String) event.getNewValue();
 		}
+	}
+
+	/**
+	 * Implementation of the <code>PanelChangeListener</code> interface allows this view to
+	 * update view actions according to the visible panel.
+	 * 
+	 * @see uk.co.dancowan.robots.ui.views.MultiPanelChangeListener#panelChanged(uk.co.dancowan.robots.ui.views.Panel)
+	 * @param newPanel the panel just revealed
+	 */
+	@Override
+	public void panelChanged(Panel newPanel)
+	{
+		createToolbar();
 	}
 
 	/*
@@ -322,7 +292,7 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	private Composite getPollComposite(Composite parent)
 	{
 		final Group pollComposite = new Group(parent, SWT.NONE);
-		pollComposite.setLayout(new GridLayout(3, true));
+		pollComposite.setLayout(new GridLayout(7, true));
 		pollComposite.setText("Polling");
 
 		final Button poll = new Button(pollComposite, SWT.TOGGLE);
@@ -330,9 +300,6 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 		poll.setToolTipText("Start the camera polling for images");
 		poll.addSelectionListener(new SelectionAdapter()
 		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
 			@Override
 			public void widgetSelected(SelectionEvent e)
 			{
@@ -350,6 +317,33 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 				}
 			}
 		});
+
+		GridData data = new GridData(GridData.FILL_BOTH);
+		data.horizontalSpan = 2;
+		poll.setLayoutData(data);
+
+		final Text pollDelay = new Text(pollComposite, SWT.BORDER | SWT.RIGHT);
+		pollDelay.setText(Integer.toString(SrvHal.getCamera().getPollDelay()));
+		pollDelay.setToolTipText("Poll interval in 10ms units");
+		addPollDelayListeners(pollDelay);
+		pollDelay.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		final Label label = new Label(pollComposite, SWT.TRAIL);
+		label.setText("FPS:");
+		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END));
+
+		mFPSText = new Text(pollComposite, SWT.BORDER | SWT.READ_ONLY | SWT.RIGHT);
+		mFPSText.setText("      ");
+		mFPSText.setLayoutData(new GridData(GridData.FILL_BOTH));
+
+		final Button save = new Button(pollComposite, SWT.PUSH);
+		save.setText("Save");
+		save.setToolTipText("Save a snapshot of the video stream");
+		save.addSelectionListener(new SaveEventListener());
+		data = new GridData(GridData.FILL_BOTH);
+		data.horizontalSpan = 2;
+		save.setLayoutData(data);
+
 		if (mPoll)
 		{
 			poll.setSelection(true);
@@ -357,16 +351,20 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 			poll.setText("Stop");
 			poll.setToolTipText("Stop the camera from polling");
 		}
-		poll.setLayoutData(new GridData(GridData.FILL_BOTH));
 
-		final Text pollDelay = new Text(pollComposite, SWT.BORDER | SWT.RIGHT);
-		pollDelay.setText(Integer.toString(SrvHal.getCamera().getPollDelay()));
-		pollDelay.setToolTipText("Poll interval in 10ms units");
+		pollComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
+		pollComposite.pack();
+		return pollComposite;
+	}
+
+	/*
+	 * Add all the delay setting listeners to the text
+	 */
+	private void addPollDelayListeners(final Text pollDelay)
+	{
+		// validation
 		pollDelay.addModifyListener(new ModifyListener()
 		{
-			/**
-			 * @see org.eclipse.swt.events.ModifyListener#modifyText(org.eclipse.swt.events.ModifyEvent)
-			 */
 			@Override
 			public void modifyText(ModifyEvent e)
 			{
@@ -381,11 +379,10 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 				}
 			}
 		});
+
+		// set on focus loss
 		pollDelay.addFocusListener(new FocusAdapter()
 		{
-			/**
-			 * @see org.eclipse.swt.events.FocusAdapter#focusLost(org.eclipse.swt.events.FocusEvent)
-			 */
 			@Override
 			public void focusLost(FocusEvent e)
 			{
@@ -400,6 +397,8 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 				}
 			}
 		});
+
+		// set on enter key
 		pollDelay.addKeyListener(new KeyAdapter()
 		{
 			@Override
@@ -416,330 +415,22 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 				}				
 			}
 		});
-		pollDelay.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		final Button save = new Button(pollComposite, SWT.PUSH);
-		save.setText("Save");
-		save.setToolTipText("Save a snapshot of the video stream");
-		save.addSelectionListener(new SelectionAdapter()
-		{
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				// stop the camera for a mo
-				Camera camera = SrvHal.getCamera();
-				boolean wasPolling = camera.isPolling();
-				if (wasPolling)
-					camera.stopPolling();
-				// make sure it has stopped
-				while (camera.isPolling())
-				{
-					try
-					{
-						Thread.sleep(10);
-					}
-					catch (InterruptedException e1)
-					{
-						// NOP
-					}
-				}
-				FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
-				dialog.setText("Save Image");
-				dialog.setFilterPath(mPath);
-				dialog.setFilterExtensions(new String[]{"*." + mOutputFormat});
-				String path = dialog.open();
-				if (path != null)
-				{
-					if (!path.endsWith(mOutputFormat))
-						path = path + "." + mOutputFormat;
-					File file = new File(path);
-					try
-					{
-						ImageIO.write(mCameraPanel.getCameraCanvas().getImage(), mOutputFormat, file);
-						updatePath(path);
-					}
-					catch (IOException ioe)
-					{
-						//TODO add an error handling layer to the main UI Activator class
-						System.err.println("IOException");
-					}
-				}
-				if (wasPolling)
-					camera.startPolling();
-			}
-		});
-		save.setLayoutData(new GridData(GridData.FILL_BOTH));
-
-		pollComposite.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		pollComposite.pack();
-		return pollComposite;
-	}
-
-	/*
-	 * Creates the Composite and listeners for image scaling and overlays
-	 */
-	private Composite getResolutionComposite(Composite parent)
-	{
-		final Group resolution = new Group(parent, SWT.NONE);
-		resolution.setLayout(new GridLayout(4, true));
-		resolution.setText("Resolution");
-		
-		final Button scale = new Button(resolution, SWT.CHECK);
-		scale.setText("Fit to Screen");
-		scale.addSelectionListener(new SelectionAdapter()
-		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				mCameraPanel.getCameraCanvas().setZoom(scale.getSelection());
-			}
-		});
-		scale.setLayoutData(new GridData());
-
-		final Button medium = new Button(resolution, SWT.RADIO);
-		medium.setText("640 x 512");
-		medium.setToolTipText("Set image resolution to 640x480 pixels");
-		medium.addSelectionListener(new SelectionAdapter()
-		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (medium.getSelection())
-					setSize(medium, SetResolutionCmd.MEDIUM);
-			}
-		});
-		medium.setLayoutData(new GridData());
-
-		final Button small = new Button(resolution, SWT.RADIO);
-		small.setText("320 x 256");
-		small.setToolTipText("Set image resolution to 320x256 pixels");
-		small.addSelectionListener(new SelectionAdapter()
-		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (small.getSelection())
-					setSize(small, SetResolutionCmd.SMALL);
-			}
-		});
-		small.setLayoutData(new GridData());
-		small.setSelection(true);
-		mLastSize = small;
-
-		final Button tiny = new Button(resolution, SWT.RADIO);
-		tiny.setText("160 x 128");
-		tiny.setToolTipText("Set image resolution to 160x128 pixels");
-		tiny.addSelectionListener(new SelectionAdapter()
-		{
-			/**
-			 * @see org.eclipse.swt.events.SelectionAdapter#widgetSelected(org.eclipse.swt.events.SelectionEvent)
-			 */
-			@Override
-			public void widgetSelected(SelectionEvent e)
-			{
-				if (tiny.getSelection())
-					setSize(tiny, SetResolutionCmd.TINY);
-			}
-		});
-		tiny.setLayoutData(new GridData());
-
-		resolution.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		resolution.pack();
-		return resolution;
-	}
-
-	/*
-	 * Ask the Camera to change the image resolution.
-	 */
-	private void setSize(Button source, String size)
-	{
-		CommandButtonMediator mediator = new CommandButtonMediator(source);
-		SrvHal.getCamera().setResolution(size, mediator);
-	}
-
-	/*
-	 * Create the composite and listeners for cursor location and colour inspection
-	 */
-	private Composite getLocationComposite(Composite parent)
-	{
-		final Group location = new Group(parent, SWT.NONE);
-		location.setLayout(new GridLayout(6, false));
-		location.setText("Sampling");
-
-		getLabel(location, "FPS:");
-		mFPSText = getText(location);
-
-		getLabel(location, "Frame:");
-		mFrameText = getText(location);
-
-		getLabel(location, "");
-		getLabel(location, "");
-
-		getLabel(location, "X-loc:");
-		final Text xLocText = getText(location);
-
-		getLabel(location, "R:");
-		final Text rText = getText(location);
-
-		getLabel(location, "        Y:");
-		final Text yText = getText(location);
-
-		getLabel(location, "Y-loc:");
-		final Text yLocText = getText(location);
-
-		getLabel(location, "G:");
-		final Text gText = getText(location);
-
-		getLabel(location, "U:");
-		final Text uText = getText(location);
-
-		getLabel(location, "");
-		getLabel(location, "");
-
-		getLabel(location, "B:");
-		final Text bText = getText(location);
-
-		getLabel(location, "V:");
-		final Text vText = getText(location);
-
-		mCameraPanel.getCameraCanvas().addMouseMotionListener(new MouseMotionAdapter()
-		{
-			/**
-			 * @see java.awt.event.MouseMotionAdapter#mouseMoved(java.awt.event.MouseEvent)
-			 */
-			@Override
-			public void mouseMoved(final MouseEvent e)
-			{
-				Display.getDefault().syncExec(new Runnable()
-				{
-					@Override
-					public void run()
-					{
-						int x = e.getX();
-						int y = e.getY();
-
-						int pointerX = 0;
-						int pointerY = 0;
-						Rectangle bounds = mCameraPanel.getCameraCanvas().getOffsetBounds();
-						if (bounds.contains(x, y))
-						{
-							pointerX = x - bounds.x;
-							pointerY = y - bounds.y;
-
-							xLocText.setText(Integer.toString(pointerX));
-							yLocText.setText(Integer.toString(pointerY));
-
-							//Grab a pixel at the mouse coordinates and calculate RGB and UYV values
-							BufferedImage image = mCameraPanel.getCameraCanvas().getImage();
-							int pixel = mCameraPanel.getCameraCanvas().getImage().getRGB(pointerX, pointerY);
-
-							if (! mGrabberLock)
-							{
-								mSampleX = pointerX;
-								mSampleY = pointerY;
-
-								// NB these values approximate the true YUV values from the hardware
-								// camera by sampling the RGB of the Image pixel at the mouse location
-								int red = image.getColorModel().getRed(pixel);
-								int green = image.getColorModel().getGreen(pixel);
-								int blue = image.getColorModel().getBlue(pixel);
-
-								rText.setText(Integer.toString(red));
-								gText.setText(Integer.toString(green));
-								bText.setText(Integer.toString(blue));
-	
-								YUV yuv = YUVUtils.getYUV(red, green, blue);
-								yText.setText(Integer.toString(yuv.getY()));
-								uText.setText(Integer.toString(yuv.getU()));
-								vText.setText(Integer.toString(yuv.getV()));
-							}
-						}
-					}
-				});
-			}
-		});
-
-		location.computeSize(SWT.DEFAULT, SWT.DEFAULT);
-		location.pack();
-		return location;
 	}
 
 	/*
 	 * Create tool-bar.
 	 */
-    private void createToolbar()
-    {
-    	IContributionItem actions = new GroupMarker("actions");
-    	IContributionItem modes = new Separator("modes");
-    	IToolBarManager mgr = getViewSite().getActionBars().getToolBarManager();
-    	mgr.add(actions);
-    	mgr.add(modes);
-    	mgr.appendToGroup("actions", new RefreshBinsAction(mColourBinComposite));
-    	mgr.appendToGroup("actions", new RefreshBlobsAction());
-
-    	List<DetectionModeAction> modeActions = new ArrayList<DetectionModeAction>();
-    	modeActions.add(new DetectionModeAction(new ReferenceCmd(), "Grab frame and enable frame referening mode", "icons/cmd_feature-difference.png"));
-    	modeActions.add(new DetectionModeAction(new SegmentationCmd(), "Enable colour segmentation mode", "icons/cmd_feature-segment.gif"));
-    	modeActions.add(new DetectionModeAction(new EdgeDetectionCmd(), "Enable edge detection mode", "icons/cmd_feature-edge.gif"));
-    	modeActions.add(new DetectionModeAction(new HorizonDetectionCmd(), "Enable horizon detection mode", "icons/cmd_feature-horizon.gif"));
-    	modeActions.add(new DetectionModeAction(new ObsticleDetectionCmd(), "Enable obstacle detection mode", "icons/cmd_feature-obstacle.png"));
-
-    	for (DetectionModeAction action : modeActions)
-    	{
-    		action.setFamily(modeActions);
-    		mgr.appendToGroup("modes", action);
-    	}
-	}
-
-	/*
-	 * Creates AWT PopupMenu for CameraComposite
-	 */
-	private void createPopupMenu()
+	private void createToolbar()
 	{
-		final Camera camera = SrvHal.getCamera();
-		final PopupMenu menu = new PopupMenu();
-		final MenuItem setColour = new MenuItem("Set colour to selected bin");
+		IToolBarManager manager = getViewSite().getActionBars().getToolBarManager();
+		manager.removeAll();
 
-		setColour.addActionListener(new ActionListener()
-		{
-			/**
-			 * @see java.awt.event.ActionListener#actionPerformed(java.awt.event.ActionEvent)
-			 */
-			@Override
-			public void actionPerformed(ActionEvent e)
-			{
-				camera.getDetector().updateColourBinFromCoords(mSampleX, mSampleY);
-				mGrabberLock = false;
-			}
-		});
-		menu.add(setColour);
+		IContributionItem actions = new GroupMarker("actions");
+		manager.add(actions);
 
-		mCameraPanel.getCameraCanvas().add(menu);
-		mCameraPanel.getCameraCanvas().addMouseListener(new MouseAdapter()
-		{
-			/**
-			 * @see java.awt.event.MouseAdapter#mouseClicked(java.awt.event.MouseEvent)
-			 */
-			@Override
-			public void mouseClicked(MouseEvent e)
-			{
-				// show the context menu when right-click detected
-				if (e.getButton() == MouseEvent.BUTTON3)
-				{
-					mGrabberLock = true;
-					menu.show(mCameraPanel.getCameraCanvas(), e.getX(), e.getY());
-				}
-			}
-		});
+		mPanels.getCurrentPanel().addToToolBar(manager);
+
+		manager.update(true);
 	}
 
 	/*
@@ -753,104 +444,53 @@ public class CameraView extends ScrolledView implements IPropertyChangeListener,
 	}
 
 	/*
-	 * Utility method used by location Composite
+	 * Handle the save button event
 	 */
-	private Text getText(Composite parent)
+	private class SaveEventListener extends SelectionAdapter
 	{
-		final Text text = new Text(parent, SWT.BORDER | SWT.READ_ONLY | SWT.RIGHT);
-		text.setText("      ");
-		text.setLayoutData(new GridData());
-
-		return text;
-	}
-
-	/*
-	 * Utility method used by location Composite
-	 */
-	private Label getLabel(Composite parent, String text)
-	{
-		final Label label = new Label(parent, SWT.TRAIL);
-		label.setText(text);
-		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END));
-
-		return label;
-	}
-
-	/*
-	 * Class mediates between an SWT widget, the source of the <code>Command</code>
-	 * and acts as a <code>CommandListener</code> which can modify the widget
-	 * according to incoming <code>CommandEvent</code>s.
-	 * 
-	 * Used by the resolution radio set to select the resolution only when the command
-	 * was successfully sent.
-	 */
-	private class CommandButtonMediator implements CommandListener
-	{
-		private final Button mSource;
-	
-		/*
-		 * C'tor adds this as a listener to the passed Command in order
-		 * to update the Button on completion.
-		 */
-		private CommandButtonMediator(Button source)
-		{
-			mSource = source;
-		}
-
-		/*
-		 * @see uk.co.dancowan.srv1q.core.CommandListener#commandCompleted(uk.co.dancowan.srv1q.core.CommandEvent)
-		 */
 		@Override
-		public void commandCompleted(CommandEvent e)
+		public void widgetSelected(SelectionEvent e)
 		{
-			Display.getDefault().asyncExec(new Runnable()
+			// stop the camera for a mo
+			Camera camera = SrvHal.getCamera();
+			boolean wasPolling = camera.isPolling();
+			if (wasPolling)
+				camera.stopPolling();
+			// make sure it has stopped
+			while (camera.isPolling())
 			{
-				public void run()
+				try
 				{
-					mLastSize = mSource;
+					Thread.sleep(10);
 				}
-			});
-		}
-
-		/*
-		 * @see uk.co.dancowan.srv1q.core.CommandListener#commandExecuted(uk.co.dancowan.srv1q.core.CommandEvent)
-		 */
-		@Override
-		public void commandExecuted(CommandEvent e)
-		{
-			//NOP - not interested in command starting
-		}
-
-		/*
-		 * @see uk.co.dancowan.srv1q.core.CommandListener#commandFailed(uk.co.dancowan.srv1q.core.CommandEvent)
-		 */
-		@Override
-		public void commandFailed(CommandEvent e)
-		{
-			Display.getDefault().asyncExec(new Runnable()
-			{
-				public void run()
+				catch (InterruptedException e1)
 				{
-					silentSelect(mSource, false);
-					silentSelect(mLastSize, true);		
+					// NOP
 				}
-			});
-		}
-
-		/*
-		 * Remove listeners from Button, select 'state' and then replace listeners.
-		 */
-		private void silentSelect(Button button, boolean state)
-		{
-			if (state != button.getSelection())
-			{
-				Listener[] selectionListeners = button.getListeners(SWT.Selection);
-				for (Listener listener : selectionListeners)
-					button.removeListener(SWT.Selection, listener);
-				button.setSelection(state);
-				for (Listener listener : selectionListeners)
-					button.addListener(SWT.Selection, listener);
 			}
+			FileDialog dialog = new FileDialog(Display.getCurrent().getActiveShell(), SWT.SAVE);
+			dialog.setText("Save Image");
+			dialog.setFilterPath(mPath);
+			dialog.setFilterExtensions(new String[]{"*." + mOutputFormat});
+			String path = dialog.open();
+			if (path != null)
+			{
+				if (!path.endsWith(mOutputFormat))
+					path = path + "." + mOutputFormat;
+				File file = new File(path);
+				try
+				{
+					ImageIO.write(mCameraPanel.getCameraCanvas().getImage(), mOutputFormat, file);
+					updatePath(path);
+				}
+				catch (IOException ioe)
+				{
+					//TODO add an error handling layer to the main UI Activator class
+					System.err.println("IOException");
+				}
+			}
+			if (wasPolling)
+				camera.startPolling();
 		}
 	}
 }
