@@ -18,18 +18,28 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
+import java.awt.MenuItem;
+import java.awt.PopupMenu;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 
 import javax.swing.ImageIcon;
 
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.Rectangle;
+import org.eclipse.swt.widgets.Display;
 
+import uk.co.dancowan.robots.srv.hal.SrvHal;
+import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer;
 import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
 import uk.co.dancowan.robots.srv.ui.views.camera.overlays.OverlayManager;
 
 /**
- * Extension of the AWT Canvas class to display images streamed from the SRV1q
+ * Extension of the AWT Canvas class to display images streamed from the SRV1
  * 
  * @author Dan Cowan
  * @since version 1.0.0
@@ -54,6 +64,12 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	private int mMaxWidth;
 	private int mFrameX;
 	private int mFrameY;
+	private int mTargetHeight;
+	private int mTargetWidth;
+	private int mCurrentHeight;
+	private int mCurrentWidth;
+
+	private final Object mMutex = new Object();
 
 	/**
 	 * C'tor.
@@ -61,13 +77,16 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	public CameraCanvas(CameraListener listener)
 	{
 		mCameraListener = listener;
-
 		mOverlayManager = new OverlayManager();
 
 		setSize(INITIAL_WIDTH, INITIAL_HEIGHT);
-		mImageBuffer = new BufferedImage(INITIAL_WIDTH, INITIAL_HEIGHT, BufferedImage.TYPE_INT_RGB);
+		mTargetHeight = mCurrentHeight = INITIAL_HEIGHT;
+		mTargetWidth = mCurrentWidth = INITIAL_WIDTH;
 
+		mImageBuffer = new BufferedImage(INITIAL_WIDTH, INITIAL_HEIGHT, BufferedImage.TYPE_INT_RGB);
 		setDisplaySize(2*INITIAL_WIDTH, 2*INITIAL_HEIGHT);
+
+		createPopupMenu();
 	}
 
 	/**
@@ -104,14 +123,23 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	public void setImage(Image image, boolean isNew)
 	{
 		if (isNew)
-			mRawImage = image;
-
-		// scale image to canvas size if requested
-		if (mZoom)
 		{
-			if (image != null)
-				image = new ImageIcon(image.getScaledInstance(mMaxWidth, mMaxHeight, Image.SCALE_FAST)).getImage();
+			mRawImage = image;
+			if (! mZoom)
+			{
+				int height = image.getHeight(null);
+				int width = image.getWidth(null);
+				if (mCurrentHeight != height) // assume different widths if different heights
+				{
+					setTargetHeight(height);
+					setTargetWidth(width);
+					new ZoomAnimation().start();
+				}
+			}
 		}
+
+		// scale image to canvas as necessary
+		image = new ImageIcon(image.getScaledInstance(getCurrentWidth(), getCurrentHeight(), Image.SCALE_FAST)).getImage();
 
 		// check BufferedImage fit
 		mImageBuffer = resizeBuffer(image);
@@ -153,23 +181,23 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 			int canvasHeight = getHeight();
 			int imageWidth = mImageBuffer.getWidth(null);
 			int imageHeight = mImageBuffer.getHeight(null);
+			
+			// center the Image in the Canvas
+			mFrameX = (canvasWidth - imageWidth) / 2;
+			mFrameY = (canvasHeight - imageHeight) / 2;
 
 			if (imageWidth != canvasWidth || imageHeight != canvasHeight)
 			{
 				g.clearRect(0, 0, canvasWidth, canvasHeight);
-				g.drawRoundRect(mFrameX - 5, mFrameY - 5, imageWidth + 10, imageHeight + 10, 10, 10);
+				g.drawRoundRect(mFrameX - 7, mFrameY - 7, imageWidth + 14, imageHeight + 14, 14, 14);
 			}
 
 			// ask overlays to paint in the buffer
 			for (OverlayContributor overlay : mOverlayManager)
 			{
 				if (overlay.shouldRun())
-					overlay.paintOverlay(mImageBuffer);
+					overlay.paintOverlay(this);
 			}
-
-			// center the Image in the Canvas
-			mFrameX = (canvasWidth - imageWidth) / 2;
-			mFrameY = (canvasHeight - imageHeight) / 2;
 
 			// paint the buffer to the screen
 			g.drawImage(mImageBuffer, mFrameX, mFrameY, null);
@@ -184,14 +212,17 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	public void setZoom(boolean zoom)
 	{
 		mZoom = zoom;
-		if (! mZoom)
+		if (mZoom)
 		{
-			setImage(mRawImage, false);
-			paint(getGraphics());
+			setTargetHeight(mMaxHeight);
+			setTargetWidth(mMaxWidth);
+			new ZoomAnimation().start();
 		}
 		else
 		{
-			paintImage();
+			setTargetHeight(mRawImage.getHeight(null));
+			setTargetWidth(mRawImage.getWidth(null));		
+			new ZoomAnimation().start();
 		}
 	}
 
@@ -223,45 +254,92 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#getImageHeight()
+	 * Translates the passed SRV coordinates into display space.
+	 * 
+	 * @param srvX
+	 * @param srvY
+	 * @return Point
 	 */
-	public int getImageHeight()
+	public Point srvToMouse(int srvX, int srvY)
 	{
-		return getHeight();
+		if (mZoom)
+		{
+			srvX = (int)(((double)srvX/(double)mRawImage.getWidth(null))*getOffsetBounds().width);
+			srvY = (int)(((double)srvY/(double)mRawImage.getHeight(null))*getOffsetBounds().height);
+		}
+		return new Point(srvX, srvY);
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#getImageWidth()
+	 * Translates the passed mouse coordinates into SRV image space.
+	 * 
+	 * @param pointerX
+	 * @param pointerY
+	 * @return Point
 	 */
-	public int getImageWidth()
+	public Point mouseToSRV(int pointerX, int pointerY)
 	{
-		return getWidth();
+		if (mZoom)
+		{
+			pointerX = (int)(((double)pointerX/(double)getOffsetBounds().width)*mRawImage.getWidth(null));
+			pointerY = (int)(((double)pointerY/(double)getOffsetBounds().height)*mRawImage.getHeight(null));
+		}
+		return new Point(pointerX, pointerY);
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#setImageHeight(int)
-	 */
-	public void setImageHeight(int height)
-	{
-		setSize(getWidth(), height);
-	}
-
-	/**
-	 * @see uk.co.dancowan.robots.srv.hal.camera.CameraImageConsumer#setImageWidth(int)
-	 */
-	public void setImageWidth(int width)
-	{
-		setSize(width, getHeight());
-	}
-
-	/*
 	 * Returns the location of the image within the display area for centering
+	 * 
+	 * @return Rectangle
 	 */
-	/*package*/ Rectangle getOffsetBounds()
+	public Rectangle getOffsetBounds()
 	{
 		return new Rectangle(mFrameX, mFrameY, mImageBuffer.getWidth(null), mImageBuffer.getHeight(null));
 	}
 
+	/*
+	 * Creates AWT PopupMenu for CameraComposite
+	 */
+	private void createPopupMenu()
+	{
+		final Camera camera = SrvHal.getCamera();
+		final PopupMenu menu = new PopupMenu();
+		final MenuItem setColour = new MenuItem("Set colour to selected bin");
+
+		setColour.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e)
+			{
+				camera.getDetector().updateColourBinFromCoords();
+				camera.getDetector().setSampleLock(false);
+			}
+		});
+		menu.add(setColour);
+
+		final Component canvas = this;
+		add(menu);
+		addMouseListener(new MouseAdapter()
+		{
+			@Override
+			public void mouseClicked(MouseEvent e)
+			{
+				// show the context menu when right-click detected within image bounds
+				if (e.getButton() == MouseEvent.BUTTON3)
+				{
+					int x = e.getX();
+					int y = e.getY();
+					Rectangle bounds = getOffsetBounds();
+					if (bounds.contains(x, y))
+					{
+						camera.getDetector().setSampleLock(true);
+						menu.show(canvas, x, y);
+					}
+				}
+			}
+		});
+	}
+	
 	/*
 	 * Check the size match of the image buffer and recreate as necessary.
 	 */
@@ -276,5 +354,152 @@ public class CameraCanvas extends Canvas implements CameraImageConsumer<Componen
 			return mImageBuffer;
 		else
 			return new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private int getTargetHeight()
+	{
+		synchronized (mMutex)
+		{
+			return mTargetHeight;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private int getTargetWidth()
+	{
+		synchronized (mMutex)
+		{
+			return mTargetWidth;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private int getCurrentHeight()
+	{
+		synchronized (mMutex)
+		{
+			return mCurrentHeight;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private int getCurrentWidth()
+	{
+		synchronized (mMutex)
+		{
+			return mCurrentWidth;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private void setTargetHeight(int height)
+	{
+		synchronized (mMutex)
+		{
+			mTargetHeight = height;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private void setTargetWidth(int width)
+	{
+		synchronized (mMutex)
+		{
+			mTargetWidth = width;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private void setCurrentHeight(int height)
+	{
+		synchronized (mMutex)
+		{
+			mCurrentHeight = height;
+		}
+	}
+
+	/*
+	 * Synchonized call for variable used by animation thread
+	 */
+	private void setCurrentWidth(int width)
+	{
+		synchronized (mMutex)
+		{
+			mCurrentWidth = width;
+		}
+	}
+
+	/*
+	 * Thread animates the zoom or resolution size changes
+	 */
+	private class ZoomAnimation extends Thread
+	{
+		private static final int SPEED = 10; //px per 5ms
+
+		private ZoomAnimation()
+		{
+			setName("Zoom Animation");
+		}
+
+		@Override
+		public void run()
+		{
+			while (getCurrentHeight() != getTargetHeight() || getCurrentWidth() != getTargetWidth())
+			{
+				if (getCurrentHeight() < getTargetHeight())
+				{
+					setCurrentHeight(getCurrentHeight() + SPEED);
+					if (getCurrentHeight() > getTargetHeight()) setCurrentHeight(getTargetHeight());
+				}
+				else
+				{
+					setCurrentHeight(getCurrentHeight() - SPEED);
+					if (getCurrentHeight() < getTargetHeight()) setCurrentHeight(getTargetHeight());
+				}
+				if (getCurrentWidth() < getTargetWidth())
+				{
+					setCurrentWidth(getCurrentWidth() + SPEED);
+					if (getCurrentWidth() > getTargetWidth()) setCurrentWidth(getTargetWidth());
+				}
+				else
+				{
+					setCurrentWidth(getCurrentWidth() - SPEED);
+					if (getCurrentWidth() < getTargetWidth()) setCurrentWidth(getTargetWidth());
+				}
+
+				Display.getDefault().syncExec(new Runnable()
+				{
+					@Override
+					public void run()
+					{
+						paintImage();
+					}
+				});
+
+				try
+				{
+					Thread.sleep(5);
+				}
+				catch (InterruptedException e)
+				{
+					return;
+				}
+			}
+		}
 	}
 }
