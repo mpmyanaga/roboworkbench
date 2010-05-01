@@ -35,22 +35,21 @@ public class FrameDecoder extends Thread
 {
 	private static final Logger INFO_LOGGER = Logger.getLogger(LoggingService.INFO_LOGGER);
 
-	private final Object mMutex = new Object();
 	private final CameraImageConsumer<Component> mConsumer;
 	private final MediaTracker mTracker;
 	private final List<Long> mPollTimes;
 
-	private MemoryImageSource mImageSource;	
 	private Image mImage;
-	private int[] mPixels;
 	private byte[] mImageBytes;
 	private String mType;
+
 	private boolean mTerminate;
 	private boolean mShouldRun;
 
-	private long mFrameTime;
 	private long mLastFrame;
 	private double mFPS;
+
+	private final Object mMutex = new Object();
 
 	/**
 	 * C'tor
@@ -69,13 +68,14 @@ public class FrameDecoder extends Thread
 
 		initImageBuffer();
 		mConsumer.setImage(mImage, true);
+
 		setName("ImageDecoder thread");
 
 		INFO_LOGGER.fine("FrameDocoder created.");
 	}
 
 	/**
-	 * Called by the <code>GradImageCmd</code> to request a new frame is
+	 * Called by the <code>GrabImageCmd</code> to request a new frame is
 	 * decoded and pushed for rendering.
 	 * 
 	 * @param type String, the image type, IBM or IMJ
@@ -95,16 +95,6 @@ public class FrameDecoder extends Thread
 	public double getFPS()
 	{
 		return mFPS;
-	}
-
-	/**
-	 * Return approximate time to process last frame.
-	 * 
-	 * @return long single frame process time approximation
-	 */
-	public long getFrameTime()
-	{
-		return mFrameTime;
 	}
 
 	/**
@@ -137,13 +127,9 @@ public class FrameDecoder extends Thread
 					continue;
 				}
 	
-				long startTime = System.currentTimeMillis();
-				if (mType.startsWith ("IMB"))
-					decodeBitmap();
-				else
+				if (mType.startsWith ("IMJ"))
 					decodeJpeg();
-				mFrameTime = System.currentTimeMillis() - startTime;
-	
+
 				mImageBytes = null;
 			}
 
@@ -206,47 +192,6 @@ public class FrameDecoder extends Thread
 	}
 
 	/*
-	 * Decode the byte data as a bitmap image.
-	 */
-	private void decodeBitmap()
-	{
-		// set resolution
-		char res = mType.charAt(3);
-		if (res == '1')
-		{
-			mConsumer.setImageWidth(40);
-			mConsumer.setImageHeight(32);
-		}
-		else if (res == '3')
-		{
-			mConsumer.setImageWidth(80);
-			mConsumer.setImageHeight(64);
-		} 
-
-		mPixels = new int[mImageBytes.length * 8];    
-		initRawBuffer();
-
-		for (int i = 0; i < mImageBytes.length; i++)
-		{
-			for (int j = 0; j < 8; j++)
-			{
-				if ((mImageBytes[i] & (0x00000080 >> j)) > 0)
-				{
-					mPixels[i*8 + j] = 0xFFFFFFFF;
-				}
-				else
-				{
-					mPixels[i*8 + j] = 0xFF000000;
-				}
-			}
-		}
-
-		mImageSource.newPixels(0, 0, mConsumer.getImageWidth(), mConsumer.getImageHeight());
-		
-		mConsumer.paintImage();
-	}
-
-	/*
 	 * Decode the byte data as a JPEG image.
 	 */
 	private void decodeJpeg()
@@ -279,9 +224,9 @@ public class FrameDecoder extends Thread
 	 */
 	private void initImageBuffer()
 	{
-		int height = mConsumer.getImageHeight();
-		int width = mConsumer.getImageWidth();
-		mPixels = new int[width*height];
+		int height = 256;
+		int width = 320;
+		int[] pixels = new int[width*height];
 		int index = 0;
 		for (int y = 0; y < height; y++)
 		{
@@ -289,23 +234,14 @@ public class FrameDecoder extends Thread
 			for (int x = 0; x < width; x++)
 			{
 				int blue = (x * 255) / (width - 1);
-				mPixels[index++] = (255 << 24) | (red << 16) | blue;
+				pixels[index++] = (255 << 24) | (red << 16) | blue;
 			}
 		}
-		mImageBytes = new byte[mPixels.length];
+		mImageBytes = new byte[pixels.length];
 
-		initRawBuffer();
-	}
-
-	/*
-	 * Initialises the <code>MemoryImageSource</code> used as a raw pixel buffer
-	 * for incoming camera images.
-	 */
-	private void initRawBuffer()
-	{
-		mImageSource = new MemoryImageSource(mConsumer.getImageWidth(), mConsumer.getImageHeight(), mPixels, 0, mConsumer.getImageWidth());
-		mImageSource.setAnimated(true);
-		mImage = mConsumer.getTargetWidget().createImage(mImageSource);
+		MemoryImageSource source = new MemoryImageSource(320, 256, pixels, 0, 320);
+		source.setAnimated(true);
+		mImage = mConsumer.getTargetWidget().createImage(source);
 	}
 
 	/*
