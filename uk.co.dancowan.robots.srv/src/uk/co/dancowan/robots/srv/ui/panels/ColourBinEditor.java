@@ -16,6 +16,7 @@ package uk.co.dancowan.robots.srv.ui.panels;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.FocusAdapter;
 import org.eclipse.swt.events.FocusEvent;
+import org.eclipse.swt.events.FocusListener;
 import org.eclipse.swt.events.KeyAdapter;
 import org.eclipse.swt.events.KeyEvent;
 import org.eclipse.swt.events.ModifyEvent;
@@ -24,11 +25,15 @@ import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
 import uk.co.dancowan.robots.srv.hal.SrvHal;
+import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.commands.featuredetector.SetBinCmd;
 import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
 import uk.co.dancowan.robots.srv.ui.views.camera.CameraCanvas;
@@ -95,7 +100,9 @@ public class ColourBinEditor extends SelectionAdapter
 				updateBin(0, ""); // params skip condition and just send command
 			}
 		});
-		narrow.setLayoutData(new GridData(GridData.FILL_BOTH));
+		GridData gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
+		narrow.setLayoutData(gd);
 
 		final Button widen = new Button(parent, SWT.PUSH);
 		widen.setText(">");
@@ -110,7 +117,9 @@ public class ColourBinEditor extends SelectionAdapter
 				updateBin(0, ""); // params skip condition and just send command
 			}
 		});
-		widen.setLayoutData(new GridData(GridData.FILL_BOTH));
+		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 2;
+		widen.setLayoutData(gd);
 
 		getLabel(parent, MAX_Y);
 		mYmax = getText(parent, MAX_Y);
@@ -119,30 +128,38 @@ public class ColourBinEditor extends SelectionAdapter
 		getLabel(parent, MAX_V);
 		mVmax = getText(parent, MAX_V);
 
-		if (mCanvas != null)
+		final Button info = new Button(parent, SWT.TOGGLE);
+		info.setText("Image data");
+		info.setToolTipText("Display Image Data");
+		info.addSelectionListener(new SelectionAdapter()
 		{
-			final Button overlay = new Button(parent, SWT.TOGGLE);
-			overlay.setText("Overlay");
-			overlay.setToolTipText("Overlay blobs detected for this colour bin's contents");
-			overlay.addSelectionListener(new SelectionAdapter()
+			@Override
+			public void widgetSelected(SelectionEvent e)
 			{
-				@Override
-				public void widgetSelected(SelectionEvent e)
-				{
-					OverlayContributor oc = mCanvas.getOverlayManager().getOverlay(BlobOverlay.ID);
-					if (oc != null)
-						oc.setShouldRun(overlay.getSelection());
-				}
-			});
-			GridData gd = new GridData(GridData.FILL_BOTH);
-			gd.horizontalSpan = 2;
-			overlay.setLayoutData(gd);
-		}
-		else
+				Camera camera = SrvHal.getCamera();
+				//camera.refreshImageData();
+				openHistogramHover(camera);
+			}
+		});
+		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 1;
+		info.setLayoutData(gd);
+
+		final Combo segment = new Combo(parent, SWT.DROP_DOWN);
+		final String[] segments = new String[]{"v0", "v1", "v2", "v3", "v4", "v5"};
+		for (String s : segments)
+			segment.add(s);
+		segment.addSelectionListener(new SelectionAdapter()
 		{
-			getLabel(parent, "");
-			getLabel(parent, "");
-		}
+			@Override
+			public void widgetSelected(SelectionEvent e)
+			{
+				System.err.println(segments[segment.getSelectionIndex()]);
+			}
+		});
+		gd = new GridData(GridData.FILL_BOTH);
+		gd.horizontalSpan = 3;
+		segment.setLayoutData(gd);
 
 		getLabel(parent, MIN_Y);
 		mYmin = getText(parent, MIN_Y);
@@ -166,14 +183,30 @@ public class ColourBinEditor extends SelectionAdapter
 		mVmin.setText("" + bin.getVmin());
 	}
 
+	private void openHistogramHover(Camera camera)
+	{
+		final Shell shell = new Shell(Display.getCurrent(), SWT.TOOL);
+		shell.setSize(400, 400);
+		shell.addFocusListener(new FocusAdapter()
+		{	
+			@Override
+			public void focusLost(FocusEvent e)
+			{
+				shell.dispose();
+			}
+		});
+
+		//int[] mean = camera.getMeanYUV();
+		
+		shell.open();
+	}
+
 	/*
 	 * Utility method used to add a Text with all the relevant listeners
 	 */
 	private Text getText(Composite parent, final String id)
 	{
 		final Text text = new Text(parent, SWT.BORDER | SWT.RIGHT);
-		text.setLayoutData(new GridData());
-		text.setText("        "); // initial content forces the size of the initial grid layout
 		text.addModifyListener(new ModifyListener()
 		{
 			@Override
@@ -242,6 +275,9 @@ public class ColourBinEditor extends SelectionAdapter
 				}
 			}
 		});
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL);
+		gd.horizontalSpan = 2;
+		text.setLayoutData(gd);
 		return text;
 	}
 
@@ -283,10 +319,12 @@ public class ColourBinEditor extends SelectionAdapter
 	 */
 	private Label getLabel(Composite parent, String text)
 	{
-		final Label label = new Label(parent, SWT.TRAIL);
+		final Label label = new Label(parent, SWT.RIGHT);
 		label.setText(text);
-		label.setLayoutData(new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END));
 
+		GridData gd = new GridData(GridData.FILL_HORIZONTAL | GridData.HORIZONTAL_ALIGN_END);
+		gd.horizontalSpan = 2;
+		label.setLayoutData(gd);
 		return label;
 	}
 }
