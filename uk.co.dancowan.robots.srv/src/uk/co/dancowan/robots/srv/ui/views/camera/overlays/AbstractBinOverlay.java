@@ -13,11 +13,11 @@
  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 package uk.co.dancowan.robots.srv.ui.views.camera.overlays;
 
-import java.awt.image.BufferedImage;
 import java.util.logging.Logger;
 
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
+import uk.co.dancowan.robots.srv.ui.views.camera.CameraCanvas;
 import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
 
 /**
@@ -84,10 +84,10 @@ public abstract class AbstractBinOverlay implements OverlayContributor
 	/**
 	 * Extending classes must implement to paint overlay.
 	 * 
-	 * @see uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor#paintOverlay(BufferedImage)
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor#paintOverlay(CameraCanvas)
 	 */
 	@Override
-	public abstract void paintOverlay(BufferedImage image);
+	public abstract void paintOverlay(CameraCanvas canvas);
 
 	/**
 	 * Checks this overlay's run flag.

@@ -20,6 +20,7 @@ import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.camera.Camera;
 import uk.co.dancowan.robots.srv.hal.featuredetector.ColourBin;
+import uk.co.dancowan.robots.srv.ui.views.camera.CameraCanvas;
 
 /**
  * OverlayContributor implementation to highlight pixels within a given colour bin.
@@ -78,13 +79,14 @@ public class ColourBinOverlay extends AbstractBinOverlay
 	 * Paints those pixels falling within the configured colour bin's bounds in a
 	 * fixed colour.
 	 * 
-	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(BufferedImage)
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(CameraCanvas)
 	 */
 	@Override
-	public void paintOverlay(BufferedImage image)
+	public void paintOverlay(CameraCanvas canvas)
 	{
 		INFO_LOGGER.finest("Colour Overlay painting");
 		int pixels = 0;
+		BufferedImage image = canvas.getImage();
 		if (image != null)
 		{
 			for (int x = 0; x < image.getWidth(); x ++)
