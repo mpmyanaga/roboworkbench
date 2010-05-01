@@ -15,19 +15,20 @@ package uk.co.dancowan.robots.srv.ui.views.camera.overlays;
 
 import java.awt.Color;
 import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.util.List;
 
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
 import org.eclipse.jface.util.PropertyChangeEvent;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.graphics.RGB;
 
 import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.featuredetector.Blob;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
+import uk.co.dancowan.robots.srv.ui.views.camera.CameraCanvas;
 import uk.co.dancowan.robots.srv.ui.views.camera.OverlayContributor;
 
 /**
@@ -76,20 +77,22 @@ public class BlobOverlay implements OverlayContributor, IPropertyChangeListener
 	/**
 	 * Outlines most recent blob information..
 	 * 
-	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(BufferedImage)
+	 * @see uk.co.dancowan.robots.srv.ui.views.camera.overlays.AbstractBinOverlay#paintOverlay(CameraCanvas)
 	 */
 	@Override
-	public void paintOverlay(BufferedImage image)
+	public void paintOverlay(CameraCanvas canvas)
 	{
-		if (image != null)
+		if (canvas.getImage() != null)
 		{
-			Graphics g = image.getGraphics();
+			Graphics g = canvas.getImage().getGraphics();
 			g.setColor(mColour);
 			List<Blob> blobs = SrvHal.getCamera().getDetector().getBlobs();
 			for (Blob blob : blobs)
 			{
-				g.drawRect(blob.getX(), blob.getY(), blob.getWidth(), blob.getHeight());
-				g.drawRect(blob.getX() + 2, blob.getY() + 2, blob.getWidth() - 4, blob.getHeight() - 4);
+				Point c = canvas.srvToMouse(blob.getX(), blob.getY());
+				Point d = canvas.srvToMouse(blob.getWidth(), blob.getHeight());
+				g.drawRect(c.x, c.y, d.x, d.y);
+				g.drawRect(c.x + 2, c.y + 2, d.x - 4, d.y - 4);
 			}
 		}
 	}
@@ -134,7 +137,7 @@ public class BlobOverlay implements OverlayContributor, IPropertyChangeListener
 	}
 
 	/*
-	 * 
+	 * Initialise class variables from preference store
 	 */
 	private void initFromPrefs()
 	{
