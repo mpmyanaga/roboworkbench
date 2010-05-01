@@ -210,7 +210,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	public void connected()
 	{
 		// error may be thrown from the command execution thread
-		Display.getDefault().syncExec(new Runnable()
+		Display.getDefault().asyncExec(new Runnable()
 		{
 			@Override
 			public void run()
@@ -229,7 +229,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	@Override
 	public void disconnected()
 	{
-		Display.getDefault().syncExec(new Runnable()
+		Display.getDefault().asyncExec(new Runnable()
 		{
 			@Override
 			public void run()
@@ -253,7 +253,7 @@ public class ConnectionView extends ScrolledView implements ConnectionListener
 	public void error(String error)
 	{
 		// error may be thrown from the command execution thread
-		Display.getDefault().syncExec(new Runnable()
+		Display.getDefault().asyncExec(new Runnable()
 		{
 			@Override
 			public void run()
