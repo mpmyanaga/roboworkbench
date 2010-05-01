@@ -47,6 +47,10 @@ public class FeatureDetector extends AbstractComponent
 	private boolean mInterupt;
 	private boolean mWasRunning;
 
+	private boolean mSampleLock;
+	private int mXCoord;
+	private int mYCoord;
+
 	/**
 	 * C'tor.
 	 *
@@ -63,6 +67,10 @@ public class FeatureDetector extends AbstractComponent
 
 		mInterupt = false;
 		mWasRunning = false;
+
+		mSampleLock = false;
+		mXCoord = 0;
+		mYCoord = 0;
 
 		createBins();
 	}
@@ -162,17 +170,34 @@ public class FeatureDetector extends AbstractComponent
 		mFocusPatternIndex = index;
 	}
 
+	public void setSampleLock(boolean lock)
+	{
+		mSampleLock = lock;
+	}
+
+	public boolean isSampleLocked()
+	{
+		return mSampleLock;
+	}
+
+	public void setXCoord(int x)
+	{
+		mXCoord = x;
+	}
+
+	public void setYCoord(int y)
+	{
+		mYCoord = y;
+	}
+
 	/**
-	 * Asks the Camera to update the colour in the focus bin from the passed
+	 * Asks the Camera to update the colour in the focus bin from the
 	 * camera image coordinates.
-	 * 
-	 * @param x
-	 * @param y
 	 */
-	public void updateColourBinFromCoords(int x, int y)
+	public void updateColourBinFromCoords()
 	{
 		interuptCamera(true);
-		new PixelGrabber(getFocusBin()).setBinFrom(x, y);
+		new PixelGrabber(getFocusBin()).setBinFrom(mXCoord, mYCoord);
 		refreshBlobs();
 	}
 
