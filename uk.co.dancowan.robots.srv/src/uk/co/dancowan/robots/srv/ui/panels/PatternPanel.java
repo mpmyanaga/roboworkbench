@@ -17,6 +17,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
@@ -26,6 +27,7 @@ import org.eclipse.swt.widgets.Group;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
 import uk.co.dancowan.robots.srv.hal.featuredetector.Pattern;
 import uk.co.dancowan.robots.srv.hal.featuredetector.PatternMemory;
+import uk.co.dancowan.robots.ui.views.Panel;
 
 /**
  * Class manages a view sub-panel for the pattern recognition algorithms of the SRV1.
@@ -47,12 +49,20 @@ public class PatternPanel implements Panel
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.ui.panels.Panel#getID()
+	 * @see uk.co.dancowan.robots.ui.views.Panel#getID()
 	 */
 	@Override
 	public String getID()
 	{
 		return ID;
+	}
+
+	/**
+	 * @see uk.co.dancowan.robots.ui.views.Panel#getDescription()
+	 */
+	public String getDescription()
+	{
+		return "NN Pattern Memory Panel";
 	}
 
 	/**
@@ -65,7 +75,7 @@ public class PatternPanel implements Panel
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.ui.panels.Panel#getPanel(org.eclipse.swt.widgets.Composite)
+	 * @see uk.co.dancowan.robots.ui.views.Panel#getPanel(org.eclipse.swt.widgets.Composite)
 	 */
 	@Override
 	public Composite getPanel(Composite parent)
@@ -87,7 +97,15 @@ public class PatternPanel implements Panel
 	}
 
 	/**
-	 * @see uk.co.dancowan.robots.srv.ui.panels.Panel#dispose()
+	 * @see uk.co.dancowan.robots.ui.views.Panel#addToToolBar(org.eclipse.jface.action.IToolBarManager)
+	 */
+	public void addToToolBar(IToolBarManager manager)
+	{
+		// NOP
+	}
+
+	/**
+	 * @see uk.co.dancowan.robots.ui.views.Panel#dispose()
 	 */
 	public void dispose()
 	{
