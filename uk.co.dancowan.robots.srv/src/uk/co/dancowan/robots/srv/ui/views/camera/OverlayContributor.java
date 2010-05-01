@@ -1,6 +1,5 @@
 package uk.co.dancowan.robots.srv.ui.views.camera;
 
-import java.awt.image.BufferedImage;
 
 /**
  * Interface for classes which intend to draw on top of an SRV camera image.
@@ -20,9 +19,9 @@ public interface OverlayContributor
 	public boolean shouldRun();
 	
 	/**
-	 * Paint this overlay to the <code>BufferedImage</code> instance.
+	 * Paint this overlay to the <code>CameraCanvas</code> instance.
 	 */
-	public void paintOverlay(BufferedImage image);
+	public void paintOverlay(CameraCanvas canvas);
 	
 	/**
 	 * Set this contributors run state.
