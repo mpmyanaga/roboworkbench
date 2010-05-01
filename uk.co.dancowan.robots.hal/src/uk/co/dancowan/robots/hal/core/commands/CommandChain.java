@@ -43,6 +43,6 @@ public class CommandChain extends AbstractCommand
 	@Override
 	protected String getCommandString()
 	{
-		throw new UnsupportedOperationException("CommandChain cannot return a command string.");
+		return "";
 	}
 }
