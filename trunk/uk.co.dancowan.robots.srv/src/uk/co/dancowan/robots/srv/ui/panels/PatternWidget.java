@@ -189,16 +189,18 @@ public class PatternWidget extends Composite implements PaintListener, IProperty
 		if (event.getProperty().equals(PreferenceConstants.PATTERN_COLOUR))
 		{
 			mForeground = ColourManager.getInstance().getColour((RGB) event.getNewValue());
+			redraw();
 		}
 		else if (event.getProperty().equals(PreferenceConstants.PATTERN_BACKGROUND_COLOUR))
 		{
 			mBackground = ColourManager.getInstance().getColour((RGB) event.getNewValue());
+			redraw();
 		}
 		else if (event.getProperty().equals(PreferenceConstants.PATTERN_EDITOR_GRID_COLOUR))
 		{
 			mGridColour = ColourManager.getInstance().getColour((RGB) event.getNewValue());
+			redraw();
 		}
-		redraw();
 	}
 
 	/**
