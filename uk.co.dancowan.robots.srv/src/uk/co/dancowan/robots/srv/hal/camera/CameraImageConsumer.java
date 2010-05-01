@@ -50,32 +50,4 @@ public interface CameraImageConsumer<T>
 	 * @return T a widget of this class's generic type
 	 */
 	public T getTargetWidget();
-
-	/**
-	 * Sets the width of the image.
-	 * 
-	 * @param width
-	 */
-	public void setImageWidth(int width);
-
-	/**
-	 * Gets the width of the image.
-	 * 
-	 * @return int
-	 */
-	public int getImageWidth();
-
-	/**
-	 * Sets the height of the image.
-	 * 
-	 * @param height
-	 */
-	public void setImageHeight(int height);
-
-	/**
-	 * Gets the height of the image.
-	 * 
-	 * @return int
-	 */
-	public int getImageHeight();
 }
