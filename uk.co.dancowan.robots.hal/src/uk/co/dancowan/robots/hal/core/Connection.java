@@ -56,7 +56,7 @@ public class Connection implements Component
 	private static final String CONNECTED = "connected";
 	private static final String DISCONNECTED = "disconnected";
 	private static final int BAUD_RATE = 115200;
-	private static final int PING_TIMEOUT = 1000;
+	private static final int PING_TIMEOUT = 2000;
 	private static final int COMMAND_TIMEOUT = 10000;
 
 	private OutputStream mOutputStream;
@@ -71,6 +71,8 @@ public class Connection implements Component
 	private long mLastCmd;
 
 	private List<ConnectionListener> mConnectionListeners;
+
+	private final Object mMutex = new Object();
 
 	/**
 	 * C'tor
@@ -125,7 +127,10 @@ public class Connection implements Component
 	 */
 	public void addConnectionListener(ConnectionListener listener)
 	{
-		mConnectionListeners.add(listener);
+		synchronized(mMutex)
+		{
+			mConnectionListeners.add(listener);
+		}
 	}
 
 	/**
@@ -136,7 +141,10 @@ public class Connection implements Component
 	 */
 	public void removeConnectionListener(ConnectionListener listener)
 	{
-		mConnectionListeners.remove(listener);
+		synchronized(mMutex)
+		{
+			mConnectionListeners.remove(listener);
+		}
 	}
 
 	/**
@@ -239,10 +247,7 @@ public class Connection implements Component
 		mSocket = null;
 		
 		INFO_LOGGER.log(Level.FINE, "Connection closed");
-		for (ConnectionListener listener : mConnectionListeners)
-		{
-			listener.disconnected();
-		}
+		fireConnectionEvent(DISCONNECTED);
 	}
 
 	/**
@@ -418,14 +423,21 @@ public class Connection implements Component
 	}
 
 	/**
-	 * Should be called by users after reading sequences of characters from
+	 * Must be called by users after reading sequences of characters from
 	 * the input stream once the read operations for the command are complete.
+	 * 
+	 * <p>Signals loggers and other listeners that the read cycle is complete. If
+	 * not called by users of the <code>Connection.read()</code> method the
+	 * consequences are unknown.</p>
 	 */
 	public void readComplete()
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			listener.rx(CommandUtils.CR);
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				listener.rx(CommandUtils.CR);
+			}
 		}
 	}
 
@@ -433,12 +445,19 @@ public class Connection implements Component
 	 * Must be called by users after writing sequences of characters to
 	 * the output stream once the write operations for the command are
 	 * complete.
+	 * 
+	 * <p>Signals loggers and other listeners that the write cycle is complete. If
+	 * not called by users of the <code>Connection.write(...)</code> methods the
+	 * consequences are unknown.</p>
 	 */
 	public void writeComplete()
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			listener.tx(CommandUtils.CR);
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				listener.tx(CommandUtils.CR);
+			}
 		}
 		mLastCmd = System.currentTimeMillis();
 	}
@@ -464,6 +483,37 @@ public class Connection implements Component
 					flushOutput();
 				}
 				fireTXEvent(new String(bytes));
+			}
+		}
+		catch (IOException e)
+		{
+			fireErrorEvent(e.getMessage());
+			throw e;
+		}
+	}
+
+	/**
+	 * Writes a single <code>int</code> to the OutputStream.
+	 * 
+	 * <p>Wraps a call to <code>java.io.OutputStream.write(int)</code>.</p>
+	 * 
+	 * @see java.io.OutputStream#write(int)
+	 * @param single the int to write
+	 * @throws IOException
+	 */	
+	public void write(int single) throws IOException
+	{
+		try
+		{
+			if (mOutputStream != null)
+			{
+				mOutputStream.write(single);
+		
+				if (isNetworkPort())
+				{
+					flushOutput();
+				}
+				fireRXEvent(Integer.toString(single));
 			}
 		}
 		catch (IOException e)
@@ -743,9 +793,12 @@ public class Connection implements Component
 	 */
 	private void fireTXEvent(String message)
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			listener.tx(message);
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				listener.tx(message);
+			}
 		}
 	}
 
@@ -754,9 +807,12 @@ public class Connection implements Component
 	 */
 	private void fireRXEvent(String message)
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			listener.rx(message);
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				listener.rx(message);
+			}
 		}
 	}
 
@@ -765,9 +821,12 @@ public class Connection implements Component
 	 */
 	private void fireErrorEvent(String message)
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			listener.error(message);
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				listener.error(message);
+			}
 		}
 	}
 
@@ -776,12 +835,15 @@ public class Connection implements Component
 	 */
 	private void fireConnectionEvent(String id)
 	{
-		for (ConnectionListener listener : mConnectionListeners)
+		synchronized(mMutex)
 		{
-			if (CONNECTED.equals(id))
-				listener.connected();
-			else
-				listener.disconnected();
+			for (ConnectionListener listener : mConnectionListeners)
+			{
+				if (CONNECTED.equals(id))
+					listener.connected();
+				else
+					listener.disconnected();
+			}
 		}
 	}
 
@@ -845,9 +907,12 @@ public class Connection implements Component
 			}
 			catch (IOException e)
 			{
-				for (ConnectionListener listener : mConnectionListeners)
+				synchronized(mMutex)
 				{
-					listener.error(e.getMessage());
+					for (ConnectionListener listener : mConnectionListeners)
+					{
+						listener.error(e.getMessage());
+					}
 				}
 				ERROR_LOGGER.finest("Connection.openNetworkConnection(): " + e.getMessage());
 				return false;
