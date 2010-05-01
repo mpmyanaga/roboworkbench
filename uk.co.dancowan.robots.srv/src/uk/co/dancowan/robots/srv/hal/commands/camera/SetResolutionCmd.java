@@ -14,6 +14,7 @@
 package uk.co.dancowan.robots.srv.hal.commands.camera;
 
 import uk.co.dancowan.robots.hal.core.commands.SendString;
+import uk.co.dancowan.robots.srv.hal.camera.Camera.Resolution;
 
 /**
  * Command sets the resolution of the camera image.
@@ -23,12 +24,7 @@ import uk.co.dancowan.robots.hal.core.commands.SendString;
  */
 public class SetResolutionCmd extends SendString
 {
-	public static final String TINY = "a";
-	public static final String SMALL = "b";
-	public static final String MEDIUM = "c";
-	public static final String LARGE = "d";
-
-	private final String mResolution;
+	private final Resolution mResolution;
 
 	/**
 	 * C'tor.
@@ -41,10 +37,10 @@ public class SetResolutionCmd extends SendString
 	 * 
 	 * @param resolution the image resolution to send
 	 */
-	public SetResolutionCmd(String resolution)
+	public SetResolutionCmd(Resolution resolution)
 	{
 		// Command is decimal, so translate = true
-		super(resolution, true);
+		super(resolution.getCommand(), true);
 
 		mResolution = resolution;
 	}
@@ -57,6 +53,6 @@ public class SetResolutionCmd extends SendString
 	@Override
 	public String getName()
 	{
-		return mResolution;
+		return mResolution.getCommand();
 	}
 }
