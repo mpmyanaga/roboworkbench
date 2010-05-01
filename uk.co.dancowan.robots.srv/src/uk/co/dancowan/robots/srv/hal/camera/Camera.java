@@ -23,6 +23,8 @@ import uk.co.dancowan.robots.hal.core.Connection;
 import uk.co.dancowan.robots.hal.core.ConnectionListener;
 import uk.co.dancowan.robots.hal.logger.LoggingService;
 import uk.co.dancowan.robots.srv.hal.SrvHal;
+import uk.co.dancowan.robots.srv.hal.commands.camera.SetCompressionCmd;
+import uk.co.dancowan.robots.srv.hal.commands.camera.SetImageProcessingCmd;
 import uk.co.dancowan.robots.srv.hal.commands.camera.SetResolutionCmd;
 import uk.co.dancowan.robots.srv.hal.featuredetector.FeatureDetector;
 
@@ -44,6 +46,8 @@ public class Camera implements ConnectionListener, Component
 	private FrameDecoder mFrameDecoder;
 	private CameraPollThread mPollThread;
 
+	private int mProcessControl;
+
 	//private final List<CameraListener> mListeners;
 
 	/**
@@ -52,6 +56,7 @@ public class Camera implements ConnectionListener, Component
 	public Camera()
 	{
 		//mListeners = new ArrayList<CameraListener>();
+		mProcessControl = 7;
 	}
 
 	/**
@@ -201,17 +206,26 @@ public class Camera implements ConnectionListener, Component
 			return 0.0;
 	}
 
-	/**
-	 * Return the time it takes to process an inbound frame in ms.
-	 * 
-	 * @return long process time in ms
-	 */
-	public long getFrameTime()
+	public void setCompression(int compression)
 	{
-		if (mFrameDecoder != null)
-			return mFrameDecoder.getFrameTime();
-		else
-			return 0;
+		CommandQ cmdQ = SrvHal.getCommandQ();
+		if (cmdQ.shouldRun())
+		{
+			Command cmd = new SetCompressionCmd(compression);
+			cmdQ.addCommand(cmd);
+		}
+	}
+
+
+	public void setProcessControl(ProcessControlEnum mode, boolean state)
+	{
+		mProcessControl += state ? mode.getValue() : -mode.getValue();
+		CommandQ cmdQ = SrvHal.getCommandQ();
+		if (cmdQ.shouldRun())
+		{
+			Command cmd = new SetImageProcessingCmd(mProcessControl);
+			cmdQ.addCommand(cmd);
+		}
 	}
 
 	/**
@@ -221,12 +235,12 @@ public class Camera implements ConnectionListener, Component
 	 * command events so the Command is returned to allow listeners to
 	 * be attached.</P>
 	 */
-	public void setResolution(String size, CommandListener listener)
+	public void setResolution(Resolution resolution, CommandListener listener)
 	{
 		CommandQ cmdQ = SrvHal.getCommandQ();
 		if (cmdQ.shouldRun())
 		{
-			Command cmd = new SetResolutionCmd(size);
+			Command cmd = new SetResolutionCmd(resolution);
 			cmdQ.addCommand(cmd);
 		}
 	}
@@ -361,6 +375,43 @@ public class Camera implements ConnectionListener, Component
 		if (connection != null)
 		{
 			connection.addConnectionListener(this);
+		}
+	}
+
+	public enum ProcessControlEnum
+	{
+		AGC (4),
+		AWB (2),
+		AEC (1);
+	
+		private final int mVal;
+		private ProcessControlEnum(int val)
+		{
+			mVal = val;
+		}
+
+		public int getValue()
+		{
+			return mVal;
+		}
+	}
+
+	public enum Resolution
+	{
+		TINY ("a"),
+		SMALL ("b"),
+		MEDIUM ("c"),
+		LARGE ("d");
+
+		private final String mCommand;
+		private Resolution(String command)
+		{
+			mCommand = command;
+		}
+
+		public String getCommand()
+		{
+			return mCommand;
 		}
 	}
 }
