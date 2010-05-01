@@ -17,6 +17,7 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Frame;
 
+import org.eclipse.jface.action.IToolBarManager;
 import org.eclipse.jface.preference.IPreferenceStore;
 import org.eclipse.jface.preference.PreferenceConverter;
 import org.eclipse.jface.util.IPropertyChangeListener;
@@ -31,8 +32,8 @@ import org.eclipse.swt.widgets.Composite;
 
 import uk.co.dancowan.robots.srv.SRVActivator;
 import uk.co.dancowan.robots.srv.hal.camera.CameraListener;
-import uk.co.dancowan.robots.srv.ui.panels.Panel;
 import uk.co.dancowan.robots.srv.ui.preferences.PreferenceConstants;
+import uk.co.dancowan.robots.ui.views.Panel;
 
 public class CameraPanel implements Panel, IPropertyChangeListener, CameraListener
 {
@@ -41,9 +42,9 @@ public class CameraPanel implements Panel, IPropertyChangeListener, CameraListen
 	private final CameraCanvas mCameraCanvas;
 	private Color mColour;
 
-	public CameraPanel()
+	public CameraPanel(CameraListener listener)
 	{
-		mCameraCanvas = new CameraCanvas(this);	
+		mCameraCanvas = new CameraCanvas(listener);	
 
 		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
 		store.addPropertyChangeListener(this);
@@ -58,8 +59,16 @@ public class CameraPanel implements Panel, IPropertyChangeListener, CameraListen
 	@Override
 	public void dispose()
 	{
-		// TODO Auto-generated method stub
+		IPreferenceStore store = SRVActivator.getDefault().getPreferenceStore();
+		store.removePropertyChangeListener(this);
+	}
 
+	/**
+	 * @see uk.co.dancowan.robots.ui.views.Panel#getDescription()
+	 */
+	public String getDescription()
+	{
+		return "Camera Panel";
 	}
 
 	/**
@@ -95,7 +104,7 @@ public class CameraPanel implements Panel, IPropertyChangeListener, CameraListen
 	public Composite getPanel(Composite parent)
 	{
 		// This SWT Composite embeds the AWT Frame, and Canvas widgets
-		final Composite awtComposite = new Composite(parent, SWT.EMBEDDED);
+		final Composite awtComposite = new Composite(parent, SWT.EMBEDDED | SWT.BORDER);
 		awtComposite.setLayout(new FillLayout());
 		awtComposite.setSize(320, 256);
 		awtComposite.addControlListener(new ControlAdapter()
@@ -116,6 +125,11 @@ public class CameraPanel implements Panel, IPropertyChangeListener, CameraListen
 		awtFrame.setLayout(new BorderLayout(3, 3));
 		awtFrame.add("Center", mCameraCanvas);
 		return awtComposite;
+	}
+
+	public void addToToolBar(IToolBarManager manager)
+	{
+		// NOP
 	}
 
 	/*
