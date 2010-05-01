@@ -73,11 +73,11 @@ public class ConnectionThread extends Thread
 			if (con == null || ! con.checkConnection())
 			{
 				con.notifyDisconnection();
-				LOGGER.finest("Connection thread exited");
+				LOGGER.finest("Connection thread exited due to external failure");
 				return;
 			}
 		}
-		LOGGER.finest("Connection thread exited");
+		LOGGER.finest("Connection thread terminated");
 	}
 
 	/**
