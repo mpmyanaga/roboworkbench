@@ -54,10 +54,6 @@ import uk.co.dancowan.robots.ui.views.ScrolledView;
  * Eclipse <code>View</code> implementation exposes motor drive commands
  * in several aspects.
  * 
- * <p>Command pad also exposes a number of configurable function keys which
- * can be used with atomic commands from the <code>AtomicCommandFactory</code>
- * class.</p>
- * 
  * @author Dan Cowan
  * @since version 1.0.0
  */
